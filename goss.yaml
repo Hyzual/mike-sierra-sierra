@@ -1,0 +1,8 @@
+http:
+  http://localhost:
+    status: 200
+    allow-insecure: false
+    no-follow-redirects: false
+    timeout: 5000
+    body:
+    - Hello world

@@ -1,0 +1,8 @@
+# Ignore dotfiles
+.editorconfig
+.gitignore
+# Ignore markdown
+*.md
+# Ignore test files
+*_test.go
+goss.yaml
