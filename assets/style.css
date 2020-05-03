@@ -1,0 +1,116 @@
+/*
+ *   Copyright (c) 2020 Joris MASSON
+
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+ /* "Framework" */
+
+body {
+    display: flex;
+    min-height: 100vh;
+    margin: 0;
+    --theme-color: rgb(42, 99, 204);
+    --hover-theme-color: rgb(36, 88, 184);
+    --inverse-contrast-color: #ffffff;
+    color: #333333;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.button-primary {
+    cursor: pointer;
+    display: inline-block;
+    overflow: hidden;
+    color: var(--inverse-contrast-color);
+    border-color: var(--theme-color);
+    background: var(--theme-color);
+    text-overflow: ellipsis;
+}
+
+.button-primary:hover {
+    border-color: var(--hover-theme-color);
+    background-color: var(--hover-theme-color);
+}
+
+.form-element-disabled {
+    --disabled-color: #929292;
+    color: var(--disabled-color);
+}
+
+.form-element-disabled > .form-label {
+    color: var(--disabled-color);
+}
+
+.form-element-disabled > .form-input {
+    border-color: var(--disabled-color);
+}
+
+.form-input {
+    height: 46px;
+    padding: 0 16px;
+    font-size: 18px;
+}
+
+.form-label {
+    display: block;
+    margin: 0 0 8px;
+    color: #6b6b6b;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.form-label[for] {
+    cursor: pointer;
+}
+
+/* login form */
+
+.main {
+    flex: 1 0 auto;
+    background-color: #fcfcfc;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-form {
+    padding: 40px;
+    border: 1px solid var(--theme-color, #333333);
+    border-radius: 5px;
+    background: rgb(243, 243, 243);
+}
+
+.login-form-title {
+    color: var(--theme-color, #333333);
+    text-align: center;
+    font-size: 24px;
+}
+
+.login-form-element {
+    margin: 0 0 20px;
+}
+
+.login-form-input {
+    border: 1px solid var(--theme-color, #333333);
+}
+
+.login-form-submit {
+    height: 48px;
+    border-radius: 4px;
+    font-size: 22px;
+    font-weight: 600;
+    width: 100%;
+    text-align: center;
+}

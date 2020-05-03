@@ -18,21 +18,16 @@
 package main
 
 import (
-	"log"
-	"net/http"
-
-	"github.com/hyzual/mike-sierra-sierra/server"
+	"fmt"
+	"os"
 )
 
-func main() {
-	cwd, err := cwd()
+// cwd returns the current working directory of the server
+// This is then used to include templates and serve static assets like CSS and JS files
+func cwd() (string, error) {
+	dir, err := os.Getwd()
 	if err != nil {
-		log.Fatalf("could not read the current working directory %v", err)
+		return "", fmt.Errorf("could not get the current working directory %v", err)
 	}
-
-	server := server.New(cwd)
-	err = http.ListenAndServe(":8080", server)
-	if err != nil {
-		log.Fatalf("could not listen on port 8080 %v", err)
-	}
+	return dir, nil
 }

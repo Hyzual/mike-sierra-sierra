@@ -21,10 +21,18 @@ RUN apk --no-cache add ca-certificates
 
 WORKDIR /app
 
-# Copy only the compiled binary
-COPY --from=builder /app/main .
+# Create a non-root group and user and give the user permissions on /app
+RUN addgroup -S mike && adduser -S mike -G mike \
+  && chown mike:mike /app
 
-EXPOSE 80
+USER mike
+
+# Copy the compiled binary (not the sources)
+COPY --from=builder --chown=mike:mike "/app/main" "/app/"
+# Copy the assets
+COPY --from=builder --chown=mike:mike "/app/assets" "/app/assets"
+
+EXPOSE 8080
 
 CMD ["./main"]
 

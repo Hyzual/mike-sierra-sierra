@@ -18,21 +18,15 @@
 package main
 
 import (
-	"log"
-	"net/http"
-
-	"github.com/hyzual/mike-sierra-sierra/server"
+	"testing"
 )
 
-func main() {
-	cwd, err := cwd()
+func TestCwd(t *testing.T) {
+	got, err := cwd()
 	if err != nil {
-		log.Fatalf("could not read the current working directory %v", err)
+		t.Errorf("did not expect an error, got one %v", err)
 	}
-
-	server := server.New(cwd)
-	err = http.ListenAndServe(":8080", server)
-	if err != nil {
-		log.Fatalf("could not listen on port 8080 %v", err)
+	if got == "" {
+		t.Errorf("did not expect an empty string, got one")
 	}
 }

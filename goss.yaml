@@ -1,5 +1,31 @@
+file:
+  /app/main:
+    exists: true
+    mode: "0755"
+    owner: mike
+    group: mike
+    filetype: file
+  /app/assets:
+    exists: true
+    mode: "0755"
+    owner: mike
+    group: mike
+    filetype: directory
+user:
+  mike:
+    exists: true
+    uid: 100
+    gid: 101
+    groups:
+    - mike
+    home: /home/mike
+    shell: /sbin/nologin
+group:
+  mike:
+    exists: true
+    gid: 101
 http:
-  http://localhost:
+  http://localhost:8080/:
     status: 200
     allow-insecure: false
     no-follow-redirects: false
