@@ -28,7 +28,7 @@ import (
 )
 
 func TestGetRoot(t *testing.T) {
-	musicServer := buildMusicServerWithCorrectRootDir()
+	musicServer := buildMusicServer()
 
 	t.Run("/ redirects to /home", func(t *testing.T) {
 		request := newGetRequest(t, "/")
@@ -49,7 +49,7 @@ func TestGetRoot(t *testing.T) {
 }
 
 func TestGetHome(t *testing.T) {
-	musicServer := buildMusicServerWithCorrectRootDir()
+	musicServer := buildMusicServer()
 	request := newGetRequest(t, "/home")
 	response := httptest.NewRecorder()
 
@@ -59,7 +59,7 @@ func TestGetHome(t *testing.T) {
 }
 
 func TestGetAssets(t *testing.T) {
-	musicServer := buildMusicServerWithCorrectRootDir()
+	musicServer := buildMusicServer()
 
 	t.Run("returns OK for a path leading to a file", func(t *testing.T) {
 		request := newGetRequest(t, "/assets/style.css")
@@ -70,30 +70,25 @@ func TestGetAssets(t *testing.T) {
 		assertStatusEquals(t, response.Code, http.StatusOK)
 	})
 
-	t.Run("forbids listing directories", func(t *testing.T) {
+	t.Run("returns NotFound for a path leading to /assets directory", func(t *testing.T) {
 		request := newGetRequest(t, "/assets/")
 		response := httptest.NewRecorder()
 
 		musicServer.ServeHTTP(response, request)
 
-		assertStatusEquals(t, response.Code, http.StatusForbidden)
+		assertStatusEquals(t, response.Code, http.StatusNotFound)
 	})
 }
 
-func TestGetLogin(t *testing.T) {
-	musicServer := buildMusicServerWithCorrectRootDir()
-	request, _ := http.NewRequest(http.MethodGet, "/login", nil)
-	response := httptest.NewRecorder()
-
-	musicServer.ServeHTTP(response, request)
-
-	assertStatusEquals(t, response.Code, http.StatusOK)
+func buildMusicServer() *server.MusicServer {
+	pathJoiner := newTestPathJoiner()
+	return server.New(pathJoiner, nil)
 }
 
-func buildMusicServerWithCorrectRootDir() *server.MusicServer {
+func newTestPathJoiner() server.PathJoiner {
 	wd, _ := os.Getwd() // will be <projectRoot>/server
 	rootDir := filepath.Join(wd, "..")
-	return server.New(rootDir)
+	return server.NewRootPathJoiner(rootDir)
 }
 
 func newGetRequest(t *testing.T, url string) *http.Request {

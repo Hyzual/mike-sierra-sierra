@@ -15,20 +15,30 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package main
+package server_test
 
 import (
-	"os"
+	"testing"
 
-	"github.com/pkg/errors"
+	"github.com/hyzual/mike-sierra-sierra/server"
 )
 
-// cwd returns the current working directory of the server
-// This is then used to include templates and serve static assets like CSS and JS files
-func cwd() (string, error) {
-	dir, err := os.Getwd()
-	if err != nil {
-		return "", errors.Wrap(err, "Could not get the current working directory")
+func TestRootPathJoiner(t *testing.T) {
+	rootDir := "/path/to/app"
+	joiner := server.NewRootPathJoiner(rootDir)
+
+	t.Run("it joins relative paths to baseDir to form absolute paths", func(t *testing.T) {
+		assertPathEquals(t, joiner.Join("./templates/login.html"), "/path/to/app/templates/login.html")
+	})
+
+	t.Run("it joins relative paths that ascend the hierarchy", func(t *testing.T) {
+		assertPathEquals(t, joiner.Join("../assets/style.css"), "/path/to/assets/style.css")
+	})
+}
+
+func assertPathEquals(t *testing.T, got, want string) {
+	t.Helper()
+	if got != want {
+		t.Errorf("joined path %s does not equal %s", got, want)
 	}
-	return dir, nil
 }

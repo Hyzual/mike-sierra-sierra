@@ -9,8 +9,8 @@
         <main class="main" role="main">
             <div class="login-form">
                 <h2 class="login-form-title">Please login:</h2>
-                <form>
-                    <div class="login-form-element form-element-disabled">
+                <form method="POST" action="/login">
+                    <div class="login-form-element">
                         <label class="form-label" for="email">Email:</label>
                         <input
                             class="form-input login-form-input"
@@ -20,10 +20,9 @@
                             placeholder="Email"
                             autocomplete="email"
                             tabindex="1"
-                            disabled
                         />
                     </div>
-                    <div class="login-form-element form-element-disabled">
+                    <div class="login-form-element">
                         <label class="form-label" for="password"
                             >Password:</label
                         >
@@ -35,7 +34,6 @@
                             placeholder="Password"
                             autocomplete="current-password"
                             tabindex="2"
-                            disabled
                         />
                     </div>
 

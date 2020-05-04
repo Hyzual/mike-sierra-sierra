@@ -18,10 +18,13 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/hyzual/mike-sierra-sierra/server"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func main() {
@@ -29,8 +32,24 @@ func main() {
 	if err != nil {
 		log.Fatalf("could not read the current working directory %v", err)
 	}
+	db, err := sql.Open("sqlite3", "file:database/file/mike.db?mode=rwc&cache=shared")
+	if err != nil {
+		log.Fatalf("could not connect to the database %v", err)
+	}
+	oneHour, err := time.ParseDuration("1h")
+	if err != nil {
+		log.Fatalf("Badly formatted duration for DB connection lifetime %v", err)
+	}
+	db.SetConnMaxLifetime(oneHour)
+	// err = db.Ping()
+	// if err != nil {
+	// 	log.Fatalf("could not ping the database %v", err)
+	// }
 
-	server := server.New(cwd)
+	userStore := server.NewUserDao(db)
+	pathJoiner := server.NewRootPathJoiner(cwd)
+	loginHandler := server.NewLoginHandler(pathJoiner, userStore)
+	server := server.New(pathJoiner, loginHandler)
 	err = http.ListenAndServe(":8080", server)
 	if err != nil {
 		log.Fatalf("could not listen on port 8080 %v", err)

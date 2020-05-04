@@ -1,3 +1,8 @@
+# Ignore IDE folders
 .vscode/
+# Ignore node_modules
 node_modules/
+# Ignore test artifacts
 coverage.html
+# Ignore database file
+database/file/mike.db

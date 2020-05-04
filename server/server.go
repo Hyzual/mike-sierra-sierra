@@ -23,28 +23,28 @@ package server
 
 import (
 	"fmt"
-	"html/template"
 	"net/http"
 	"path"
-	"path/filepath"
 )
 
 // MusicServer serves HTTP requests.
 // It serves the HTML pages, the REST routes and the media files as well.
 type MusicServer struct {
-	rootDirectory string //Project root directory from which to load templates and assets as a relative path
+	pathJoiner   PathJoiner
+	loginHandler *LoginHandler
 	http.Handler
 }
 
 // New creates a new MusicServer
-func New(rootDirectory string) *MusicServer {
+func New(pathJoiner PathJoiner, loginHandler *LoginHandler) *MusicServer {
 	s := new(MusicServer)
-	s.rootDirectory = rootDirectory
+	s.pathJoiner = pathJoiner
+	s.loginHandler = loginHandler
 
 	router := http.NewServeMux()
 	router.Handle("/", http.HandlerFunc(s.rootHandler))
 	router.Handle("/home", http.HandlerFunc(s.homeHandler))
-	router.Handle("/login", http.HandlerFunc(s.loginHandler))
+	router.Handle("/login", s.loginHandler)
 	router.Handle("/assets/", http.HandlerFunc(s.assetsHandler))
 
 	s.Handler = router
@@ -63,27 +63,12 @@ func (s *MusicServer) homeHandler(writer http.ResponseWriter, request *http.Requ
 	fmt.Fprint(writer, "Hello world")
 }
 
-func (s *MusicServer) loginHandler(writer http.ResponseWriter, request *http.Request) {
-	tmpl, err := template.ParseFiles(filepath.Join(s.rootDirectory, "./templates/login.html"))
-
-	if err != nil {
-		http.Error(writer, fmt.Sprintf("problem loading template %s", err.Error()), http.StatusInternalServerError)
-		return
-	}
-	err = tmpl.Execute(writer, nil)
-	if err != nil {
-		http.Error(writer, fmt.Sprintf("problem executing template %s", err.Error()), http.StatusInternalServerError)
-	}
-}
-
 func (s *MusicServer) assetsHandler(writer http.ResponseWriter, request *http.Request) {
 	cleanedPath := path.Clean(request.URL.Path)
 	if cleanedPath == "/assets" {
-		http.Error(writer, "Forbidden", http.StatusForbidden)
+		http.NotFound(writer, request)
 		return
 	}
 
-	joinedPath := path.Join(s.rootDirectory, cleanedPath)
-
-	http.ServeFile(writer, request, joinedPath)
+	http.ServeFile(writer, request, s.pathJoiner.Join(cleanedPath))
 }

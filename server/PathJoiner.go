@@ -15,20 +15,26 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package main
+package server
 
-import (
-	"os"
+import "path/filepath"
 
-	"github.com/pkg/errors"
-)
+//PathJoiner joins filesystem paths to its base path
+type PathJoiner interface {
+	Join(string) string
+}
 
-// cwd returns the current working directory of the server
-// This is then used to include templates and serve static assets like CSS and JS files
-func cwd() (string, error) {
-	dir, err := os.Getwd()
-	if err != nil {
-		return "", errors.Wrap(err, "Could not get the current working directory")
-	}
-	return dir, nil
+//NewRootPathJoiner returns a new RootPathJoiner
+func NewRootPathJoiner(rootDirectoryPath string) PathJoiner {
+	return &RootPathJoiner{rootDirectoryPath}
+}
+
+//RootPathJoiner implements PathJoiner with its base path set to the project's root
+type RootPathJoiner struct {
+	rootDirectoryPath string //Project root directory from which to load templates and assets as a relative path
+}
+
+//Join the given path to the project's root directory
+func (r *RootPathJoiner) Join(path string) string {
+	return filepath.Join(r.rootDirectoryPath, path)
 }

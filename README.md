@@ -22,6 +22,12 @@ $ make lint
 $ make coverhtml
 ```
 
+#### Database
+
+Mike-sierra-sierra uses [SQLite](https://www.sqlite.org) to persist data.
+The database file is located at ./database/file/mike.db
+If it does not exist (it is gitignored), the server will create it on first run.
+
 #### Build the production Docker image
 
 ```sh

@@ -13,3 +13,5 @@ node_modules/
 **/*_test.go
 goss.yaml
 coverage.html
+# Ignore dev database file
+database/file/

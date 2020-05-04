@@ -1,11 +1,23 @@
 file:
+  /app/assets:
+    exists: true
+    mode: "0755"
+    owner: mike
+    group: mike
+    filetype: directory
+  /app/database/file:
+    exists: true
+    mode: "0755"
+    owner: root
+    group: root
+    filetype: directory
   /app/main:
     exists: true
     mode: "0755"
     owner: mike
     group: mike
     filetype: file
-  /app/assets:
+  /app/templates:
     exists: true
     mode: "0755"
     owner: mike

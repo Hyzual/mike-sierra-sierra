@@ -54,9 +54,14 @@ clean-dev-container:
 	docker container stop mike > /dev/null \
 	&& docker container rm mike > /dev/null
 
+# Bind-mount the $GOPATH/pkg folder so that the container does not re-download packages all the time
 start: clean-dev-container ## Build and run the dev docker container.
 	@docker build --file ./tools/docker-dev/Dockerfile.dev --tag hyzual/mike-sierra-sierra:dev ./tools/docker-dev \
-	&& docker run --detach --publish 8080:8080 --name mike --mount type=bind,source=`pwd`,destination=/app,readonly=1 hyzual/mike-sierra-sierra:dev
+	&& docker run --detach --publish 8080:8080 --name mike \
+		--mount type=bind,source=`pwd`,destination=/app,readonly \
+		--mount type=bind,source=`pwd`/database/file,destination=/app/database/file \
+		--mount type=bind,source=$$GOPATH/pkg,destination=/go/pkg,readonly \
+		hyzual/mike-sierra-sierra:dev
 	@echo "Go to http://localhost:8080"
 
 help: ## Display this help screen

@@ -1,12 +1,12 @@
 FROM golang:1.14.2-alpine3.11
-# Add git, needed for go get
-RUN apk --no-cache add git \
+# git is needed for go get. gcc and musl-dev are needed for go-sqlite3 (cgo)
+RUN apk --no-cache add git gcc musl-dev \
   && go get github.com/cespare/reflex
 
 COPY reflex.conf /
 
-# App sources volume
-VOLUME ["/app"]
+# App sources, Database
+VOLUME ["/app", "/app/database/file"]
 
 WORKDIR /app
 

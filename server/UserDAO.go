@@ -15,20 +15,39 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package main
+package server
 
 import (
-	"os"
+	"database/sql"
 
 	"github.com/pkg/errors"
 )
 
-// cwd returns the current working directory of the server
-// This is then used to include templates and serve static assets like CSS and JS files
-func cwd() (string, error) {
-	dir, err := os.Getwd()
-	if err != nil {
-		return "", errors.Wrap(err, "Could not get the current working directory")
+// UserStore handles database operations linked to Users
+type UserStore interface {
+	VerifyCredentialsMatch(credentials LoginFormRepresentation) error
+}
+
+type UserDAO struct {
+	db *sql.DB
+}
+
+func NewUserDao(db *sql.DB) UserStore {
+	return &UserDAO{db}
+}
+
+func (u *UserDAO) VerifyCredentialsMatch(credentials LoginFormRepresentation) error {
+	row := u.db.QueryRow(`SELECT * FROM user
+		WHERE user.email = ? AND user.password = ?`, credentials.Email, credentials.Password)
+
+	var (
+		id       uint64
+		email    string
+		password string
+	)
+	if err := row.Scan(&id, &email, &password); err != nil {
+		return errors.Wrap(err, "Could not retrieve the user by its credentials")
 	}
-	return dir, nil
+
+	return nil
 }
