@@ -4,18 +4,22 @@ More soon!
 
 ### Contributing
 
+#### Start the dev Docker container
+
+```sh
+$ make start
+# Then, access http://localhost:8080
+```
+
 #### Go commands
 
 ```sh
-$ make build
-# Start the server
-$ make start
-# Remove the binary
-$ make clean
 # Run unit tests
 $ make test
 # Run golint
 $ make lint
+# Generate html test coverage
+$ make coverhtml
 ```
 
 #### Build the production Docker image
@@ -33,7 +37,7 @@ $ make dgoss-ci
 # It will run the container with goss and goss.yaml inside
 $ dgoss edit --user=$(id -u) hyzual/mike-sierra-sierra
 # Once in the container, you can run goss commands
-container$ goss autoadd
+[container]$ goss autoadd
 ```
 
 #### Run stylelint

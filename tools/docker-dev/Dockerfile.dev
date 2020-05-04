@@ -1,0 +1,16 @@
+FROM golang:1.14.2-alpine3.11
+# Add git, needed for go get
+RUN apk --no-cache add git \
+  && go get github.com/cespare/reflex
+
+COPY reflex.conf /
+
+# App sources volume
+VOLUME ["/app"]
+
+WORKDIR /app
+
+EXPOSE 8080
+
+# Watch for changes, rebuild and rerun the server
+ENTRYPOINT ["reflex", "-c", "/reflex.conf"]

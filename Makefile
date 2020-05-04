@@ -1,12 +1,11 @@
 # FROM https://gitlab.com/pantomath-io/demo-tools/-/blob/master/Makefile
 PROJECT_NAME := "mike-sierra-sierra"
 PKG := "github.com/hyzual/$(PROJECT_NAME)"
-PROJECT_EXEC_NAME := "mike"
 PKG_LIST := $(shell go list ${PKG}/... | grep -v /vendor/)
-GO_FILES := $(shell find . -name '*.go' | grep -v /vendor/ | grep -v _test.go)
 
-.PHONY: all dep build clean test coverage coverhtml lint start npm-dep \
-stylelint-ci prettier-ci
+.PHONY: all dep build clean test coverage lint start
+
+.SILENT: clean-dev-container
 
 all: build
 
@@ -20,7 +19,7 @@ race: ## Run data race detector
 	@go test -race -short ${PKG_LIST}
 
 # test -z returns code 1 when its argument is not empty. gofmt -l returns the files that are not well-formatted
-goformat: ## Test whether the Go code is well-formatted
+goformat-ci: ## Test whether the Go code is well-formatted
 	@test -z $$(gofmt -l .)
 
 coverage: ## Generate global code coverage report
@@ -28,6 +27,9 @@ coverage: ## Generate global code coverage report
 
 coverhtml: ## Generate global code coverage report in HTML
 	./tools/coverage.sh html;
+
+build-ci: ## Check that the Go code can be compiled
+	go build -v ${PKG_LIST}
 
 dep: ## Get the Go dependencies
 	go mod download
@@ -47,14 +49,15 @@ build-docker-image: ## Builds the production Docker image
 dgoss-ci: ## Run goss tests on the production Docker image
 	dgoss run hyzual/mike-sierra-sierra:latest
 
-build: ## Build the binary file
-	@go build -i -v -o $(PROJECT_EXEC_NAME) $(PKG)
+# Pipe to /dev/null because we don't care if the container did not exist
+clean-dev-container:
+	docker container stop mike > /dev/null \
+	&& docker container rm mike > /dev/null
 
-clean: ## Remove previous build
-	@rm -f $(PROJECT_EXEC_NAME)
-
-start: build ## Run the built executable
-	./$(PROJECT_EXEC_NAME)
+start: clean-dev-container ## Build and run the dev docker container.
+	@docker build --file ./tools/docker-dev/Dockerfile.dev --tag hyzual/mike-sierra-sierra:dev ./tools/docker-dev \
+	&& docker run --detach --publish 8080:8080 --name mike --mount type=bind,source=`pwd`,destination=/app,readonly=1 hyzual/mike-sierra-sierra:dev
+	@echo "Go to http://localhost:8080"
 
 help: ## Display this help screen
 	@grep -h -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

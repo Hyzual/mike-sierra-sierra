@@ -36,10 +36,10 @@ jobs:
     # Build and test Go code
 
     - name: Build
-      run: make build
+      run: make build-ci
 
     - name: Test coverage
-      run: make coverhtml
+      run: make coverage
 
     - name: Test race conditions
       run: make race
@@ -50,7 +50,7 @@ jobs:
       uses: Jerome1337/golint-action@v1.0.1
 
     - name: Go format
-      run: make goformat
+      run: make goformat-ci
 
     - name: Stylelint
       run: make stylelint-ci
