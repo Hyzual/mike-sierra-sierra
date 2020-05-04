@@ -1,0 +1,27 @@
+{
+  "name": "mike-sierra-sierra",
+  "version": "0.1.0",
+  "author": "Joris MASSON",
+  "description": "Music streaming server",
+  "license": "GPL-3.0-or-later",
+  "private": true,
+  "homepage": "https://github.com/Hyzual/mike-sierra-sierra#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hyzual/mike-sierra-sierra.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Hyzual/mike-sierra-sierra/issues"
+  },
+  "devDependencies": {
+    "prettier": "^2.0.5",
+    "stylelint": "^13.3.3",
+    "stylelint-config-property-sort-order-smacss": "^6.0.0",
+    "stylelint-config-standard": "^20.0.0",
+    "stylelint-prettier": "^1.1.2"
+  },
+  "scripts": {
+    "stylelint": "stylelint --config ./.stylelintrc.js",
+    "prettier": "prettier --config ./.prettierrc"
+  }
+}

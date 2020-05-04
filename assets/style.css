@@ -15,27 +15,29 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
- /* "Framework" */
+/* "Framework" */
 
 body {
     display: flex;
     min-height: 100vh;
     margin: 0;
+
     --theme-color: rgb(42, 99, 204);
     --hover-theme-color: rgb(36, 88, 184);
-    --inverse-contrast-color: #ffffff;
-    color: #333333;
+    --inverse-contrast-color: #fff;
+
+    color: #333;
     font-family: Arial, Helvetica, sans-serif;
 }
 
 .button-primary {
-    cursor: pointer;
     display: inline-block;
     overflow: hidden;
-    color: var(--inverse-contrast-color);
     border-color: var(--theme-color);
     background: var(--theme-color);
+    color: var(--inverse-contrast-color);
     text-overflow: ellipsis;
+    cursor: pointer;
 }
 
 .button-primary:hover {
@@ -45,21 +47,8 @@ body {
 
 .form-element-disabled {
     --disabled-color: #929292;
+
     color: var(--disabled-color);
-}
-
-.form-element-disabled > .form-label {
-    color: var(--disabled-color);
-}
-
-.form-element-disabled > .form-input {
-    border-color: var(--disabled-color);
-}
-
-.form-input {
-    height: 46px;
-    padding: 0 16px;
-    font-size: 18px;
 }
 
 .form-label {
@@ -74,28 +63,42 @@ body {
     cursor: pointer;
 }
 
+.form-input {
+    height: 46px;
+    padding: 0 16px;
+    font-size: 18px;
+}
+
+.form-element-disabled > .form-label {
+    color: var(--disabled-color);
+}
+
+.form-element-disabled > .form-input {
+    border-color: var(--disabled-color);
+}
+
 /* login form */
 
 .main {
-    flex: 1 0 auto;
-    background-color: #fcfcfc;
     display: flex;
+    flex: 1 0 auto;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    background-color: #fcfcfc;
 }
 
 .login-form {
     padding: 40px;
-    border: 1px solid var(--theme-color, #333333);
+    border: 1px solid var(--theme-color, #333);
     border-radius: 5px;
     background: rgb(243, 243, 243);
 }
 
 .login-form-title {
-    color: var(--theme-color, #333333);
-    text-align: center;
+    color: var(--theme-color, #333);
     font-size: 24px;
+    text-align: center;
 }
 
 .login-form-element {
@@ -103,14 +106,14 @@ body {
 }
 
 .login-form-input {
-    border: 1px solid var(--theme-color, #333333);
+    border: 1px solid var(--theme-color, #333);
 }
 
 .login-form-submit {
+    width: 100%;
     height: 48px;
     border-radius: 4px;
     font-size: 22px;
     font-weight: 600;
-    width: 100%;
     text-align: center;
 }

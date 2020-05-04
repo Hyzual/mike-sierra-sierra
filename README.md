@@ -21,3 +21,18 @@ $ dgoss edit --user=$(id -u) hyzual/mike-sierra-sierra
 # Once in the container, you can run goss commands
 container$ goss autoadd
 ```
+
+#### Run stylelint
+
+```sh
+npm run stylelint ./assets
+# To automatically fix problems
+npm run stylelint -- --fix ./assets
+```
+
+#### Run prettier
+
+```sh
+# To automatically format HTML templates and CSS assets
+npm run prettier -- --write ./templates ./assets
+```

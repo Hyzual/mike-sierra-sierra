@@ -1,4 +1,4 @@
-name: Go pipeline
+name: CI pipeline
 
 on:
   push:
@@ -7,9 +7,8 @@ on:
     branches: [ master ]
 
 jobs:
-
   build:
-    name: Go pipeline
+    name: Build and test Go code
     runs-on: ubuntu-latest
     steps:
 
@@ -34,16 +33,26 @@ jobs:
     - name: Test race conditions
       run: go test -race -v ./...
 
-    - name: Go vet
-      run: go vet -v ./...
-
-    - name: Go lint
-      uses: Jerome1337/golint-action@v1.0.1
-
-    # test -z returns code 1 when its argument is not empty. gofmt -l returns the files that are not well-formatted
-    - name: Go format
-      run: test -z $(gofmt -l .)
-
     # Publish coverage to the build log
     - name: Publish coverage
       run: go tool cover -func=count.out
+
+  style:
+    name: Coding style conformity and static analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Go lint
+        uses: Jerome1337/golint-action@v1.0.1
+
+      # test -z returns code 1 when its argument is not empty. gofmt -l returns the files that are not well-formatted
+      - name: Go format
+        run: test -z $(gofmt -l .)
+
+      - name: Go vet
+        run: go vet -v ./...
+
+      - name: Stylelint
+        run: npm run stylelint ./assets
+
+      - name: Prettier for HTML
+        run: npm run prettier -- --list-different ./templates

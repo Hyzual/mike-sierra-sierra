@@ -18,5 +18,5 @@ trim_trailing_whitespace = false
 [*.{yml,yaml}]
 indent_size = 2
 
-[Dockerfile]
+[{Dockerfile,package.json}]
 indent_size = 2
