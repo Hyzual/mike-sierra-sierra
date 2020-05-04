@@ -1,11 +1,9 @@
 name: CI pipeline
-
 on:
   push:
     branches-ignore: [ master ]
   pull_request:
     branches: [ master ]
-
 jobs:
   build:
     name: Build and test Go code
@@ -18,11 +16,19 @@ jobs:
         go-version: ^1.14
       id: go
 
-    - name: Check out code into the Go module directory
+    - name: Install goss and dgoss
+      uses: e1himself/goss-installation-action@v1
+      with:
+        # Goss release version to install
+        version: 'v0.3.10'
+
+    - name: Check out the code into the Go module directory
       uses: actions/checkout@v2.1.0
 
     - name: Get dependencies
       run: go mod download
+
+    # Build and test Go code
 
     - name: Build
       run: go build -v .
@@ -33,26 +39,32 @@ jobs:
     - name: Test race conditions
       run: go test -race -v ./...
 
-    # Publish coverage to the build log
+    # Static analysis and conformity to coding style
+
+    - name: Go vet
+      run: go vet -v ./...
+
+    - name: Go lint
+      uses: Jerome1337/golint-action@v1.0.1
+
+    - name: Go format
+      run: test -z $(gofmt -l .) # test -z returns code 1 when its argument is not empty. gofmt -l returns the files that are not well-formatted
+
+    - name: Stylelint
+      run: npm run stylelint ./assets
+
+    - name: Prettier for HTML
+      run: npm run prettier -- --list-different ./templates
+
+    # Test the docker image
+
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag hyzual/mike-sierra-sierra:latest
+
+    - name: Run goss tests
+      run: dgoss run hyzual/mike-sierra-sierra:latest
+
+    # Publish test coverage to the build log
+
     - name: Publish coverage
       run: go tool cover -func=count.out
-
-  style:
-    name: Coding style conformity and static analysis
-    runs-on: ubuntu-latest
-    steps:
-      - name: Go lint
-        uses: Jerome1337/golint-action@v1.0.1
-
-      # test -z returns code 1 when its argument is not empty. gofmt -l returns the files that are not well-formatted
-      - name: Go format
-        run: test -z $(gofmt -l .)
-
-      - name: Go vet
-        run: go vet -v ./...
-
-      - name: Stylelint
-        run: npm run stylelint ./assets
-
-      - name: Prettier for HTML
-        run: npm run prettier -- --list-different ./templates
