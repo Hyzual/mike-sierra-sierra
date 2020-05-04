@@ -1,8 +1,15 @@
 # Ignore dotfiles
 .editorconfig
 .gitignore
+.prettierrc
+.stylelintrc.js
+# Ignore build stuff
+Makefile
+# Ignore node_modules
+node_modules/
 # Ignore markdown
 *.md
 # Ignore test files
-*_test.go
+**/*_test.go
 goss.yaml
+coverage.html

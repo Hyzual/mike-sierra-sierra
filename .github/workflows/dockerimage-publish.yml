@@ -17,10 +17,10 @@ jobs:
         uses: actions/checkout@v2.1.0
 
       - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag hyzual/mike-sierra-sierra:latest
+        run: make build-docker-image
 
       - name: Run goss tests
-        run: dgoss run hyzual/mike-sierra-sierra:latest
+        run: make dgoss-ci
 
       - name: Push the Docker image to Docker Hub
         uses: elgohr/Publish-Docker-Github-Action@master
