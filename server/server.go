@@ -25,6 +25,8 @@ import (
 	"fmt"
 	"net/http"
 	"path"
+
+	"github.com/gorilla/mux"
 )
 
 // MusicServer serves HTTP requests.
@@ -41,11 +43,12 @@ func New(pathJoiner PathJoiner, loginHandler *LoginHandler) *MusicServer {
 	s.pathJoiner = pathJoiner
 	s.loginHandler = loginHandler
 
-	router := http.NewServeMux()
-	router.Handle("/", http.HandlerFunc(s.rootHandler))
-	router.Handle("/home", http.HandlerFunc(s.homeHandler))
-	router.Handle("/login", s.loginHandler)
-	router.Handle("/assets/", http.HandlerFunc(s.assetsHandler))
+	router := mux.NewRouter()
+	router.HandleFunc("/", s.rootHandler)
+	router.HandleFunc("/home", s.homeHandler)
+	router.HandleFunc("/login", s.loginHandler.GetHandler).Methods(http.MethodGet)
+	router.HandleFunc("/login", s.loginHandler.PostHandler).Methods(http.MethodPost)
+	router.PathPrefix("/assets/").HandlerFunc(s.assetsHandler)
 
 	s.Handler = router
 	return s

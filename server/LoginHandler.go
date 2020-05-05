@@ -38,21 +38,8 @@ func NewLoginHandler(pathJoiner PathJoiner, userStore UserStore) *LoginHandler {
 	return &LoginHandler{pathJoiner, userStore}
 }
 
-func (l *LoginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	if request.Method == http.MethodGet {
-		l.loginGetHandler(writer, request)
-		return
-	}
-
-	if request.Method == http.MethodPost {
-		l.loginPostHandler(writer, request)
-		return
-	}
-
-	http.NotFound(writer, request)
-}
-
-func (l *LoginHandler) loginGetHandler(writer http.ResponseWriter, request *http.Request) {
+// GetHandler handles GET /login route
+func (l *LoginHandler) GetHandler(writer http.ResponseWriter, request *http.Request) {
 	tmpl, err := template.ParseFiles(l.pathJoiner.Join("./templates/login.html"))
 
 	if err != nil {
@@ -65,7 +52,8 @@ func (l *LoginHandler) loginGetHandler(writer http.ResponseWriter, request *http
 	}
 }
 
-func (l *LoginHandler) loginPostHandler(writer http.ResponseWriter, request *http.Request) {
+// PostHandler handles POST /login route
+func (l *LoginHandler) PostHandler(writer http.ResponseWriter, request *http.Request) {
 	decoder := schema.NewDecoder()
 	err := request.ParseForm()
 	if err != nil {

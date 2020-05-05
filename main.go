@@ -36,11 +36,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("could not connect to the database %v", err)
 	}
-	oneHour, err := time.ParseDuration("1h")
-	if err != nil {
-		log.Fatalf("Badly formatted duration for DB connection lifetime %v", err)
-	}
-	db.SetConnMaxLifetime(oneHour)
+	db.SetConnMaxLifetime(1 * time.Hour)
 	// err = db.Ping()
 	// if err != nil {
 	// 	log.Fatalf("could not ping the database %v", err)
@@ -49,8 +45,15 @@ func main() {
 	userStore := server.NewUserDao(db)
 	pathJoiner := server.NewRootPathJoiner(cwd)
 	loginHandler := server.NewLoginHandler(pathJoiner, userStore)
-	server := server.New(pathJoiner, loginHandler)
-	err = http.ListenAndServe(":8080", server)
+	router := server.New(pathJoiner, loginHandler)
+
+	srv := &http.Server{
+		Handler:      router,
+		Addr:         ":8080",
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+	}
+	err = srv.ListenAndServe()
 	if err != nil {
 		log.Fatalf("could not listen on port 8080 %v", err)
 	}

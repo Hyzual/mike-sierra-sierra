@@ -28,68 +28,66 @@ import (
 	"github.com/hyzual/mike-sierra-sierra/server"
 )
 
-func TestLogin(t *testing.T) {
-	t.Run("it handles GET /login", func(t *testing.T) {
-		handler := buildLoginHandler(nil)
-		request := newGetRequest(t, "/login")
+func TestGetLogin(t *testing.T) {
+	handler := buildLoginHandler(nil)
+	request := newGetRequest(t, "/login")
+	response := httptest.NewRecorder()
+
+	handler.GetHandler(response, request)
+
+	assertStatusEquals(t, response.Code, http.StatusOK)
+}
+
+func TestPostLogin(t *testing.T) {
+	userDAO := StubUserDAO{false}
+	handler := buildLoginHandler(&userDAO)
+
+	t.Run("when no request body is provided, it will return Bad Request", func(t *testing.T) {
+		request, _ := http.NewRequest(http.MethodPost, "/login", nil)
 		response := httptest.NewRecorder()
 
-		handler.ServeHTTP(response, request)
+		handler.PostHandler(response, request)
 
-		assertStatusEquals(t, response.Code, http.StatusOK)
+		assertStatusEquals(t, response.Code, http.StatusBadRequest)
 	})
 
-	t.Run("it handles POST /login", func(t *testing.T) {
-		userDAO := StubUserDAO{false}
-		handler := buildLoginHandler(&userDAO)
+	t.Run("when no email is provided, it will return Bad Request", func(t *testing.T) {
+		request := newPostLoginRequest(t, strings.NewReader("password=welcome0"))
+		response := httptest.NewRecorder()
 
-		t.Run("when no request body is provided, it will return Bad Request", func(t *testing.T) {
-			request, _ := http.NewRequest(http.MethodPost, "/login", nil)
-			response := httptest.NewRecorder()
+		handler.PostHandler(response, request)
 
-			handler.ServeHTTP(response, request)
+		assertStatusEquals(t, response.Code, http.StatusBadRequest)
+	})
 
-			assertStatusEquals(t, response.Code, http.StatusBadRequest)
-		})
+	t.Run("when no password is provided, it will return Bad Request", func(t *testing.T) {
+		request := newPostLoginRequest(t, strings.NewReader("email=mike@example.com"))
+		response := httptest.NewRecorder()
 
-		t.Run("when no email is provided, it will return Bad Request", func(t *testing.T) {
-			request := newPostLoginRequest(t, strings.NewReader("password=welcome0"))
-			response := httptest.NewRecorder()
+		handler.PostHandler(response, request)
 
-			handler.ServeHTTP(response, request)
+		assertStatusEquals(t, response.Code, http.StatusBadRequest)
+	})
 
-			assertStatusEquals(t, response.Code, http.StatusBadRequest)
-		})
+	t.Run("when credentials don't match those from the store, it will return Forbidden", func(t *testing.T) {
+		request := newPostLoginRequest(t, strings.NewReader("email=wrong.user@example.com&password=wrong_password"))
+		response := httptest.NewRecorder()
 
-		t.Run("when no password is provided, it will return Bad Request", func(t *testing.T) {
-			request := newPostLoginRequest(t, strings.NewReader("email=mike@example.com"))
-			response := httptest.NewRecorder()
+		handler.PostHandler(response, request)
 
-			handler.ServeHTTP(response, request)
+		assertStatusEquals(t, response.Code, http.StatusForbidden)
+	})
 
-			assertStatusEquals(t, response.Code, http.StatusBadRequest)
-		})
+	t.Run("when successful, POST /login will redirect to /home", func(t *testing.T) {
+		userDAO = StubUserDAO{true}
+		handler = buildLoginHandler(&userDAO)
+		request := newPostLoginRequest(t, strings.NewReader("email=mike@example.com&password=welcome0"))
+		response := httptest.NewRecorder()
 
-		t.Run("when credentials don't match those from the store, it will return Forbidden", func(t *testing.T) {
-			request := newPostLoginRequest(t, strings.NewReader("email=wrong.user@example.com&password=wrong_password"))
-			response := httptest.NewRecorder()
+		handler.PostHandler(response, request)
 
-			handler.ServeHTTP(response, request)
-
-			assertStatusEquals(t, response.Code, http.StatusForbidden)
-		})
-
-		t.Run("when successful, POST /login will redirect to /home", func(t *testing.T) {
-			userDAO = StubUserDAO{true}
-			handler = buildLoginHandler(&userDAO)
-			request := newPostLoginRequest(t, strings.NewReader("email=mike@example.com&password=welcome0"))
-			response := httptest.NewRecorder()
-
-			handler.ServeHTTP(response, request)
-
-			assertStatusEquals(t, response.Code, http.StatusFound)
-			assertLocationHeaderEquals(t, response, "/home")
-		})
+		assertStatusEquals(t, response.Code, http.StatusFound)
+		assertLocationHeaderEquals(t, response, "/home")
 	})
 }
 
