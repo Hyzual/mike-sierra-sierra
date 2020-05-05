@@ -4,11 +4,25 @@ More soon!
 
 ### Contributing
 
+#### HTTPS support
+
+Download and install [mkcert](https://github.com/FiloSottile/mkcert#installation)
+Then, run the following commands:
+
+```sh
+$ mkcert -install
+$ mkcert localhost ::1
+$ mv localhost+1.pem ./certs/cert.pem
+$ mv localhost+1-key.pem ./certs/key.pem
+```
+
+> Warning: the rootCA-key.pem file that mkcert automatically generates gives complete power to intercept secure requests from your machine. Do not share it.
+
 #### Start the dev Docker container
 
 ```sh
 $ make start
-# Then, access http://localhost:8080
+# Then, access http://localhost:8443
 ```
 
 #### Go commands

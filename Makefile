@@ -3,6 +3,8 @@ PROJECT_NAME := "mike-sierra-sierra"
 PKG := "github.com/hyzual/$(PROJECT_NAME)"
 PKG_LIST := $(shell go list ${PKG}/... | grep -v /vendor/)
 
+get_ip_addr = `docker inspect -f '{{.NetworkSettings.Networks.tuleap_default.IPAddress}}' mike-dev`
+
 .PHONY: all dep build clean test coverage lint start
 
 .SILENT: clean-dev-container
@@ -57,12 +59,13 @@ clean-dev-container:
 # Bind-mount the $GOPATH/pkg folder so that the container does not re-download packages all the time
 start: clean-dev-container ## Build and run the dev docker container.
 	@docker build --file ./tools/docker-dev/Dockerfile.dev --tag hyzual/mike-sierra-sierra:dev ./tools/docker-dev \
-	&& docker run --detach --publish 8080:8080 --name mike \
+	&& docker run --detach --publish 8443:8443 --name mike \
 		--mount type=bind,source=`pwd`,destination=/app,readonly \
 		--mount type=bind,source=`pwd`/database/file,destination=/app/database/file \
+		--mount type=bind,source=`pwd`/certs,destination=/app/certs \
 		--mount type=bind,source=$$GOPATH/pkg,destination=/go/pkg,readonly \
 		hyzual/mike-sierra-sierra:dev
-	@echo "Go to http://localhost:8080"
+	@echo "Go to https://localhost:8443"
 
 help: ## Display this help screen
 	@grep -h -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

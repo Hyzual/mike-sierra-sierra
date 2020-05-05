@@ -5,12 +5,12 @@ RUN apk --no-cache add git gcc musl-dev \
 
 COPY reflex.conf /
 
-# App sources, Database
-VOLUME ["/app", "/app/database/file"]
+# App sources, Database, TLS cert and key
+VOLUME ["/app", "/app/database/file", "/app/certs"]
 
 WORKDIR /app
 
-EXPOSE 8080
+EXPOSE 8443
 
 # Watch for changes, rebuild and rerun the server
 ENTRYPOINT ["reflex", "-c", "/reflex.conf"]

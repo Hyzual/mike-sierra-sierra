@@ -37,10 +37,6 @@ func main() {
 		log.Fatalf("could not connect to the database %v", err)
 	}
 	db.SetConnMaxLifetime(1 * time.Hour)
-	// err = db.Ping()
-	// if err != nil {
-	// 	log.Fatalf("could not ping the database %v", err)
-	// }
 
 	userStore := server.NewUserDao(db)
 	pathJoiner := server.NewRootPathJoiner(cwd)
@@ -49,12 +45,12 @@ func main() {
 
 	srv := &http.Server{
 		Handler:      router,
-		Addr:         ":8080",
+		Addr:         ":8443",
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
-	err = srv.ListenAndServe()
+	err = srv.ListenAndServeTLS("./certs/cert.pem", "./certs/key.pem")
 	if err != nil {
-		log.Fatalf("could not listen on port 8080 %v", err)
+		log.Fatalf("could not listen on port 8443 %v", err)
 	}
 }

@@ -6,3 +6,6 @@ node_modules/
 coverage.html
 # Ignore database file
 database/file/mike.db
+# Ignore TLS cert and key
+certs/*
+!certs/.gitkeep
