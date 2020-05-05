@@ -28,14 +28,19 @@ type UserStore interface {
 	VerifyCredentialsMatch(credentials LoginFormRepresentation) error
 }
 
+// UserDAO implements UserStore
 type UserDAO struct {
 	db *sql.DB
 }
 
+// NewUserDao creates a new UserDAO
 func NewUserDao(db *sql.DB) UserStore {
 	return &UserDAO{db}
 }
 
+// VerifyCredentialsMatch verifies if the provided credentials match credentials store in the database.
+// If they do match, the error will be nil.
+// If they don't match, it will return an error
 func (u *UserDAO) VerifyCredentialsMatch(credentials LoginFormRepresentation) error {
 	row := u.db.QueryRow(`SELECT * FROM user
 		WHERE user.email = ? AND user.password = ?`, credentials.Email, credentials.Password)
