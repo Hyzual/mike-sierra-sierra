@@ -5,24 +5,36 @@ file:
     owner: mike
     group: mike
     filetype: directory
+    contains: []
+  /app/certs:
+    exists: true
+    mode: "0755"
+    size: 4096
+    owner: root
+    group: root
+    filetype: directory
+    contains: []
   /app/database/file:
     exists: true
     mode: "0755"
     owner: root
     group: root
     filetype: directory
+    contains: []
   /app/main:
     exists: true
     mode: "0755"
     owner: mike
     group: mike
     filetype: file
+    contains: []
   /app/templates:
     exists: true
     mode: "0755"
     owner: mike
     group: mike
     filetype: directory
+    contains: []
 user:
   mike:
     exists: true

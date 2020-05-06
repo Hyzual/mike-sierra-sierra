@@ -4,7 +4,7 @@ More soon!
 
 ### Contributing
 
-#### HTTPS support
+#### Enable HTTPS support
 
 Download and install [mkcert](https://github.com/FiloSottile/mkcert#installation)
 Then, run the following commands:
@@ -22,7 +22,7 @@ $ mv localhost+1-key.pem ./certs/key.pem
 
 ```sh
 $ make start
-# Then, access http://localhost:8443
+# Then, access https://localhost:8443
 ```
 
 #### Go commands
@@ -54,8 +54,9 @@ $ make dgoss-ci
 #### How to edit the goss.yaml file interactively
 
 ```sh
-# It will run the container with goss and goss.yaml inside
-$ dgoss edit --user=$(id -u) hyzual/mike-sierra-sierra
+# It will run the container with goss and goss.yaml inside. --user allows you to edit the goss.yaml file.
+# The env variable disables HTTPS (otherwise you need to provide valid cert and key)
+$ dgoss edit -e MIKE_DISABLE_HTTPS=1 --user=$(id -u) hyzual/mike-sierra-sierra
 # Once in the container, you can run goss commands
 [container]$ goss autoadd
 ```

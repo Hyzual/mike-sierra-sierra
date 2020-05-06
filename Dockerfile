@@ -26,8 +26,8 @@ RUN apk --no-cache add ca-certificates
 
 WORKDIR /app
 
-# Database volume
-VOLUME ["/app/database/file"]
+# Database volume, TLS cert and key volume
+VOLUME ["/app/database/file", "/app/certs"]
 
 # Create a non-root group and user and give the user permissions on /app
 RUN addgroup -S mike && adduser -S mike -G mike \
@@ -41,7 +41,7 @@ COPY --from=builder --chown=mike:mike ["/app/built.tar",  "/app/"]
 RUN tar -xf /app/built.tar \
   && rm /app/built.tar
 
-EXPOSE 8080
+EXPOSE 8080 8443
 
 CMD ["./main"]
 

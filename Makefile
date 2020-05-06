@@ -49,7 +49,7 @@ build-docker-image: ## Builds the production Docker image
 	docker build . --file Dockerfile --tag hyzual/mike-sierra-sierra:latest
 
 dgoss-ci: ## Run goss tests on the production Docker image
-	dgoss run hyzual/mike-sierra-sierra:latest
+	dgoss run -e MIKE_DISABLE_HTTPS=1 hyzual/mike-sierra-sierra:latest
 
 # Pipe to /dev/null because we don't care if the container did not exist
 clean-dev-container:

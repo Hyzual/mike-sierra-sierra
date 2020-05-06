@@ -21,11 +21,14 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/hyzual/mike-sierra-sierra/server"
 	_ "github.com/mattn/go-sqlite3"
 )
+
+const disableHTTPSEnv = "MIKE_DISABLE_HTTPS"
 
 func main() {
 	cwd, err := cwd()
@@ -43,14 +46,26 @@ func main() {
 	loginHandler := server.NewLoginHandler(pathJoiner, userStore)
 	router := server.New(pathJoiner, loginHandler)
 
+	var port string
+	isHTTPSDisabled := os.Getenv(disableHTTPSEnv) != ""
+	if isHTTPSDisabled {
+		port = "8080"
+	} else {
+		port = "8443"
+	}
 	srv := &http.Server{
 		Handler:      router,
-		Addr:         ":8443",
+		Addr:         ":" + port,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
-	err = srv.ListenAndServeTLS("./certs/cert.pem", "./certs/key.pem")
-	if err != nil {
-		log.Fatalf("could not listen on port 8443 %v", err)
+	if isHTTPSDisabled {
+		err = srv.ListenAndServe()
+	} else {
+		err = srv.ListenAndServeTLS("./certs/cert.pem", "./certs/key.pem")
 	}
+	if err != nil {
+		log.Fatalf("could not listen on port %s %v", port, err)
+	}
+
 }
