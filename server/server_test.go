@@ -18,106 +18,149 @@
 package server_test
 
 import (
+	"html/template"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/hyzual/mike-sierra-sierra/server"
+	"github.com/hyzual/mike-sierra-sierra/tests"
 )
 
 func TestGetRoot(t *testing.T) {
-	musicServer := buildMusicServer()
+	musicServer := newMusicServer()
 
 	t.Run("/ redirects to /home", func(t *testing.T) {
-		request := newGetRequest(t, "/")
+		request := tests.NewGetRequest(t, "/")
 		response := httptest.NewRecorder()
 		musicServer.ServeHTTP(response, request)
 
-		assertStatusEquals(t, response.Code, http.StatusFound)
-		assertLocationHeaderEquals(t, response, "/home")
+		tests.AssertStatusEquals(t, response.Code, http.StatusFound)
+		tests.AssertLocationHeaderEquals(t, response, "/home")
 	})
 
 	t.Run("/unknown route will return NotFound", func(t *testing.T) {
-		request := newGetRequest(t, "/unknown")
+		request := tests.NewGetRequest(t, "/unknown")
 		response := httptest.NewRecorder()
 		musicServer.ServeHTTP(response, request)
 
-		assertStatusEquals(t, response.Code, http.StatusNotFound)
+		tests.AssertStatusEquals(t, response.Code, http.StatusNotFound)
 	})
 }
 
 func TestGetHome(t *testing.T) {
-	musicServer := buildMusicServer()
-	request := newGetRequest(t, "/home")
+	musicServer := newMusicServer()
+	request := tests.NewGetRequest(t, "/home")
 	response := httptest.NewRecorder()
 
 	musicServer.ServeHTTP(response, request)
 
-	assertStatusEquals(t, response.Code, http.StatusOK)
+	tests.AssertStatusEquals(t, response.Code, http.StatusOK)
 }
 
 func TestGetLogin(t *testing.T) {
-	musicServer := buildMusicServer()
-	request := newGetRequest(t, "/login")
+	musicServer := newMusicServer()
+	request := tests.NewGetRequest(t, "/login")
 	response := httptest.NewRecorder()
 
 	musicServer.ServeHTTP(response, request)
 
-	assertStatusEquals(t, response.Code, http.StatusOK)
+	tests.AssertStatusEquals(t, response.Code, http.StatusOK)
 }
 
 func TestGetAssets(t *testing.T) {
-	musicServer := buildMusicServer()
+	tempFile, removeTempFile := createTempFile(t)
+	defer removeTempFile()
+	musicServer := newMusicServerWithFile(tempFile.Name())
 
 	t.Run("returns OK for a path leading to a file", func(t *testing.T) {
-		request := newGetRequest(t, "/assets/style.css")
+		request := tests.NewGetRequest(t, "/assets/style.css")
 		response := httptest.NewRecorder()
 
 		musicServer.ServeHTTP(response, request)
 
-		assertStatusEquals(t, response.Code, http.StatusOK)
+		tests.AssertStatusEquals(t, response.Code, http.StatusOK)
 	})
 
 	t.Run("returns NotFound for a path leading to /assets directory", func(t *testing.T) {
-		request := newGetRequest(t, "/assets/")
+		request := tests.NewGetRequest(t, "/assets/")
 		response := httptest.NewRecorder()
 
 		musicServer.ServeHTTP(response, request)
 
-		assertStatusEquals(t, response.Code, http.StatusNotFound)
+		tests.AssertStatusEquals(t, response.Code, http.StatusNotFound)
 	})
 }
 
-func buildMusicServer() *server.MusicServer {
-	pathJoiner := newTestPathJoiner()
-	return server.New(pathJoiner, nil)
+func TestGetMusic(t *testing.T) {
+	tempFile, removeTempFile := createTempFile(t)
+	defer removeTempFile()
+	musicServer := newMusicServerWithMusic(tempFile.Name())
+
+	t.Run("returns OK for a path leading to a music file", func(t *testing.T) {
+		request := tests.NewGetRequest(t, "/music/album/amazing-song.mp3")
+		response := httptest.NewRecorder()
+
+		musicServer.ServeHTTP(response, request)
+
+		tests.AssertStatusEquals(t, response.Code, http.StatusOK)
+	})
 }
 
-func newTestPathJoiner() server.PathJoiner {
-	wd, _ := os.Getwd() // will be <projectRoot>/server
-	rootDir := filepath.Join(wd, "..")
-	return server.NewRootPathJoiner(rootDir)
+func newMusicServer() *server.MusicServer {
+	assetsIncluder := &StubAssetsIncluder{filename: ""}
+	templateLoader := &StubTemplateLoader{}
+	return server.New(assetsIncluder, templateLoader, nil, nil)
 }
 
-func newGetRequest(t *testing.T, url string) *http.Request {
+func newMusicServerWithFile(filename string) *server.MusicServer {
+	assetsIncluder := &StubAssetsIncluder{filename}
+	templateLoader := &StubTemplateLoader{}
+	return server.New(assetsIncluder, templateLoader, nil, nil)
+}
+
+func newMusicServerWithMusic(filename string) *server.MusicServer {
+	musicLoader := &StubMusicLoader{filename}
+	return server.New(nil, nil, musicLoader, nil)
+}
+
+type StubAssetsIncluder struct {
+	filename string
+}
+
+func (s *StubAssetsIncluder) Join(relativePath string) string {
+	return s.filename
+}
+
+type StubTemplateLoader struct{}
+
+func (s *StubTemplateLoader) Load(path string) (*template.Template, error) {
+	stubTemplate, _ := template.New("stub").Parse("<html></html>")
+	return stubTemplate, nil
+}
+
+type StubMusicLoader struct {
+	filename string
+}
+
+func (s *StubMusicLoader) Join(relativePath string) string {
+	return s.filename
+}
+
+func createTempFile(t *testing.T) (*os.File, func()) {
 	t.Helper()
-	req, _ := http.NewRequest(http.MethodGet, url, nil)
-	return req
-}
 
-func assertStatusEquals(t *testing.T, got, want int) {
-	t.Helper()
-	if got != want {
-		t.Errorf("did not get correct status, got %d, want %d", got, want)
+	tempFile, err := ioutil.TempFile("", "db")
+	if err != nil {
+		t.Fatalf("could not create temp file %v", err)
 	}
-}
 
-func assertLocationHeaderEquals(t *testing.T, response *httptest.ResponseRecorder, want string) {
-	t.Helper()
-	got := response.Header().Get("Location")
-	if got != want {
-		t.Errorf("Location Header did not match expected route, got %s, want %s", got, want)
+	removeFile := func() {
+		tempFile.Close()
+		os.Remove(tempFile.Name())
 	}
+
+	return tempFile, removeFile
 }

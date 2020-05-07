@@ -5,8 +5,8 @@ RUN apk --no-cache add git gcc musl-dev \
 
 COPY reflex.conf /
 
-# App sources, Database, TLS cert and key
-VOLUME ["/app", "/app/database/file", "/app/secrets"]
+# App sources volume, database volume, TLS cert and key volume, music volume
+VOLUME ["/app", "/app/database/file", "/app/secrets" , "/music"]
 
 WORKDIR /app
 

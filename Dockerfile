@@ -26,8 +26,8 @@ RUN apk --no-cache add ca-certificates
 
 WORKDIR /app
 
-# Database volume, TLS cert and key volume
-VOLUME ["/app/database/file", "/app/secrets"]
+# Database volume, TLS cert and key volume, music volume
+VOLUME ["/app/database/file", "/app/secrets", "/music"]
 
 # Create a non-root group and user and give the user permissions on /app
 RUN addgroup -S mike && adduser -S mike -G mike \

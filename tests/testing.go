@@ -46,3 +46,11 @@ func AssertLocationHeaderEquals(t *testing.T, response *httptest.ResponseRecorde
 		t.Errorf("Location Header did not match expected route, got %s, want %s", got, want)
 	}
 }
+
+// AssertNoError verifies that the error is nil
+func AssertNoError(t *testing.T, err error) {
+	t.Helper()
+	if err != nil {
+		t.Errorf("did not expect an error, got one %v", err)
+	}
+}

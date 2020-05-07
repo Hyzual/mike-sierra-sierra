@@ -22,6 +22,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
 	"time"
 
 	"github.com/gorilla/sessions"
@@ -31,6 +32,7 @@ import (
 )
 
 const disableHTTPSEnv = "MIKE_DISABLE_HTTPS"
+const musicPath = "/music" // It is a volume in the Docker image
 
 func main() {
 	cwd, err := cwd()
@@ -44,7 +46,10 @@ func main() {
 	db.SetConnMaxLifetime(1 * time.Hour)
 
 	userStore := user.NewDAO(db)
-	pathJoiner := server.NewRootPathJoiner(cwd)
+	assetsIncluder := server.NewAssetsIncluder(cwd)
+	templatesPath := path.Join(cwd, "templates")
+	templateLoader := server.NewTemplateLoader(templatesPath)
+	musicLoader := server.NewMusicLoader(musicPath)
 
 	key, err := server.GetCookieStoreKey()
 	if err != nil {
@@ -53,7 +58,7 @@ func main() {
 	sessionStore := sessions.NewCookieStore(key)
 
 	loginHandler := user.NewLoginHandler(userStore, sessionStore)
-	router := server.New(pathJoiner, loginHandler)
+	router := server.New(assetsIncluder, templateLoader, musicLoader, loginHandler)
 
 	var port string
 	isHTTPSDisabled := os.Getenv(disableHTTPSEnv) != ""

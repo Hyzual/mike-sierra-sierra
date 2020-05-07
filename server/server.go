@@ -23,7 +23,6 @@ package server
 
 import (
 	"fmt"
-	"html/template"
 	"net/http"
 	"path"
 
@@ -34,14 +33,16 @@ import (
 // MusicServer serves HTTP requests.
 // It serves the HTML pages, the REST routes and the media files as well.
 type MusicServer struct {
-	pathJoiner PathJoiner
+	assetsIncluder AssetsIncluder
+	templateLoader TemplateLoader
 	http.Handler
 }
 
 // New creates a new MusicServer
-func New(pathJoiner PathJoiner, loginHandler *user.LoginHandler) *MusicServer {
+func New(assetsIncluder AssetsIncluder, templateLoader TemplateLoader, musicLoader PathJoiner, loginHandler *user.LoginHandler) *MusicServer {
 	s := new(MusicServer)
-	s.pathJoiner = pathJoiner
+	s.assetsIncluder = assetsIncluder
+	s.templateLoader = templateLoader
 
 	router := mux.NewRouter()
 	router.HandleFunc("/", s.rootHandler)
@@ -49,6 +50,9 @@ func New(pathJoiner PathJoiner, loginHandler *user.LoginHandler) *MusicServer {
 	router.HandleFunc("/login", s.getLoginHandler).Methods(http.MethodGet)
 	router.Handle("/login", loginHandler).Methods(http.MethodPost)
 	router.PathPrefix("/assets/").HandlerFunc(s.assetsHandler)
+
+	musicHandler := &musicHandler{musicLoader}
+	router.PathPrefix("/music/").Handler(http.StripPrefix("/music/", musicHandler))
 
 	s.Handler = router
 	return s
@@ -63,19 +67,25 @@ func (s *MusicServer) rootHandler(writer http.ResponseWriter, request *http.Requ
 }
 
 func (s *MusicServer) homeHandler(writer http.ResponseWriter, request *http.Request) {
-	fmt.Fprint(writer, "Hello world")
+	tmpl, err := s.templateLoader.Load("app.html")
+	if err != nil {
+		http.Error(writer, fmt.Sprintf("could not load template %s", err), http.StatusInternalServerError)
+	}
+	err = tmpl.Execute(writer, nil)
+	if err != nil {
+		http.Error(writer, fmt.Sprintf("could not execute template %s", err), http.StatusInternalServerError)
+	}
 }
 
 func (s *MusicServer) getLoginHandler(writer http.ResponseWriter, request *http.Request) {
-	tmpl, err := template.ParseFiles(s.pathJoiner.Join("./templates/login.html"))
-
+	tmpl, err := s.templateLoader.Load("login.html")
 	if err != nil {
-		http.Error(writer, fmt.Sprintf("problem loading template %s", err.Error()), http.StatusInternalServerError)
+		http.Error(writer, fmt.Sprintf("could not load template %s", err), http.StatusInternalServerError)
 		return
 	}
 	err = tmpl.Execute(writer, nil)
 	if err != nil {
-		http.Error(writer, fmt.Sprintf("problem executing template %s", err.Error()), http.StatusInternalServerError)
+		http.Error(writer, fmt.Sprintf("could not execute template %s", err), http.StatusInternalServerError)
 	}
 }
 
@@ -86,5 +96,15 @@ func (s *MusicServer) assetsHandler(writer http.ResponseWriter, request *http.Re
 		return
 	}
 
-	http.ServeFile(writer, request, s.pathJoiner.Join(cleanedPath))
+	http.ServeFile(writer, request, s.assetsIncluder.Join(cleanedPath))
+}
+
+type musicHandler struct {
+	musicLoader PathJoiner
+}
+
+func (m *musicHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+	//TODO: I don't know if it's worth it to clean that path. I never get the paths with dots
+	cleanedPath := path.Clean(request.URL.Path)
+	http.ServeFile(writer, request, m.musicLoader.Join(cleanedPath))
 }

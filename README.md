@@ -42,6 +42,14 @@ Mike-sierra-sierra uses [SQLite](https://www.sqlite.org) to persist data.
 The database file is located at ./database/file/mike.db
 If it does not exist (it is gitignored), the server will create it on first run.
 
+#### Add music files to the dev Docker image
+
+```sh
+# Run an alpine container with bind-mount to a folder where you have music (on your host)
+$ docker run -it --rm -v /home/<my-user>/Music:/source -v mike_music:/dest alpine ash
+[container]$ cp /source/*.mp3 dest
+```
+
 #### Build the production Docker image
 
 ```sh

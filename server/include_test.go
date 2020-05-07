@@ -23,16 +23,31 @@ import (
 	"github.com/hyzual/mike-sierra-sierra/server"
 )
 
-func TestRootPathJoiner(t *testing.T) {
-	rootDir := "/path/to/app"
-	joiner := server.NewRootPathJoiner(rootDir)
+func TestAssetsJoin(t *testing.T) {
+	basePath := "/path/to/app/assets"
+	includer := server.NewAssetsIncluder(basePath)
 
 	t.Run("it joins relative paths to baseDir to form absolute paths", func(t *testing.T) {
-		assertPathEquals(t, joiner.Join("./templates/login.html"), "/path/to/app/templates/login.html")
+		assertPathEquals(t, includer.Join("./style.css"), "/path/to/app/assets/style.css")
 	})
 
+	//TODO: it should not allow ascending
 	t.Run("it joins relative paths that ascend the hierarchy", func(t *testing.T) {
-		assertPathEquals(t, joiner.Join("../assets/style.css"), "/path/to/assets/style.css")
+		assertPathEquals(t, includer.Join("../style.css"), "/path/to/app/style.css")
+	})
+}
+
+func TestMusicJoin(t *testing.T) {
+	basePath := "/path/to/music"
+	loader := server.NewMusicLoader(basePath)
+
+	t.Run("it joins relative paths to baseDir to form absolute paths", func(t *testing.T) {
+		assertPathEquals(t, loader.Join("./song.mp3"), "/path/to/music/song.mp3")
+	})
+
+	//TODO: it should not allow ascending
+	t.Run("it joins relative paths that ascend the hierarchy", func(t *testing.T) {
+		assertPathEquals(t, loader.Join("../song.mp3"), "/path/to/song.mp3")
 	})
 }
 
