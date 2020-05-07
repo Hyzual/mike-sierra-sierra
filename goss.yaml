@@ -6,7 +6,7 @@ file:
     group: mike
     filetype: directory
     contains: []
-  /app/certs:
+  /app/secrets:
     exists: true
     mode: "0755"
     size: 4096

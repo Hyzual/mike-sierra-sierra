@@ -23,31 +23,31 @@ package server
 
 import (
 	"fmt"
+	"html/template"
 	"net/http"
 	"path"
 
 	"github.com/gorilla/mux"
+	"github.com/hyzual/mike-sierra-sierra/server/user"
 )
 
 // MusicServer serves HTTP requests.
 // It serves the HTML pages, the REST routes and the media files as well.
 type MusicServer struct {
-	pathJoiner   PathJoiner
-	loginHandler *LoginHandler
+	pathJoiner PathJoiner
 	http.Handler
 }
 
 // New creates a new MusicServer
-func New(pathJoiner PathJoiner, loginHandler *LoginHandler) *MusicServer {
+func New(pathJoiner PathJoiner, loginHandler *user.LoginHandler) *MusicServer {
 	s := new(MusicServer)
 	s.pathJoiner = pathJoiner
-	s.loginHandler = loginHandler
 
 	router := mux.NewRouter()
 	router.HandleFunc("/", s.rootHandler)
 	router.HandleFunc("/home", s.homeHandler)
-	router.HandleFunc("/login", s.loginHandler.GetHandler).Methods(http.MethodGet)
-	router.HandleFunc("/login", s.loginHandler.PostHandler).Methods(http.MethodPost)
+	router.HandleFunc("/login", s.getLoginHandler).Methods(http.MethodGet)
+	router.Handle("/login", loginHandler).Methods(http.MethodPost)
 	router.PathPrefix("/assets/").HandlerFunc(s.assetsHandler)
 
 	s.Handler = router
@@ -64,6 +64,19 @@ func (s *MusicServer) rootHandler(writer http.ResponseWriter, request *http.Requ
 
 func (s *MusicServer) homeHandler(writer http.ResponseWriter, request *http.Request) {
 	fmt.Fprint(writer, "Hello world")
+}
+
+func (s *MusicServer) getLoginHandler(writer http.ResponseWriter, request *http.Request) {
+	tmpl, err := template.ParseFiles(s.pathJoiner.Join("./templates/login.html"))
+
+	if err != nil {
+		http.Error(writer, fmt.Sprintf("problem loading template %s", err.Error()), http.StatusInternalServerError)
+		return
+	}
+	err = tmpl.Execute(writer, nil)
+	if err != nil {
+		http.Error(writer, fmt.Sprintf("problem executing template %s", err.Error()), http.StatusInternalServerError)
+	}
 }
 
 func (s *MusicServer) assetsHandler(writer http.ResponseWriter, request *http.Request) {

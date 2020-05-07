@@ -24,7 +24,9 @@ import (
 	"os"
 	"time"
 
+	"github.com/gorilla/sessions"
 	"github.com/hyzual/mike-sierra-sierra/server"
+	"github.com/hyzual/mike-sierra-sierra/server/user"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -41,9 +43,16 @@ func main() {
 	}
 	db.SetConnMaxLifetime(1 * time.Hour)
 
-	userStore := server.NewUserDao(db)
+	userStore := user.NewDAO(db)
 	pathJoiner := server.NewRootPathJoiner(cwd)
-	loginHandler := server.NewLoginHandler(pathJoiner, userStore)
+
+	key, err := server.GetCookieStoreKey()
+	if err != nil {
+		log.Fatalf("could not get a cookie store key %v", err)
+	}
+	sessionStore := sessions.NewCookieStore(key)
+
+	loginHandler := user.NewLoginHandler(userStore, sessionStore)
 	router := server.New(pathJoiner, loginHandler)
 
 	var port string
@@ -62,10 +71,9 @@ func main() {
 	if isHTTPSDisabled {
 		err = srv.ListenAndServe()
 	} else {
-		err = srv.ListenAndServeTLS("./certs/cert.pem", "./certs/key.pem")
+		err = srv.ListenAndServeTLS("./secrets/cert.pem", "./secrets/key.pem")
 	}
 	if err != nil {
 		log.Fatalf("could not listen on port %s %v", port, err)
 	}
-
 }

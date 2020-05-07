@@ -15,7 +15,7 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package server
+package user
 
 import (
 	"database/sql"
@@ -23,36 +23,34 @@ import (
 	"github.com/pkg/errors"
 )
 
-// UserStore handles database operations linked to Users
-type UserStore interface {
-	VerifyCredentialsMatch(credentials LoginFormRepresentation) error
+// Store handles database operations linked to Users
+type Store interface {
+	GetUserMatchingCredentials(credentials *Credentials) (*Current, error)
 }
 
-// UserDAO implements UserStore
-type UserDAO struct {
+// DAO implements Store
+type DAO struct {
 	db *sql.DB
 }
 
-// NewUserDao creates a new UserDAO
-func NewUserDao(db *sql.DB) UserStore {
-	return &UserDAO{db}
+// NewDAO creates a new DAO
+func NewDAO(db *sql.DB) Store {
+	return &DAO{db}
 }
 
-// VerifyCredentialsMatch verifies if the provided credentials match credentials store in the database.
-// If they do match, the error will be nil.
+// GetUserMatchingCredentials retrieves the user matching the provided credentials.
+// If the credentials match credentials stored in the database, it will return a Current and nil error.
 // If they don't match, it will return an error
-func (u *UserDAO) VerifyCredentialsMatch(credentials LoginFormRepresentation) error {
-	row := u.db.QueryRow(`SELECT * FROM user
+func (d *DAO) GetUserMatchingCredentials(credentials *Credentials) (*Current, error) {
+	row := d.db.QueryRow(`SELECT user.id, user.email FROM user
 		WHERE user.email = ? AND user.password = ?`, credentials.Email, credentials.Password)
-
 	var (
-		id       uint64
-		email    string
-		password string
+		id    uint
+		email string
 	)
-	if err := row.Scan(&id, &email, &password); err != nil {
-		return errors.Wrap(err, "Could not retrieve the user by its credentials")
+	if err := row.Scan(&id, &email); err != nil {
+		return nil, errors.Wrap(err, "Could not retrieve the current user by its credentials")
 	}
 
-	return nil
+	return &Current{id, email}, nil
 }

@@ -58,6 +58,16 @@ func TestGetHome(t *testing.T) {
 	assertStatusEquals(t, response.Code, http.StatusOK)
 }
 
+func TestGetLogin(t *testing.T) {
+	musicServer := buildMusicServer()
+	request := newGetRequest(t, "/login")
+	response := httptest.NewRecorder()
+
+	musicServer.ServeHTTP(response, request)
+
+	assertStatusEquals(t, response.Code, http.StatusOK)
+}
+
 func TestGetAssets(t *testing.T) {
 	musicServer := buildMusicServer()
 

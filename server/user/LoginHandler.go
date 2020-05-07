@@ -15,45 +15,36 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package server
+/*
+Package user groups together user authentication code.
+Authenticating the user, logging in, retrieving logged-in current user, etc.
+*/
+package user
 
 import (
-	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/schema"
+	"github.com/gorilla/sessions"
 	"github.com/pkg/errors"
 )
 
-// LoginHandler handles GET and POST to /login route
+const userSessionName = "userSession"
+
+// LoginHandler handles POST /login route
 type LoginHandler struct {
-	pathJoiner PathJoiner
-	userStore  UserStore
+	userStore    Store
+	sessionStore sessions.Store
 }
 
 // NewLoginHandler create a new LoginHandler
-func NewLoginHandler(pathJoiner PathJoiner, userStore UserStore) *LoginHandler {
-	return &LoginHandler{pathJoiner, userStore}
+func NewLoginHandler(userStore Store, sessionStore sessions.Store) *LoginHandler {
+	return &LoginHandler{userStore, sessionStore}
 }
 
-// GetHandler handles GET /login route
-func (l *LoginHandler) GetHandler(writer http.ResponseWriter, request *http.Request) {
-	tmpl, err := template.ParseFiles(l.pathJoiner.Join("./templates/login.html"))
-
-	if err != nil {
-		http.Error(writer, fmt.Sprintf("problem loading template %s", err.Error()), http.StatusInternalServerError)
-		return
-	}
-	err = tmpl.Execute(writer, nil)
-	if err != nil {
-		http.Error(writer, fmt.Sprintf("problem executing template %s", err.Error()), http.StatusInternalServerError)
-	}
-}
-
-// PostHandler handles POST /login route
-func (l *LoginHandler) PostHandler(writer http.ResponseWriter, request *http.Request) {
+// ServeHTTP handles POST /login route
+func (l *LoginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	decoder := schema.NewDecoder()
 	err := request.ParseForm()
 	if err != nil {
@@ -62,20 +53,39 @@ func (l *LoginHandler) PostHandler(writer http.ResponseWriter, request *http.Req
 		return
 	}
 
-	loginForm := new(LoginFormRepresentation)
+	credentials := new(Credentials)
 	decoder.ZeroEmpty(true)
-	err = decoder.Decode(loginForm, request.PostForm)
+	err = decoder.Decode(credentials, request.PostForm)
 	if err != nil {
 		log.Println(errors.Wrap(err, "Could not decode the login form into its representation"))
 		http.Error(writer, "Bad Request", http.StatusBadRequest)
 		return
 	}
 
-	err = l.userStore.VerifyCredentialsMatch(*loginForm)
+	currentUser, err := l.userStore.GetUserMatchingCredentials(credentials)
 	if err != nil {
 		http.Error(writer, "Forbidden", http.StatusForbidden)
 		return
 	}
+	session, err := l.sessionStore.Get(request, userSessionName)
+	if err != nil {
+		log.Println(errors.Wrap(err, "Could not decode the user session"))
+		http.Error(writer, "Internal Server Errror", http.StatusInternalServerError)
+		return
+	}
+	session.Values["userID"] = currentUser.ID
+	session.Options = &sessions.Options{
+		Path:     "/",
+		Secure:   true,
+		MaxAge:   86400 * 7, // session should last one week
+		SameSite: http.SameSiteStrictMode,
+	}
+	err = session.Save(request, writer)
+	if err != nil {
+		log.Println(errors.Wrap(err, "Could not save the user session"))
+		http.Error(writer, "Internal Server Error", http.StatusInternalServerError)
+	}
+
 	http.Redirect(writer, request, "/home", http.StatusFound)
 }
 
@@ -84,8 +94,14 @@ func badRequest(writer http.ResponseWriter, request *http.Request) {
 	http.Error(writer, "Bad Request", http.StatusBadRequest)
 }
 
-// LoginFormRepresentation represents the login form that is expected from the HTML
-type LoginFormRepresentation struct {
+// Credentials represents the user credentials required to log in
+type Credentials struct {
 	Email    string `schema:"email,required"`
 	Password string `schema:"password,required"`
+}
+
+// Current represents the logged-in user
+type Current struct {
+	ID    uint
+	Email string
 }

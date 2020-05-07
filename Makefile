@@ -51,10 +51,10 @@ build-docker-image: ## Builds the production Docker image
 dgoss-ci: ## Run goss tests on the production Docker image
 	dgoss run -e MIKE_DISABLE_HTTPS=1 hyzual/mike-sierra-sierra:latest
 
-# Pipe to /dev/null because we don't care if the container did not exist
+# Use || true because it's not a problem if the container does not exist
 clean-dev-container:
-	docker container stop mike > /dev/null \
-	&& docker container rm mike > /dev/null
+	docker container stop mike || true \
+	&& docker container rm mike || true
 
 # Bind-mount the $GOPATH/pkg folder so that the container does not re-download packages all the time
 start: clean-dev-container ## Build and run the dev docker container.
@@ -62,7 +62,7 @@ start: clean-dev-container ## Build and run the dev docker container.
 	&& docker run --detach --publish 8443:8443 --name mike \
 		--mount type=bind,source=`pwd`,destination=/app,readonly \
 		--mount type=bind,source=`pwd`/database/file,destination=/app/database/file \
-		--mount type=bind,source=`pwd`/certs,destination=/app/certs \
+		--mount type=bind,source=`pwd`/secrets,destination=/app/secrets \
 		--mount type=bind,source=$$GOPATH/pkg,destination=/go/pkg,readonly \
 		hyzual/mike-sierra-sierra:dev
 	@echo "Go to https://localhost:8443"
