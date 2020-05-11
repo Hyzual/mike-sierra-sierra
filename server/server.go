@@ -47,7 +47,7 @@ func New(sessionManager *sessionup.Manager, assetsIncluder AssetsIncluder, templ
 	s.assetsIncluder = assetsIncluder
 	s.templateLoader = templateLoader
 
-	homeHandler := NewHomeHandler(templateLoader)
+	homeHandler := &homeHandler{templateLoader}
 
 	router := mux.NewRouter()
 	router.HandleFunc("/", s.rootHandler)
@@ -97,17 +97,11 @@ func (m *musicHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reque
 	http.ServeFile(writer, request, m.musicLoader.Join(request.URL.EscapedPath()))
 }
 
-// HomeHandler handles GET /home. It renders the app template and inits the app
-type HomeHandler struct {
+type homeHandler struct {
 	templateLoader TemplateLoader
 }
 
-// NewHomeHandler creates a new HomeHandler
-func NewHomeHandler(templateLoader TemplateLoader) http.Handler {
-	return &HomeHandler{templateLoader}
-}
-
-func (h *HomeHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+func (h *homeHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	tmpl, err := h.templateLoader.Load("app.html")
 	if err != nil {
 		http.Error(writer, fmt.Sprintf("could not load template %s", err), http.StatusInternalServerError)

@@ -15,7 +15,7 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package server_test
+package server
 
 import (
 	"errors"
@@ -26,10 +26,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/swithek/sessionup"
-
-	"github.com/hyzual/mike-sierra-sierra/server"
 	"github.com/hyzual/mike-sierra-sierra/tests"
+	"github.com/swithek/sessionup"
 )
 
 func TestUnkwnownRoute(t *testing.T) {
@@ -58,7 +56,7 @@ func TestGetRoot(t *testing.T) {
 
 func TestGetHome(t *testing.T) {
 	templateLoader := &StubTemplateLoader{}
-	handler := server.NewHomeHandler(templateLoader)
+	handler := &homeHandler{templateLoader}
 
 	request := tests.NewGetRequest(t, "/home")
 	response := httptest.NewRecorder()
@@ -118,7 +116,7 @@ func TestGetMusic(t *testing.T) {
 }
 
 func TestUnauthorized(t *testing.T) {
-	handler := server.HandleUnauthorized(errors.New("Error"))
+	handler := HandleUnauthorized(errors.New("Error"))
 	request := tests.NewGetRequest(t, "/home")
 	response := httptest.NewRecorder()
 
@@ -133,28 +131,28 @@ func newSessionManager() *sessionup.Manager {
 	return sessionup.NewManager(
 		sessionStore,
 		sessionup.CookieName("id"),
-		sessionup.Reject(server.HandleUnauthorized),
+		sessionup.Reject(HandleUnauthorized),
 	)
 }
 
-func newMusicServer() *server.MusicServer {
+func newMusicServer() *MusicServer {
 	sessionManager := newSessionManager()
 	assetsIncluder := &StubAssetsIncluder{filename: ""}
 	templateLoader := &StubTemplateLoader{}
-	return server.New(sessionManager, assetsIncluder, templateLoader, nil, nil)
+	return New(sessionManager, assetsIncluder, templateLoader, nil, nil)
 }
 
-func newMusicServerWithAsset(filename string) *server.MusicServer {
+func newMusicServerWithAsset(filename string) *MusicServer {
 	sessionManager := newSessionManager()
 	assetsIncluder := &StubAssetsIncluder{filename}
 	templateLoader := &StubTemplateLoader{}
-	return server.New(sessionManager, assetsIncluder, templateLoader, nil, nil)
+	return New(sessionManager, assetsIncluder, templateLoader, nil, nil)
 }
 
-func newMusicServerWithMusic(filename string) *server.MusicServer {
+func newMusicServerWithMusic(filename string) *MusicServer {
 	sessionManager := newSessionManager()
 	musicLoader := &StubMusicLoader{filename}
-	return server.New(sessionManager, nil, nil, musicLoader, nil)
+	return New(sessionManager, nil, nil, musicLoader, nil)
 }
 
 type StubAssetsIncluder struct {
