@@ -15,7 +15,19 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+ import { getFolder } from "./rest-querier";
+
 document.addEventListener("DOMContentLoaded", () => {
-    //eslint-disable-next-line no-console
-    console.log("Hello World");
+    printFolder();
 });
+
+async function printFolder(): Promise<void> {
+    const res = await getFolder(0);
+    if (res.error) {
+        // eslint-disable-next-line no-console
+        console.log(res.error);
+        return;
+    }
+    // eslint-disable-next-line no-console
+    console.log(res.result)
+}

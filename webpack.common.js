@@ -81,7 +81,7 @@ const configuration = {
         css_extract_plugin,
     ],
     resolve: {
-        extensions: [".ts"],
+        extensions: [".ts", ".js"],
     },
 };
 

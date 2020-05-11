@@ -45,3 +45,22 @@ func TestGetSong(t *testing.T) {
 		tests.AssertContentTypeHeaderEquals(t, response, jsonMediaType)
 	})
 }
+
+func TestGetFolder(t *testing.T) {
+	handler := &folderHandler{}
+	t.Run(`when folder id 0 is given,
+		it will return the representation of the top-level music folder`, func(t *testing.T) {
+		request := tests.NewGetRequest(t, "/api/folders/0")
+		response := httptest.NewRecorder()
+
+		handler.ServeHTTP(response, request)
+
+		var got Folder
+		err := json.NewDecoder(response.Body).Decode(&got)
+		if err != nil {
+			t.Fatalf("Unable to parse response from server %q into slice of Folder, '%v'", response.Body, err)
+		}
+		tests.AssertStatusEquals(t, response.Code, http.StatusOK)
+		tests.AssertContentTypeHeaderEquals(t, response, jsonMediaType)
+	})
+}

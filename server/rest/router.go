@@ -31,14 +31,23 @@ import (
 // Register registers a gorilla/mux Subrouter for the REST API on the given router
 func Register(router *mux.Router, sessionManager *sessionup.Manager) {
 	songHandler := &songHandler{}
+	folderHandler := &folderHandler{}
 
 	apiRouter := router.PathPrefix("/api/").Subrouter()
 	apiRouter.Handle("/songs/{songId}", sessionManager.Auth(songHandler))
+	apiRouter.Handle("/folders/{folderId}", sessionManager.Auth(folderHandler))
 }
 
-// Song represents a song's details
+// Song represents a music file. It is distinguished by media type (audio/mp3, audio/flac, etc.)
+// Most of its fields mirror tags such as ID3 tags for MP3. It is output by the REST API.
 type Song struct {
-	Title string `json:"title"`
+	Title       string `json:"title"`       // Title is the song's title. E.g. "Know Your Enemy"
+	TrackNumber uint   `json:"trackNumber"` // TrackNumber is the track number of the song. E.g. "3"
+	DiskNumber  uint   `json:"diskNumber"`  // DiskNumber is the disk number of the song. E.g. "1"
+	Artist      string `json:"artist"`      // Artist is the name of the main artist. E.g. "Yoko Kanno"
+	Duration    uint   `json:"duration"`    // Duration is the duration of the song in seconds. E.g. "165"
+	URI         string `json:"uri"`         // URI to access this song on this server. E.g. "/music/Yoko%20Kanno/1-03%20-Know%20Your%20Enemy.flac"
+	Type        string `json:"type"`        // MIME type of the song E.g. "audio/flac"
 }
 
 const contentTypeHeader = "Content-Type"
@@ -48,8 +57,28 @@ type songHandler struct {
 }
 
 func (s *songHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	resp := &Song{Title: "Hello World"}
-	json.NewEncoder(writer).Encode(resp)
+	response := &Song{Title: "Hello World"}
+	json.NewEncoder(writer).Encode(response)
+
+	writer.Header().Set("Content-Type", jsonMediaType)
+	writer.WriteHeader(http.StatusOK)
+}
+
+// Folder represents a music folder. It can be any folder in the filesystem hierarchy
+// such as an album, an artist folder containing many albums, a genre folder containing
+// many artists, etc. It is output by the REST API.
+type Folder struct {
+	Name  string `json:"name"`
+	Items []Song `json:"items"`
+}
+
+type folderHandler struct {
+}
+
+func (f *folderHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+	songs := []Song{{Title: "Hello World"}}
+	response := &Folder{Name: "Music", Items: songs}
+	json.NewEncoder(writer).Encode(response)
 
 	writer.Header().Set("Content-Type", jsonMediaType)
 	writer.WriteHeader(http.StatusOK)
