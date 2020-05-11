@@ -64,11 +64,7 @@ func New(sessionManager *sessionup.Manager, assetsIncluder AssetsIncluder, templ
 }
 
 func (s *MusicServer) rootHandler(writer http.ResponseWriter, request *http.Request) {
-	if request.URL.Path == "/" {
-		http.Redirect(writer, request, "/home", http.StatusFound)
-		return
-	}
-	http.NotFound(writer, request)
+	http.Redirect(writer, request, "/home", http.StatusFound)
 }
 
 func (s *MusicServer) getLoginHandler(writer http.ResponseWriter, request *http.Request) {
@@ -84,7 +80,7 @@ func (s *MusicServer) getLoginHandler(writer http.ResponseWriter, request *http.
 }
 
 func (s *MusicServer) assetsHandler(writer http.ResponseWriter, request *http.Request) {
-	cleanedPath := path.Clean(request.URL.Path)
+	cleanedPath := path.Clean(request.URL.EscapedPath())
 	if cleanedPath == "/assets" {
 		http.NotFound(writer, request)
 		return

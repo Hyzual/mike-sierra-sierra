@@ -32,6 +32,17 @@ import (
 	"github.com/hyzual/mike-sierra-sierra/tests"
 )
 
+func TestUnkwnownRoute(t *testing.T) {
+	musicServer := newMusicServer()
+	t.Run("/unknown returns 404", func(t *testing.T) {
+		request := tests.NewGetRequest(t, "/unknown")
+		response := httptest.NewRecorder()
+		musicServer.ServeHTTP(response, request)
+
+		tests.AssertStatusEquals(t, response.Code, http.StatusNotFound)
+	})
+}
+
 func TestGetRoot(t *testing.T) {
 	musicServer := newMusicServer()
 
@@ -42,14 +53,6 @@ func TestGetRoot(t *testing.T) {
 
 		tests.AssertStatusEquals(t, response.Code, http.StatusFound)
 		tests.AssertLocationHeaderEquals(t, response, "/home")
-	})
-
-	t.Run("/unknown route will return NotFound", func(t *testing.T) {
-		request := tests.NewGetRequest(t, "/unknown")
-		response := httptest.NewRecorder()
-		musicServer.ServeHTTP(response, request)
-
-		tests.AssertStatusEquals(t, response.Code, http.StatusNotFound)
 	})
 }
 
