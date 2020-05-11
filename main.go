@@ -25,10 +25,11 @@ import (
 	"path"
 	"time"
 
-	"github.com/gorilla/sessions"
 	"github.com/hyzual/mike-sierra-sierra/server"
 	"github.com/hyzual/mike-sierra-sierra/server/user"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/swithek/sessionup"
+	"github.com/swithek/sessionup/memstore"
 )
 
 const disableHTTPSEnv = "MIKE_DISABLE_HTTPS"
@@ -51,14 +52,13 @@ func main() {
 	templateLoader := server.NewTemplateLoader(templatesPath)
 	musicLoader := server.NewMusicLoader(musicPath)
 
-	key, err := server.GetCookieStoreKey()
-	if err != nil {
-		log.Fatalf("could not get a cookie store key %v", err)
-	}
-	sessionStore := sessions.NewCookieStore(key)
-
-	loginHandler := user.NewLoginHandler(userStore, sessionStore)
-	router := server.New(assetsIncluder, templateLoader, musicLoader, loginHandler)
+	sessionStore := memstore.New(time.Minute * 5)
+	sessionManager := sessionup.NewManager(
+		sessionStore, sessionup.CookieName("id"),
+		sessionup.Reject(server.HandleUnauthorized),
+	)
+	loginHandler := user.NewLoginHandler(userStore, sessionManager)
+	router := server.New(sessionManager, assetsIncluder, templateLoader, musicLoader, loginHandler)
 
 	var port string
 	isHTTPSDisabled := os.Getenv(disableHTTPSEnv) != ""

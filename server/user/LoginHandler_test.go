@@ -25,7 +25,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gorilla/sessions"
+	"github.com/swithek/sessionup"
+
 	"github.com/hyzual/mike-sierra-sierra/server/user"
 	"github.com/hyzual/mike-sierra-sierra/tests"
 )
@@ -71,20 +72,8 @@ func TestLoginHandler(t *testing.T) {
 		tests.AssertStatusEquals(t, response.Code, http.StatusForbidden)
 	})
 
-	t.Run("when session cannot be opened, it will return Internal Server Error", func(t *testing.T) {
-		sessionStore := &StubSessionStore{true, true}
-		handler := newLoginHandlerBadSession(sessionStore)
-		request := newValidPostLoginRequest()
-		response := httptest.NewRecorder()
-
-		handler.ServeHTTP(response, request)
-
-		tests.AssertStatusEquals(t, response.Code, http.StatusInternalServerError)
-	})
-
-	t.Run("when session cannot be saved, it will return Internal Server Error", func(t *testing.T) {
-		sessionStore := &StubSessionStore{false, true}
-		handler := newLoginHandlerBadSession(sessionStore)
+	t.Run("when session cannot be initialized, it will return Internal Server Error", func(t *testing.T) {
+		handler := newLoginHandlerBadSession()
 		request := newValidPostLoginRequest()
 		response := httptest.NewRecorder()
 
@@ -117,19 +106,23 @@ func newValidPostLoginRequest() *http.Request {
 
 func newLoginHandlerInvalidCredentials() *user.LoginHandler {
 	dao := &StubUserDAO{false}
-	sessionStore := &StubSessionStore{false, false}
-	return user.NewLoginHandler(dao, sessionStore)
+	sessionStore := tests.NewStubSessionStore(false)
+	sessionManager := sessionup.NewManager(sessionStore)
+	return user.NewLoginHandler(dao, sessionManager)
 }
 
-func newLoginHandlerBadSession(sessionStore sessions.Store) *user.LoginHandler {
+func newLoginHandlerBadSession() *user.LoginHandler {
 	dao := &StubUserDAO{true}
-	return user.NewLoginHandler(dao, sessionStore)
+	sessionStore := tests.NewStubSessionStore(true)
+	sessionManager := sessionup.NewManager(sessionStore)
+	return user.NewLoginHandler(dao, sessionManager)
 }
 
 func newValidLoginHandler() *user.LoginHandler {
 	dao := &StubUserDAO{true}
-	sessionStore := &StubSessionStore{false, false}
-	return user.NewLoginHandler(dao, sessionStore)
+	sessionStore := tests.NewStubSessionStore(false)
+	sessionManager := sessionup.NewManager(sessionStore)
+	return user.NewLoginHandler(dao, sessionManager)
 }
 
 type StubUserDAO struct {
@@ -141,27 +134,4 @@ func (s *StubUserDAO) GetUserMatchingCredentials(credentials *user.Credentials) 
 		return &user.Current{ID: 1, Email: "admin@example.comn"}, nil
 	}
 	return nil, errors.New("Credentials do not match")
-}
-
-type StubSessionStore struct {
-	shouldThrowOnGet  bool
-	shouldThrowOnSave bool
-}
-
-func (s *StubSessionStore) Get(r *http.Request, name string) (*sessions.Session, error) {
-	if s.shouldThrowOnGet {
-		return nil, errors.New("could not get session")
-	}
-	return sessions.NewSession(s, "testSession"), nil
-}
-
-func (s *StubSessionStore) New(r *http.Request, name string) (*sessions.Session, error) {
-	return nil, errors.New("could not create new session")
-}
-
-func (s *StubSessionStore) Save(r *http.Request, w http.ResponseWriter, session *sessions.Session) error {
-	if s.shouldThrowOnSave {
-		return errors.New("could not save session")
-	}
-	return nil
 }

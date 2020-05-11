@@ -24,23 +24,24 @@ package user
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/schema"
-	"github.com/gorilla/sessions"
 	"github.com/pkg/errors"
+	"github.com/swithek/sessionup"
 )
 
 const userSessionName = "userSession"
 
 // LoginHandler handles POST /login route
 type LoginHandler struct {
-	userStore    Store
-	sessionStore sessions.Store
+	userStore      Store
+	sessionManager *sessionup.Manager
 }
 
-// NewLoginHandler create a new LoginHandler
-func NewLoginHandler(userStore Store, sessionStore sessions.Store) *LoginHandler {
-	return &LoginHandler{userStore, sessionStore}
+// NewLoginHandler creates a new LoginHandler
+func NewLoginHandler(userStore Store, sessionManager *sessionup.Manager) *LoginHandler {
+	return &LoginHandler{userStore, sessionManager}
 }
 
 // ServeHTTP handles POST /login route
@@ -67,23 +68,12 @@ func (l *LoginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reque
 		http.Error(writer, "Forbidden", http.StatusForbidden)
 		return
 	}
-	session, err := l.sessionStore.Get(request, userSessionName)
+	stringUserID := strconv.FormatUint(uint64(currentUser.ID), 10)
+	err = l.sessionManager.Init(writer, request, stringUserID)
 	if err != nil {
 		log.Println(errors.Wrap(err, "Could not decode the user session"))
 		http.Error(writer, "Internal Server Errror", http.StatusInternalServerError)
 		return
-	}
-	session.Values["userID"] = currentUser.ID
-	session.Options = &sessions.Options{
-		Path:     "/",
-		Secure:   true,
-		MaxAge:   86400 * 7, // session should last one week
-		SameSite: http.SameSiteStrictMode,
-	}
-	err = session.Save(request, writer)
-	if err != nil {
-		log.Println(errors.Wrap(err, "Could not save the user session"))
-		http.Error(writer, "Internal Server Error", http.StatusInternalServerError)
 	}
 
 	http.Redirect(writer, request, "/home", http.StatusFound)

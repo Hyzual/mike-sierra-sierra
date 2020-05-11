@@ -18,12 +18,15 @@
 package server_test
 
 import (
+	"errors"
 	"html/template"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
+
+	"github.com/swithek/sessionup"
 
 	"github.com/hyzual/mike-sierra-sierra/server"
 	"github.com/hyzual/mike-sierra-sierra/tests"
@@ -51,11 +54,13 @@ func TestGetRoot(t *testing.T) {
 }
 
 func TestGetHome(t *testing.T) {
-	musicServer := newMusicServer()
+	templateLoader := &StubTemplateLoader{}
+	handler := server.NewHomeHandler(templateLoader)
+
 	request := tests.NewGetRequest(t, "/home")
 	response := httptest.NewRecorder()
 
-	musicServer.ServeHTTP(response, request)
+	handler.ServeHTTP(response, request)
 
 	tests.AssertStatusEquals(t, response.Code, http.StatusOK)
 }
@@ -73,7 +78,7 @@ func TestGetLogin(t *testing.T) {
 func TestGetAssets(t *testing.T) {
 	tempFile, removeTempFile := createTempFile(t)
 	defer removeTempFile()
-	musicServer := newMusicServerWithFile(tempFile.Name())
+	musicServer := newMusicServerWithAsset(tempFile.Name())
 
 	t.Run("returns OK for a path leading to a file", func(t *testing.T) {
 		request := tests.NewGetRequest(t, "/assets/style.css")
@@ -109,21 +114,44 @@ func TestGetMusic(t *testing.T) {
 	})
 }
 
-func newMusicServer() *server.MusicServer {
-	assetsIncluder := &StubAssetsIncluder{filename: ""}
-	templateLoader := &StubTemplateLoader{}
-	return server.New(assetsIncluder, templateLoader, nil, nil)
+func TestUnauthorized(t *testing.T) {
+	handler := server.HandleUnauthorized(errors.New("Error"))
+	request := tests.NewGetRequest(t, "/home")
+	response := httptest.NewRecorder()
+
+	handler.ServeHTTP(response, request)
+
+	tests.AssertStatusEquals(t, response.Code, http.StatusFound)
+	tests.AssertLocationHeaderEquals(t, response, "/login")
 }
 
-func newMusicServerWithFile(filename string) *server.MusicServer {
+func newSessionManager() *sessionup.Manager {
+	sessionStore := tests.NewStubSessionStore(false)
+	return sessionup.NewManager(
+		sessionStore,
+		sessionup.CookieName("id"),
+		sessionup.Reject(server.HandleUnauthorized),
+	)
+}
+
+func newMusicServer() *server.MusicServer {
+	sessionManager := newSessionManager()
+	assetsIncluder := &StubAssetsIncluder{filename: ""}
+	templateLoader := &StubTemplateLoader{}
+	return server.New(sessionManager, assetsIncluder, templateLoader, nil, nil)
+}
+
+func newMusicServerWithAsset(filename string) *server.MusicServer {
+	sessionManager := newSessionManager()
 	assetsIncluder := &StubAssetsIncluder{filename}
 	templateLoader := &StubTemplateLoader{}
-	return server.New(assetsIncluder, templateLoader, nil, nil)
+	return server.New(sessionManager, assetsIncluder, templateLoader, nil, nil)
 }
 
 func newMusicServerWithMusic(filename string) *server.MusicServer {
+	sessionManager := newSessionManager()
 	musicLoader := &StubMusicLoader{filename}
-	return server.New(nil, nil, musicLoader, nil)
+	return server.New(sessionManager, nil, nil, musicLoader, nil)
 }
 
 type StubAssetsIncluder struct {

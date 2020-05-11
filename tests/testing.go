@@ -18,9 +18,13 @@
 package tests
 
 import (
+	"context"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/swithek/sessionup"
 )
 
 // NewGetRequest simplifies creating a new GET request
@@ -53,4 +57,42 @@ func AssertNoError(t *testing.T, err error) {
 	if err != nil {
 		t.Errorf("did not expect an error, got one %v", err)
 	}
+}
+
+// StubSessionStore mocks a sessionup Store
+type StubSessionStore struct {
+	shouldThrowOnCreate bool
+}
+
+// NewStubSessionStore creates a new Stub store
+func NewStubSessionStore(shouldThrowOnCreate bool) *StubSessionStore {
+	return &StubSessionStore{shouldThrowOnCreate}
+}
+
+// Create mocks sessionup Store's method. It throws an error when StubSessionStore.shouldThrowOnCreate is true
+func (s *StubSessionStore) Create(ctx context.Context, session sessionup.Session) error {
+	if s.shouldThrowOnCreate {
+		return errors.New("Could not create session")
+	}
+	return nil
+}
+
+// FetchByID mocks sessionup Store's method
+func (s *StubSessionStore) FetchByID(ctx context.Context, id string) (sessionup.Session, bool, error) {
+	return sessionup.Session{}, false, errors.New("This method is not supposed to be call in the tests")
+}
+
+// FetchByUserKey mocks sessionup Store's method
+func (s *StubSessionStore) FetchByUserKey(ctx context.Context, key string) ([]sessionup.Session, error) {
+	return nil, errors.New("This method is not supposed to be call in the tests")
+}
+
+// DeleteByID mocks sessionup Store's method
+func (s *StubSessionStore) DeleteByID(ctx context.Context, id string) error {
+	return errors.New("This method is not supposed to be call in the tests")
+}
+
+// DeleteByUserKey mocks sessionup Store's method
+func (s *StubSessionStore) DeleteByUserKey(ctx context.Context, key string, expID ...string) error {
+	return errors.New("This method is not supposed to be call in the tests")
 }
