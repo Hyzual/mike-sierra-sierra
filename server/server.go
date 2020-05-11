@@ -27,6 +27,7 @@ import (
 	"path"
 
 	"github.com/gorilla/mux"
+	"github.com/hyzual/mike-sierra-sierra/server/rest"
 	"github.com/hyzual/mike-sierra-sierra/server/user"
 	"github.com/swithek/sessionup"
 )
@@ -41,7 +42,13 @@ type MusicServer struct {
 }
 
 // New creates a new MusicServer
-func New(sessionManager *sessionup.Manager, assetsIncluder AssetsIncluder, templateLoader TemplateLoader, musicLoader PathJoiner, loginHandler *user.LoginHandler) *MusicServer {
+func New(
+	sessionManager *sessionup.Manager,
+	assetsIncluder AssetsIncluder,
+	templateLoader TemplateLoader,
+	musicLoader PathJoiner,
+	loginHandler *user.LoginHandler,
+) *MusicServer {
 	s := new(MusicServer)
 	s.sessionManager = sessionManager
 	s.assetsIncluder = assetsIncluder
@@ -55,6 +62,8 @@ func New(sessionManager *sessionup.Manager, assetsIncluder AssetsIncluder, templ
 	router.HandleFunc("/login", s.getLoginHandler).Methods(http.MethodGet)
 	router.Handle("/login", loginHandler).Methods(http.MethodPost)
 	router.PathPrefix("/assets/").HandlerFunc(s.assetsHandler)
+	// The REST API Subrouter registers itself
+	rest.Register(router, sessionManager)
 
 	musicHandler := &musicHandler{musicLoader}
 	router.PathPrefix("/music/").Handler(http.StripPrefix("/music/", musicHandler))

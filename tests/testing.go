@@ -42,12 +42,21 @@ func AssertStatusEquals(t *testing.T, got, want int) {
 	}
 }
 
-// AssertLocationHeaderEquals verifies that the request's Location header matches expectation
+// AssertLocationHeaderEquals verifies that the response's Location header matches expectation
 func AssertLocationHeaderEquals(t *testing.T, response *httptest.ResponseRecorder, want string) {
 	t.Helper()
 	got := response.Header().Get("Location")
 	if got != want {
 		t.Errorf("Location Header did not match expected route, got %s, want %s", got, want)
+	}
+}
+
+// AssertContentTypeHeaderEquals verifies that the response's Content-Type header matches expectation
+func AssertContentTypeHeaderEquals(t *testing.T, response *httptest.ResponseRecorder, want string) {
+	t.Helper()
+	got := response.Header().Get("Content-Type")
+	if got != want {
+		t.Errorf("Content-Type Header did not match expected type, got %s, want %s", got, want)
 	}
 }
 
