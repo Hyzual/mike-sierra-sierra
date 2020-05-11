@@ -9,3 +9,5 @@ database/file/mike.db
 # Ignore TLS cert and key
 secrets/*
 !secrets/.gitkeep
+# Ignore built assets files
+assets/

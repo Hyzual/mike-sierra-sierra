@@ -22,7 +22,7 @@ jobs:
         # Goss release version to install
         version: 'v0.3.10'
 
-    - name: Check out the code into the Go module directory
+    - name: Check out the code
       uses: actions/checkout@v2.1.0
 
     # Install dependencies
@@ -55,7 +55,7 @@ jobs:
     - name: Stylelint
       run: make stylelint-ci
 
-    - name: Prettier for HTML
+    - name: Prettier for HTML and Javascript config
       run: make prettier-ci
 
     # Build and test the docker image

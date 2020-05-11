@@ -5,13 +5,17 @@
 .stylelintrc.js
 # Ignore build stuff
 Makefile
+assets/
 # Ignore node_modules
 node_modules/
 # Ignore markdown
 *.md
 # Ignore test files
 **/*_test.go
+tests/
 goss.yaml
 coverage.html
 # Ignore dev database file
 database/file/
+# Ignore dev secrets
+secrets/

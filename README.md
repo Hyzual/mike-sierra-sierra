@@ -22,6 +22,8 @@ $ mv localhost+1-key.pem ./certs/key.pem
 
 ```sh
 $ make start
+# Build and watch the CSS and Javascript
+$ make watch
 # Then, access https://localhost:8443
 ```
 
@@ -34,6 +36,15 @@ $ make test
 $ make lint
 # Generate html test coverage
 $ make coverhtml
+```
+
+#### NPM commands
+
+```sh
+# Build and minify the CSS and Javascript (for production)
+make build-assets
+# Build and watch (for development)
+make watch
 ```
 
 #### Database
@@ -72,14 +83,14 @@ $ dgoss edit -e MIKE_DISABLE_HTTPS=1 --user=$(id -u) hyzual/mike-sierra-sierra
 #### Run stylelint
 
 ```sh
-$ npm run stylelint -- ./assets
+$ npm run stylelint -- ./styles
 # To automatically fix problems
-$ npm run stylelint -- --fix ./assets
+$ npm run stylelint -- --fix ./styles
 ```
 
 #### Run prettier
 
 ```sh
-# To automatically format HTML templates and CSS assets
-$ npm run prettier -- --write ./templates ./assets
+# To automatically format HTML templates, Typescript files and CSS assets
+$ npm run prettier -- --write ./templates ./scripts ./styles
 ```

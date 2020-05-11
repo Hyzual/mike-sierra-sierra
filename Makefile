@@ -5,7 +5,7 @@ PKG_LIST := $(shell go list ${PKG}/... | grep -v /vendor/)
 
 get_ip_addr = `docker inspect -f '{{.NetworkSettings.Networks.tuleap_default.IPAddress}}' mike-dev`
 
-.PHONY: all dep build clean test coverage lint start
+.PHONY: all dep build clean test coverage lint start watch
 
 .SILENT: clean-dev-container
 
@@ -39,8 +39,11 @@ dep: ## Get the Go dependencies
 npm-dep: ## Get the NPM dependencies
 	npm install
 
-stylelint-ci: ## Checks whether CSS stylesheets are well-formatted
-	npm run stylelint --silent -- ./assets
+build-assets: ## Build the frontend assets for production
+	npm run build
+
+stylelint-ci: ## Checks CSS for errors and formatting
+	npm run stylelint --silent -- ./styles
 
 prettier-ci: ## Checks whether HTML templates are well-formatted
 	npm run prettier --silent -- --list-different ./templates
@@ -68,6 +71,9 @@ start: clean-dev-container ## Build and run the dev docker container.
 		--mount source=mike_music,destination=/music,readonly \
 		hyzual/mike-sierra-sierra:dev
 	@echo "Go to https://localhost:8443"
+
+watch: ## Build and watch frontend assets
+	npm run watch
 
 help: ## Display this help screen
 	@grep -h -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

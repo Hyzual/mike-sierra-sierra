@@ -25,6 +25,7 @@ import (
 	"path"
 	"time"
 
+	"github.com/blang/vfs"
 	"github.com/hyzual/mike-sierra-sierra/server"
 	"github.com/hyzual/mike-sierra-sierra/server/user"
 	_ "github.com/mattn/go-sqlite3"
@@ -47,10 +48,12 @@ func main() {
 	db.SetConnMaxLifetime(1 * time.Hour)
 
 	userStore := user.NewDAO(db)
-	assetsIncluder := server.NewAssetsIncluder(cwd)
+	assetsPath := path.Join(cwd, "assets")
+	assetsLoader := server.NewBasePathJoiner(cwd)
 	templatesPath := path.Join(cwd, "templates")
 	templateLoader := server.NewTemplateLoader(templatesPath)
-	musicLoader := server.NewMusicLoader(musicPath)
+	musicLoader := server.NewBasePathJoiner(musicPath)
+	assetsResolver := server.NewAssetsResolver(vfs.OS(), assetsPath)
 
 	sessionStore := memstore.New(time.Minute * 5)
 	sessionManager := sessionup.NewManager(
@@ -58,7 +61,14 @@ func main() {
 		sessionup.Reject(server.HandleUnauthorized),
 	)
 	loginHandler := user.NewLoginHandler(userStore, sessionManager)
-	router := server.New(sessionManager, assetsIncluder, templateLoader, musicLoader, loginHandler)
+	router := server.New(
+		sessionManager,
+		assetsLoader,
+		templateLoader,
+		musicLoader,
+		assetsResolver,
+		loginHandler,
+	)
 
 	var port string
 	isHTTPSDisabled := os.Getenv(disableHTTPSEnv) != ""

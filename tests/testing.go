@@ -68,6 +68,14 @@ func AssertNoError(t *testing.T, err error) {
 	}
 }
 
+// AssertError verifies that the error is not nil
+func AssertError(t *testing.T, err error) {
+	t.Helper()
+	if err == nil {
+		t.Errorf("Expected an error but did not get one")
+	}
+}
+
 // StubSessionStore mocks a sessionup Store
 type StubSessionStore struct {
 	shouldThrowOnCreate bool

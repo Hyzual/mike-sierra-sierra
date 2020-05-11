@@ -19,7 +19,6 @@ package server
 
 import (
 	"errors"
-	"html/template"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -52,28 +51,6 @@ func TestGetRoot(t *testing.T) {
 		tests.AssertStatusEquals(t, response.Code, http.StatusFound)
 		tests.AssertLocationHeaderEquals(t, response, "/home")
 	})
-}
-
-func TestGetHome(t *testing.T) {
-	templateLoader := &StubTemplateLoader{}
-	handler := &homeHandler{templateLoader}
-
-	request := tests.NewGetRequest(t, "/home")
-	response := httptest.NewRecorder()
-
-	handler.ServeHTTP(response, request)
-
-	tests.AssertStatusEquals(t, response.Code, http.StatusOK)
-}
-
-func TestGetLogin(t *testing.T) {
-	musicServer := newMusicServer()
-	request := tests.NewGetRequest(t, "/login")
-	response := httptest.NewRecorder()
-
-	musicServer.ServeHTTP(response, request)
-
-	tests.AssertStatusEquals(t, response.Code, http.StatusOK)
 }
 
 func TestGetAssets(t *testing.T) {
@@ -137,44 +114,29 @@ func newSessionManager() *sessionup.Manager {
 
 func newMusicServer() *MusicServer {
 	sessionManager := newSessionManager()
-	assetsIncluder := &StubAssetsIncluder{filename: ""}
-	templateLoader := &StubTemplateLoader{}
-	return New(sessionManager, assetsIncluder, templateLoader, nil, nil)
+	assetsIncluder := &stubPathJoiner{filename: ""}
+	templateLoader := &stubTemplateLoader{}
+	return New(sessionManager, assetsIncluder, templateLoader, nil, nil, nil)
 }
 
 func newMusicServerWithAsset(filename string) *MusicServer {
 	sessionManager := newSessionManager()
-	assetsIncluder := &StubAssetsIncluder{filename}
-	templateLoader := &StubTemplateLoader{}
-	return New(sessionManager, assetsIncluder, templateLoader, nil, nil)
+	assetsIncluder := &stubPathJoiner{filename}
+	templateLoader := &stubTemplateLoader{}
+	return New(sessionManager, assetsIncluder, templateLoader, nil, nil, nil)
 }
 
 func newMusicServerWithMusic(filename string) *MusicServer {
 	sessionManager := newSessionManager()
-	musicLoader := &StubMusicLoader{filename}
-	return New(sessionManager, nil, nil, musicLoader, nil)
+	musicLoader := &stubPathJoiner{filename}
+	return New(sessionManager, nil, nil, musicLoader, nil, nil)
 }
 
-type StubAssetsIncluder struct {
+type stubPathJoiner struct {
 	filename string
 }
 
-func (s *StubAssetsIncluder) Join(relativePath string) string {
-	return s.filename
-}
-
-type StubTemplateLoader struct{}
-
-func (s *StubTemplateLoader) Load(path string) (*template.Template, error) {
-	stubTemplate, _ := template.New("stub").Parse("<html></html>")
-	return stubTemplate, nil
-}
-
-type StubMusicLoader struct {
-	filename string
-}
-
-func (s *StubMusicLoader) Join(relativePath string) string {
+func (s *stubPathJoiner) Join(relativePath string) string {
 	return s.filename
 }
 

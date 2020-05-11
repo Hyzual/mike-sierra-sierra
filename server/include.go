@@ -18,10 +18,13 @@
 package server
 
 import (
+	"encoding/json"
 	"html/template"
+	"os"
 	"path"
 	"path/filepath"
 
+	"github.com/blang/vfs"
 	"github.com/pkg/errors"
 )
 
@@ -30,39 +33,24 @@ type PathJoiner interface {
 	Join(relativePath string) string
 }
 
-// AssetsIncluder implements PathJoiner
-type AssetsIncluder interface {
-	PathJoiner
+// NewBasePathJoiner creates a new PathJoiner
+func NewBasePathJoiner(basePath string) PathJoiner {
+	return &basePathJoiner{basePath}
 }
 
-// AssetsBaseIncluder implements AssetsIncluder for production code
-type AssetsBaseIncluder struct {
-	basePath string // absolute path to the /assets directory
+// basePathJoiner implements PathJoiner. It is given a base path and will
+// Join all relative paths to it.
+type basePathJoiner struct {
+	basePath string // absolute path
 }
 
-// NewAssetsIncluder creates a new AssetsIncluder
-func NewAssetsIncluder(basePath string) AssetsIncluder {
-	return &AssetsBaseIncluder{basePath}
-}
-
-// Join joins the given relative path to the its base path
-func (a *AssetsBaseIncluder) Join(relativePath string) string {
-	return path.Join(a.basePath, relativePath)
-}
-
-// MusicBaseLoader implements PathJoiner
-type MusicBaseLoader struct {
-	basePath string // absolute path to the /music directory
-}
-
-// NewMusicLoader creates a new PathJoiner
-func NewMusicLoader(basePath string) PathJoiner {
-	return &MusicBaseLoader{basePath}
-}
-
-// Join joins the given relative path to the its base path
-func (m *MusicBaseLoader) Join(relativePath string) string {
-	return path.Join(m.basePath, relativePath)
+// Join joins the given relative path to the basePath
+func (b *basePathJoiner) Join(relativePath string) string {
+	dir := path.Dir(relativePath)
+	if dir == ".." {
+		return b.basePath
+	}
+	return path.Join(b.basePath, relativePath)
 }
 
 // TemplateLoader resolves the given relative file path from the templates/ folder
@@ -71,19 +59,19 @@ type TemplateLoader interface {
 	Load(templatePath string) (*template.Template, error)
 }
 
-// TemplateBaseLoader implements TemplateLoader for production code
-type TemplateBaseLoader struct {
+// templateBaseLoader implements TemplateLoader for production code
+type templateBaseLoader struct {
 	basePath string // absolute path to the /templates directory
 }
 
 // NewTemplateLoader creates a new TemplateLoader
 func NewTemplateLoader(basePath string) TemplateLoader {
-	return &TemplateBaseLoader{basePath}
+	return &templateBaseLoader{basePath}
 }
 
 // Load loads the template at templatePath (relative path from the templates/ folder)
 // and returns it. It returns an error if any (for example no file exists at templatePath)
-func (t *TemplateBaseLoader) Load(templatePath string) (*template.Template, error) {
+func (t *templateBaseLoader) Load(templatePath string) (*template.Template, error) {
 	cleanedPath := path.Join(t.basePath, filepath.Clean(templatePath))
 	tmpl, err := template.ParseFiles(cleanedPath)
 
@@ -92,3 +80,46 @@ func (t *TemplateBaseLoader) Load(templatePath string) (*template.Template, erro
 	}
 	return tmpl, nil
 }
+
+// AssetsResolver reads the manifest.json file in the /assets directory
+// It is used by templates to resolve assets URLs with chunkhashes in their names.
+// For example, it translates "style.css" to "style-caf5894036274013394c.css".
+// It returns an error if it can't find the manifest file or can't decode its contents
+// from JSON or can't find the given baseName in the manifest contents
+type AssetsResolver interface {
+	GetHashedName(baseName string) (string, error)
+}
+
+// baseAssetsResoler inmplements AssetsResolver
+type baseAssetsResolver struct {
+	fs             vfs.Filesystem
+	assetsBasePath string
+}
+
+// NewAssetsResolver creates a new AssetsResolver
+func NewAssetsResolver(fs vfs.Filesystem, assetsBasePath string) AssetsResolver {
+	return &baseAssetsResolver{fs, assetsBasePath}
+}
+
+func (b *baseAssetsResolver) GetHashedName(baseName string) (string, error) {
+	manifestPath := path.Join(b.assetsBasePath, "./manifest.json")
+	manifestFile, err := b.fs.OpenFile(manifestPath, os.O_RDONLY, 0)
+	if err != nil {
+		return "", errors.Wrapf(err, "Could not read the manifest.json file in this folder: %s. Did you run 'npm run build' ?", b.assetsBasePath)
+	}
+	defer manifestFile.Close()
+
+	var manifestContents assetsManifest
+	err = json.NewDecoder(manifestFile).Decode(&manifestContents)
+	if err != nil {
+		return "", errors.Wrap(err, "Could not decode the manifest.json file")
+	}
+
+	hashedFileName, ok := manifestContents[baseName]
+	if !ok {
+		return "", errors.Errorf("Could not find %s in the manifest.json file", baseName)
+	}
+	return hashedFileName, nil
+}
+
+type assetsManifest = map[string]string

@@ -22,7 +22,6 @@ It handles all HTTP routing, serves HTML pages, REST routes and media files.
 package server
 
 import (
-	"fmt"
 	"net/http"
 	"path"
 
@@ -36,31 +35,32 @@ import (
 // It serves the HTML pages, the REST routes and the media files as well.
 type MusicServer struct {
 	sessionManager *sessionup.Manager
-	assetsIncluder AssetsIncluder
-	templateLoader TemplateLoader
+	assetsLoader   PathJoiner
+	assetsResolver AssetsResolver
 	http.Handler
 }
 
 // New creates a new MusicServer
 func New(
 	sessionManager *sessionup.Manager,
-	assetsIncluder AssetsIncluder,
+	assetsLoader PathJoiner,
 	templateLoader TemplateLoader,
 	musicLoader PathJoiner,
-	loginHandler *user.LoginHandler,
+	assetsResolver AssetsResolver,
+	postLoginHandler *user.LoginHandler,
 ) *MusicServer {
 	s := new(MusicServer)
 	s.sessionManager = sessionManager
-	s.assetsIncluder = assetsIncluder
-	s.templateLoader = templateLoader
+	s.assetsLoader = assetsLoader
 
-	homeHandler := &homeHandler{templateLoader}
+	homeHandler := &homeHandler{templateLoader, assetsResolver}
+	getLoginHandler := &getLoginHandler{templateLoader, assetsResolver}
 
 	router := mux.NewRouter()
 	router.HandleFunc("/", s.rootHandler)
 	router.Handle("/home", sessionManager.Auth(homeHandler))
-	router.HandleFunc("/login", s.getLoginHandler).Methods(http.MethodGet)
-	router.Handle("/login", loginHandler).Methods(http.MethodPost)
+	router.Handle("/login", getLoginHandler).Methods(http.MethodGet)
+	router.Handle("/login", postLoginHandler).Methods(http.MethodPost)
 	router.PathPrefix("/assets/").HandlerFunc(s.assetsHandler)
 	// The REST API Subrouter registers itself
 	rest.Register(router, sessionManager)
@@ -76,49 +76,22 @@ func (s *MusicServer) rootHandler(writer http.ResponseWriter, request *http.Requ
 	http.Redirect(writer, request, "/home", http.StatusFound)
 }
 
-func (s *MusicServer) getLoginHandler(writer http.ResponseWriter, request *http.Request) {
-	tmpl, err := s.templateLoader.Load("login.html")
-	if err != nil {
-		http.Error(writer, fmt.Sprintf("could not load template %s", err), http.StatusInternalServerError)
-		return
-	}
-	err = tmpl.Execute(writer, nil)
-	if err != nil {
-		http.Error(writer, fmt.Sprintf("could not execute template %s", err), http.StatusInternalServerError)
-	}
-}
-
 func (s *MusicServer) assetsHandler(writer http.ResponseWriter, request *http.Request) {
-	cleanedPath := path.Clean(request.URL.EscapedPath())
+	cleanedPath := path.Clean(request.URL.Path)
 	if cleanedPath == "/assets" {
 		http.NotFound(writer, request)
 		return
 	}
 
-	http.ServeFile(writer, request, s.assetsIncluder.Join(cleanedPath))
+	http.ServeFile(writer, request, s.assetsLoader.Join(cleanedPath))
 }
 
 type musicHandler struct {
-	musicLoader PathJoiner
+	pathJoiner PathJoiner
 }
 
 func (m *musicHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	http.ServeFile(writer, request, m.musicLoader.Join(request.URL.EscapedPath()))
-}
-
-type homeHandler struct {
-	templateLoader TemplateLoader
-}
-
-func (h *homeHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	tmpl, err := h.templateLoader.Load("app.html")
-	if err != nil {
-		http.Error(writer, fmt.Sprintf("could not load template %s", err), http.StatusInternalServerError)
-	}
-	err = tmpl.Execute(writer, nil)
-	if err != nil {
-		http.Error(writer, fmt.Sprintf("could not execute template %s", err), http.StatusInternalServerError)
-	}
+	http.ServeFile(writer, request, m.pathJoiner.Join(request.URL.Path))
 }
 
 // HandleUnauthorized redirects to /login when users are not authenticated
