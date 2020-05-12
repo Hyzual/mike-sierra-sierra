@@ -88,6 +88,14 @@ $ npm run stylelint -- ./styles
 $ npm run stylelint -- --fix ./styles
 ```
 
+#### Run eslint
+
+```sh
+$ npm run eslint -- ./scripts
+# To automatically fix problems
+$ npm run eslint -- --fix ./scripts
+```
+
 #### Run prettier
 
 ```sh

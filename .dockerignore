@@ -1,5 +1,8 @@
+# Ignore git
+.git/
 # Ignore dotfiles
 .editorconfig
+.eslintrc.js
 .gitignore
 .prettierrc
 .stylelintrc.js

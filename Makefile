@@ -42,11 +42,14 @@ npm-dep: ## Get the NPM dependencies
 build-assets: ## Build the frontend assets for production
 	npm run build
 
+eslint-ci: ## Checks TypeScript files for errors and formatting
+	npm run eslint --silent -- ./scripts
+
 stylelint-ci: ## Checks CSS for errors and formatting
 	npm run stylelint --silent -- ./styles
 
-prettier-ci: ## Checks whether HTML templates are well-formatted
-	npm run prettier --silent -- --list-different ./templates
+prettier-ci: ## Checks whether HTML templates and JS configurations are well-formatted
+	npm run prettier --silent -- --list-different ./templates .eslintrc.js .stylelintrc.js webpack.*.js
 
 build-docker-image: ## Builds the production Docker image
 	docker build . --file Dockerfile --tag hyzual/mike-sierra-sierra:latest
