@@ -53,20 +53,21 @@ func New(
 	s.sessionManager = sessionManager
 	s.assetsLoader = assetsLoader
 
-	homeHandler := &homeHandler{templateLoader, assetsResolver}
-	getLoginHandler := &getLoginHandler{templateLoader, assetsResolver}
+	homeHandler := sessionManager.Auth(
+		WrapErrors(&homeHandler{templateLoader, assetsResolver}),
+	)
+	getLoginHandler := WrapErrors(&getLoginHandler{templateLoader, assetsResolver})
+	musicHandler := &musicHandler{musicLoader}
 
 	router := mux.NewRouter()
 	router.HandleFunc("/", s.rootHandler)
-	router.Handle("/home", sessionManager.Auth(homeHandler))
+	router.Handle("/home", homeHandler)
 	router.Handle("/login", getLoginHandler).Methods(http.MethodGet)
 	router.Handle("/login", postLoginHandler).Methods(http.MethodPost)
 	router.PathPrefix("/assets/").HandlerFunc(s.assetsHandler)
+	router.PathPrefix("/music/").Handler(http.StripPrefix("/music/", musicHandler))
 	// The REST API Subrouter registers itself
 	rest.Register(router, sessionManager)
-
-	musicHandler := &musicHandler{musicLoader}
-	router.PathPrefix("/music/").Handler(http.StripPrefix("/music/", musicHandler))
 
 	s.Handler = router
 	return s
@@ -94,8 +95,25 @@ func (m *musicHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reque
 	http.ServeFile(writer, request, m.pathJoiner.Join(request.URL.Path))
 }
 
-// HandleUnauthorized redirects to /login when users are not authenticated
-// It is used by sessionup's Auth middleware
+// ErroringHandler is a http.Handler that can return an error.
+// If the error is not nil, it will be output as a 500 Internal Server Error.
+type ErroringHandler interface {
+	ServeHTTP(writer http.ResponseWriter, request *http.Request) error
+}
+
+// WrapErrors wraps ErroringHandler, catches the error returned from its ServeHTTP function
+// and outputs a 500 Internal Server Error to the user with it.
+func WrapErrors(next ErroringHandler) http.Handler {
+	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		err := next.ServeHTTP(writer, request)
+		if err != nil {
+			http.Error(writer, err.Error(), http.StatusInternalServerError)
+		}
+	})
+}
+
+// HandleUnauthorized redirects to /login when users are not authenticated.
+// It is used by sessionup's Auth middleware.
 func HandleUnauthorized(_ error) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		http.Redirect(writer, request, "/login", http.StatusFound)

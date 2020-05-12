@@ -18,55 +18,163 @@
 package server
 
 import (
+	"errors"
+	"fmt"
 	"html/template"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/hyzual/mike-sierra-sierra/tests"
 )
 
 func TestGetLogin(t *testing.T) {
-	musicServer := newMusicServerWithManifest("style.css")
 	request := tests.NewGetRequest(t, "/login")
-	response := httptest.NewRecorder()
 
-	musicServer.ServeHTTP(response, request)
+	t.Run("when it cannot resolve assets, it will return a 500 error", func(t *testing.T) {
+		assetsResolver := &stubAssetsResolver{true, ""}
+		templateLoader := newTemplateLoaderWithValidTemplate()
+		musicServer := newMusicServerWithDeps(assetsResolver, templateLoader)
 
-	tests.AssertStatusEquals(t, response.Code, http.StatusOK)
+		response := httptest.NewRecorder()
+		musicServer.ServeHTTP(response, request)
+
+		tests.AssertStatusEquals(t, response.Code, http.StatusInternalServerError)
+	})
+
+	t.Run("when it cannot load the template, it will return a 500 error", func(t *testing.T) {
+		assetsResolver := &stubAssetsResolver{false, "style.css"}
+		templateLoader := newTemplateLoaderWithInvalidTemplate()
+		musicServer := newMusicServerWithDeps(assetsResolver, templateLoader)
+
+		response := httptest.NewRecorder()
+		musicServer.ServeHTTP(response, request)
+
+		tests.AssertStatusEquals(t, response.Code, http.StatusInternalServerError)
+	})
+
+	t.Run("when it cannot execute the template, it will return a 500 error", func(t *testing.T) {
+		assetsResolver := &stubAssetsResolver{false, "style.css"}
+		templateLoader := newTemplateLoaderWithTemplateExecError()
+		musicServer := newMusicServerWithDeps(assetsResolver, templateLoader)
+
+		response := httptest.NewRecorder()
+		musicServer.ServeHTTP(response, request)
+
+		tests.AssertStatusEquals(t, response.Code, http.StatusInternalServerError)
+	})
+
+	t.Run("it will execute the template with its assets", func(t *testing.T) {
+		assetsResolver := &stubAssetsResolver{false, "style.css"}
+		templateLoader := newTemplateLoaderWithValidTemplate()
+		musicServer := newMusicServerWithDeps(assetsResolver, templateLoader)
+
+		response := httptest.NewRecorder()
+		musicServer.ServeHTTP(response, request)
+
+		tests.AssertStatusEquals(t, response.Code, http.StatusOK)
+	})
 }
 
 func TestGetHome(t *testing.T) {
-	templateLoader := &stubTemplateLoader{}
-	assetsResolver := &stubAssetsResolver{filename: "style.css"}
-	handler := &homeHandler{templateLoader, assetsResolver}
-
 	request := tests.NewGetRequest(t, "/home")
-	response := httptest.NewRecorder()
 
-	handler.ServeHTTP(response, request)
+	t.Run("when it cannot resolve assets, it will return an error", func(t *testing.T) {
+		assetsResolver := &stubAssetsResolver{true, ""}
+		templateLoader := newTemplateLoaderWithValidTemplate()
+		handler := &homeHandler{templateLoader, assetsResolver}
 
-	tests.AssertStatusEquals(t, response.Code, http.StatusOK)
+		response := httptest.NewRecorder()
+
+		err := handler.ServeHTTP(response, request)
+
+		tests.AssertError(t, err)
+	})
+
+	t.Run("when it cannot load the template, it will return an error", func(t *testing.T) {
+		assetsResolver := &stubAssetsResolver{false, "asset"}
+		templateLoader := newTemplateLoaderWithInvalidTemplate()
+		handler := &homeHandler{templateLoader, assetsResolver}
+
+		response := httptest.NewRecorder()
+		err := handler.ServeHTTP(response, request)
+
+		tests.AssertError(t, err)
+	})
+
+	t.Run("when it cannot execute the template, it will return an error", func(t *testing.T) {
+		assetsResolver := &stubAssetsResolver{false, "asset"}
+		templateLoader := newTemplateLoaderWithTemplateExecError()
+		handler := &homeHandler{templateLoader, assetsResolver}
+
+		response := httptest.NewRecorder()
+		err := handler.ServeHTTP(response, request)
+
+		tests.AssertError(t, err)
+	})
+
+	t.Run("it will execute the template with its assets", func(t *testing.T) {
+		assetsResolver := &stubAssetsResolver{filename: "asset"}
+		templateLoader := newTemplateLoaderWithValidTemplate()
+		handler := &homeHandler{templateLoader, assetsResolver}
+
+		response := httptest.NewRecorder()
+
+		err := handler.ServeHTTP(response, request)
+
+		tests.AssertStatusEquals(t, response.Code, http.StatusOK)
+		tests.AssertNoError(t, err)
+	})
 }
 
-func newMusicServerWithManifest(hashedName string) *MusicServer {
+func newMusicServerWithDeps(assetsResolver AssetsResolver, templateLoader TemplateLoader) *MusicServer {
 	sessionManager := newSessionManager()
-	templateLoader := &stubTemplateLoader{}
-	assetsResolver := &stubAssetsResolver{hashedName}
-	return New(sessionManager, nil, templateLoader, nil, assetsResolver, nil)
+	return New(
+		sessionManager,
+		nil,
+		templateLoader,
+		nil,
+		assetsResolver,
+		nil,
+	)
 }
 
-type stubTemplateLoader struct{}
+func newTemplateLoaderWithInvalidTemplate() TemplateLoader {
+	return &stubTemplateLoader{true, nil}
+}
+
+func newTemplateLoaderWithTemplateExecError() TemplateLoader {
+	stubTemplate, _ := template.New("stub").Parse(`<html>{{template "Unknown"}}</html>`)
+	return &stubTemplateLoader{false, stubTemplate}
+}
+
+func newTemplateLoaderWithValidTemplate() TemplateLoader {
+	stubTemplate, err := template.New("stub").Parse(`<html></html>`)
+	fmt.Fprintln(os.Stdout, err)
+	return &stubTemplateLoader{false, stubTemplate}
+}
+
+type stubTemplateLoader struct {
+	shouldErrorOnLoad bool
+	tmpl              *template.Template
+}
 
 func (s *stubTemplateLoader) Load(path string) (*template.Template, error) {
-	stubTemplate, _ := template.New("stub").Parse("<html></html>")
-	return stubTemplate, nil
+	if s.shouldErrorOnLoad {
+		return nil, errors.New("Could not load template")
+	}
+	return s.tmpl, nil
 }
 
 type stubAssetsResolver struct {
-	filename string
+	shouldErrorOnGet bool
+	filename         string
 }
 
 func (s *stubAssetsResolver) GetHashedName(baseName string) (string, error) {
+	if s.shouldErrorOnGet {
+		return "", errors.New("Could not get hashed name")
+	}
 	return s.filename, nil
 }

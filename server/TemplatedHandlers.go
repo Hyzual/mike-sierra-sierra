@@ -18,8 +18,9 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
+
+	"github.com/pkg/errors"
 )
 
 type getLoginHandler struct {
@@ -27,24 +28,17 @@ type getLoginHandler struct {
 	assetsResolver AssetsResolver
 }
 
-func (g *getLoginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+func (g *getLoginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) error {
 	hashedName, err := g.assetsResolver.GetHashedName("style.css")
 	if err != nil {
-		http.Error(writer, fmt.Sprintf("could not resolve assets %s", err), http.StatusInternalServerError)
-		return
+		return errors.Wrapf(err, "could not resolve assets %s", "style.css")
 	}
-	//TODO: test those error cases
 	tmpl, err := g.templateLoader.Load("login.html")
 	if err != nil {
-		http.Error(writer, fmt.Sprintf("could not load template %s", err), http.StatusInternalServerError)
-		return
+		return errors.Wrapf(err, "could not load template %s", "login.html")
 	}
 	presenter := &loginPresenter{StylesheetURI: "/assets/" + hashedName}
-	err = tmpl.Execute(writer, presenter)
-	if err != nil {
-		http.Error(writer, fmt.Sprintf("could not execute template %s", err), http.StatusInternalServerError)
-		return
-	}
+	return tmpl.Execute(writer, presenter)
 }
 
 type loginPresenter struct {
@@ -56,34 +50,27 @@ type homeHandler struct {
 	assetsResolver AssetsResolver
 }
 
-func (h *homeHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+func (h *homeHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) error {
 	stylesheetHashedName, err := h.assetsResolver.GetHashedName("style.css")
 	if err != nil {
-		http.Error(writer, fmt.Sprintf("could not resolve assets %s", err), http.StatusInternalServerError)
-		return
+		return errors.Wrapf(err, "could not resolve asset %s", "style.css")
 	}
 	appHashedName, err := h.assetsResolver.GetHashedName("index.js")
 	if err != nil {
-		http.Error(writer, fmt.Sprintf("could not resolve assets %s", err), http.StatusInternalServerError)
-		return
+		return errors.Wrapf(err, "could not resolve asset %s", "index.js")
 	}
-
-	//TODO: test those error cases
 	tmpl, err := h.templateLoader.Load("app.html")
 	if err != nil {
-		http.Error(writer, fmt.Sprintf("could not load template %s", err), http.StatusInternalServerError)
-		return
+		return errors.Wrapf(err, "could not load template %s", "app.html")
 	}
 	presenter := &homePresenter{
 		StylesheetURI: "/assets/" + stylesheetHashedName,
 		AppURI:        "/assets/" + appHashedName,
 	}
-	err = tmpl.Execute(writer, presenter)
-	if err != nil {
-		http.Error(writer, fmt.Sprintf("could not execute template %s", err), http.StatusInternalServerError)
-		return
-	}
+	return tmpl.Execute(writer, presenter)
 }
+
+//TODO: UT the homeHandler errors directly
 
 type homePresenter struct {
 	StylesheetURI string // Public URI path to the stylesheet
