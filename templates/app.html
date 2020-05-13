@@ -1,12 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <meta charset="utf-8" />
         <title>Mike-Sierra-Sierra - App</title>
         <link rel="stylesheet" href="{{.StylesheetURI}}" />
     </head>
-    <body>
-        <main class="main" role="main">
+    <body class="app-body">
+        {{with .HeaderPresenter}}
+        <header class="app-header">
+            <div class="app-header-app-name">Mike-Sierra-Sierra</div>
+            <div class="app-header-spacer"></div>
+            <div class="app-header-current-user">
+                <img
+                    src="https://www.gravatar.com/avatar/00000000000000000000000000000000?s=32"
+                    alt="Gravatar profile picture"
+                    class="app-header-current-user-avatar"
+                /><span>{{.Username}}</span>
+            </div>
+            <div class="app-header-logout">
+                <a class="app-header-logout-link" href="/logout" tabindex="2"
+                    >Log out</a
+                >
+            </div>
+        </header>
+        {{end}}
+        <main class="app-main" role="main">
             <div class="player">
                 <audio controls>
                     <source
@@ -16,6 +34,7 @@
                 </audio>
             </div>
         </main>
-        <script src="{{ .AppURI }}"></script>
+        <noscript>Mike-Sierra-Sierra needs JavaScript to function.</noscript>
+        <script src="{{ .AppURI }}" type="module"></script>
     </body>
 </html>

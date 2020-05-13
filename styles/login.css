@@ -1,0 +1,60 @@
+/*
+ *   Copyright (c) 2020 Joris MASSON
+
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+.login-body {
+    display: flex;
+    min-height: 100vh;
+}
+
+.login-main {
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--dark-shades-color);
+}
+
+.login-form {
+    padding: 40px;
+    border: 1px solid var(--darker-main-color);
+    border-radius: 5px;
+    background: var(--lighter-dark-shades-color);
+}
+
+.login-form-title {
+    color: var(--main-color);
+    font-size: 24px;
+    text-align: center;
+}
+
+.login-form-element {
+    margin: 0 0 20px;
+}
+
+.login-form-input {
+    border: 1px solid var(--main-color);
+}
+
+.login-form-submit {
+    width: 100%;
+    height: 48px;
+    border-radius: 4px;
+    font-size: 22px;
+    font-weight: 600;
+    text-align: center;
+}

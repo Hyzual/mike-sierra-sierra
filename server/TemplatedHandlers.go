@@ -63,16 +63,21 @@ func (h *homeHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 	if err != nil {
 		return errors.Wrapf(err, "could not load template %s", "app.html")
 	}
+	headerPresenter := &headerPresenter{"Hyzual"}
 	presenter := &homePresenter{
-		StylesheetURI: "/assets/" + stylesheetHashedName,
-		AppURI:        "/assets/" + appHashedName,
+		StylesheetURI:   "/assets/" + stylesheetHashedName,
+		AppURI:          "/assets/" + appHashedName,
+		HeaderPresenter: headerPresenter,
 	}
 	return tmpl.Execute(writer, presenter)
 }
 
-//TODO: UT the homeHandler errors directly
-
 type homePresenter struct {
-	StylesheetURI string // Public URI path to the stylesheet
-	AppURI        string // Public URI path to the javascript app
+	StylesheetURI   string // Public URI path to the stylesheet
+	AppURI          string // Public URI path to the javascript app
+	HeaderPresenter *headerPresenter
+}
+
+type headerPresenter struct {
+	Username string // Username of the current logged-in user
 }
