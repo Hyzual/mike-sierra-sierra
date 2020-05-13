@@ -32,7 +32,7 @@ COPY . .
 
 # Build the frontend assets and tar the assets together.
 # It avoids having to mkdir the assets folder in the runtime image
-RUN npm install && npm run build \
+RUN npm install --no-audit && npm run build \
   && tar -cf assets.tar assets/
 
 # -----
