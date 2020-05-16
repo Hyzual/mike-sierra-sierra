@@ -1,5 +1,5 @@
 module.exports = {
-    plugins: ["@typescript-eslint", "no-unsanitized"],
+    plugins: ["@typescript-eslint", "no-unsanitized", "jest"],
     extends: [
         "eslint:recommended",
         "plugin:@typescript-eslint/eslint-recommended",
@@ -90,4 +90,31 @@ module.exports = {
             },
         ],
     },
+    overrides: [
+        {
+            files: ["*.test.ts"],
+            extends: ["plugin:jest/recommended"],
+            rules: {
+                "jest/consistent-test-it": "error",
+                "jest/valid-title": "error",
+                "jest/no-restricted-matchers": [
+                    "error",
+                    { resolves: "Use `expect(await promise)` instead." },
+                ],
+                "jest/prefer-spy-on": "error",
+                "jest/require-top-level-describe": "error",
+                "jest/prefer-hooks-on-top": "error",
+            },
+        },
+        {
+            files: [".eslintrc.js", "jest.config.js", "webpack.*.js"],
+            env: {
+                node: true,
+            },
+            rules: {
+                "no-console": "off",
+                "@typescript-eslint/no-var-requires": "off",
+            },
+        },
+    ],
 };

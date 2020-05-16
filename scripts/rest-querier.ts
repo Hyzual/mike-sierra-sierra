@@ -38,7 +38,7 @@ export async function getFolder(folder_id: number): Promise<Result<Folder, Error
     try {
         const folder = await response.json();
         return ok(folder)
-    } catch (err) {
-        return err(ono(err, "Could not decode JSON into Folder"));
+    } catch (error) {
+        return err(ono(error, "Could not decode JSON into Folder"));
     }
 }

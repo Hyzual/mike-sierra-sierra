@@ -5,16 +5,16 @@ PKG_LIST := $(shell go list ${PKG}/... | grep -v /vendor/)
 
 get_ip_addr = `docker inspect -f '{{.NetworkSettings.Networks.tuleap_default.IPAddress}}' mike-dev`
 
-.PHONY: all dep clean test coverage lint start watch
+.PHONY: all dep clean coverage start watch race
 
 .SILENT: clean-dev-container
 
 all: start
 
-lint: ## Lint the files
+lint-go: ## Lint the files
 	@golint -set_exit_status ${PKG_LIST}
 
-test: ## Run unit tests
+test-go: ## Run Go unit tests
 	@go test -short ${PKG_LIST}
 
 race: ## Run data race detector
@@ -24,10 +24,10 @@ race: ## Run data race detector
 goformat-ci: ## Test whether the Go code is well-formatted
 	@test -z $$(gofmt -l .)
 
-coverage: ## Generate global code coverage report
+coverage-go: ## Generate global code coverage report
 	./tools/coverage.sh;
 
-coverhtml: ## Generate global code coverage report in HTML
+coverage-go-html: ## Generate global code coverage report in HTML
 	./tools/coverage.sh html;
 
 build-ci: ## Check that the Go code can be compiled
@@ -42,14 +42,20 @@ npm-dep: ## Get the NPM dependencies
 build-assets: ## Build the frontend assets for production
 	npm run build
 
-eslint-ci: ## Checks TypeScript files for errors and formatting
-	npm run eslint --silent -- ./scripts
+coverage-jest: ## Run Jest unit tests with coverage
+	npm run test --silent -- --coverage
+
+test-jest: ## Run Jest unit tests
+	npm run test --silent
+
+eslint-ci: ## Checks TypeScript and Javascript files for errors and formatting
+	npm run eslint --silent -- .
 
 stylelint-ci: ## Checks CSS for errors and formatting
 	npm run stylelint --silent -- ./styles
 
 prettier-ci: ## Checks whether HTML templates and JS configurations are well-formatted
-	npm run prettier --silent -- --list-different ./templates .eslintrc.js .stylelintrc.js webpack.*.js
+	npm run prettier --silent -- --list-different ./templates .eslintrc.js .stylelintrc.js
 
 build-docker-image: ## Builds the production Docker image
 	docker build . --file Dockerfile --tag hyzual/mike-sierra-sierra:latest

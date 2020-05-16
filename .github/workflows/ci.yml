@@ -5,8 +5,8 @@ on:
   pull_request:
     branches: [ master ]
 jobs:
-  build:
-    name: Build and test
+  backend_tests:
+    name: Test Go server
     runs-on: ubuntu-latest
     steps:
 
@@ -16,12 +16,6 @@ jobs:
         go-version: ^1.14
       id: go
 
-    - name: Install goss and dgoss
-      uses: e1himself/goss-installation-action@v1
-      with:
-        # Goss release version to install
-        version: 'v0.3.10'
-
     - name: Check out the code
       uses: actions/checkout@v2.1.0
 
@@ -30,16 +24,13 @@ jobs:
     - name: Go dependencies
       run: make dep
 
-    - name: NPM dependencies
-      run: make npm-dep
-
     # Build and test Go code
 
     - name: Build
       run: make build-ci
 
-    - name: Test coverage
-      run: make coverage
+    - name: Go test coverage
+      run: make coverage-go
 
     - name: Test race conditions
       run: make race
@@ -52,6 +43,26 @@ jobs:
     - name: Go format
       run: make goformat-ci
 
+  frontend_tests:
+    name: Test Front-end
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Check out the code
+      uses: actions/checkout@v2.1.0
+
+    # Install dependencies
+
+    - name: NPM dependencies
+      run: make npm-dep
+
+    # Run Jest tests
+
+    - name: Jest test coverage
+      run: make coverage-jest
+
+    # Static analysis and conformity to coding style
+
     - name: eslint
       run: make eslint-ci
 
@@ -61,7 +72,19 @@ jobs:
     - name: Prettier for HTML and Javascript config
       run: make prettier-ci
 
-    # Build and test the docker image
+  docker_image:
+    name: Test Docker image
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Install goss and dgoss
+      uses: e1himself/goss-installation-action@v1
+      with:
+        # Goss release version to install
+        version: 'v0.3.10'
+
+    - name: Check out the code
+      uses: actions/checkout@v2.1.0
 
     - name: Build the Docker image
       run: make build-docker-image

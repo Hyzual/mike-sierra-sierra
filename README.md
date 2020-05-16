@@ -31,20 +31,24 @@ $ make watch
 
 ```sh
 # Run unit tests
-$ make test
+$ make test-go
 # Run golint
-$ make lint
+$ make lint-go
 # Generate html test coverage
-$ make coverhtml
+$ make coverage-go-html
 ```
 
 #### NPM commands
 
 ```sh
 # Build and minify the CSS and Javascript (for production)
-make build-assets
+$ make build-assets
+# Run unit tests
+$ make test-jest
+# Display text test coverage
+$ make coverage-jest
 # Build and watch (for development)
-make watch
+$ make watch
 ```
 
 #### Database
@@ -91,9 +95,9 @@ $ npm run stylelint -- --fix ./styles
 #### Run eslint
 
 ```sh
-$ npm run eslint -- ./scripts
+$ npm run eslint -- .
 # To automatically fix problems
-$ npm run eslint -- --fix ./scripts
+$ npm run eslint -- --fix .
 ```
 
 #### Run prettier
