@@ -13,10 +13,10 @@ RUN go mod download
 # Copy the rest of the source files
 COPY . .
 
-# Build the go app and tar the binary and runtime folders together.
+# Build the go webserver and cli binaries and tar the webserver and the folders needed at runtime together.
 # It avoids having many COPY layers in the runtime image
-RUN go build -o main . \
-  && tar -cf built.tar main LICENSE templates/ database/
+RUN go build -o . ./cmd/webserver ./cmd/cli \
+  && tar -cf built.tar webserver LICENSE templates/ database/
 
 # -----
 # Builder image for frontend assets
@@ -51,6 +51,10 @@ VOLUME ["/app/database/file/", "/app/secrets/", "/music/"]
 RUN addgroup -S mike && adduser -S mike -G mike \
   && chown -R mike:mike /app
 
+# Copy the CLI app so that it is in the PATH
+COPY --from=go-builder ["/app/cli", "/usr/local/bin/mike"]
+
+# Change to non-root user
 USER mike
 
 # Copy the compiled binary and assets (not the sources)
@@ -64,7 +68,7 @@ RUN tar -xf ./assets.tar && rm ./assets.tar
 
 EXPOSE 8080 8443
 
-CMD ["./main"]
+CMD ["./webserver"]
 
 # Check that the homepage is displayed
 HEALTHCHECK --interval=5m --timeout=5s --start-period=5s --retries=3 \

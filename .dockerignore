@@ -13,6 +13,9 @@ assets/
 node_modules/
 # Ignore markdown
 *.md
+# Ignore CI / IDE stuff
+.github/
+.vscode/
 # Ignore test files
 **/*_test.go
 tests/
@@ -22,3 +25,5 @@ coverage.html
 database/file/
 # Ignore dev secrets
 secrets/
+# Ignore dev tools
+tools/

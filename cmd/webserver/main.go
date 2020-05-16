@@ -26,6 +26,7 @@ import (
 	"time"
 
 	"github.com/blang/vfs"
+	"github.com/hyzual/mike-sierra-sierra"
 	"github.com/hyzual/mike-sierra-sierra/server"
 	"github.com/hyzual/mike-sierra-sierra/server/user"
 	_ "github.com/mattn/go-sqlite3"
@@ -37,7 +38,7 @@ const disableHTTPSEnv = "MIKE_DISABLE_HTTPS"
 const musicPath = "/music" // It is a volume in the Docker image
 
 func main() {
-	cwd, err := cwd()
+	cwd, err := mike.Cwd()
 	if err != nil {
 		log.Fatalf("could not read the current working directory %v", err)
 	}

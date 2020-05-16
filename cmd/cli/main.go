@@ -15,20 +15,10 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package mike
+package main
 
-import (
-	"os"
+import "fmt"
 
-	"github.com/pkg/errors"
-)
-
-// Cwd returns the current working directory of the server
-// This is then used to include templates and serve static assets like CSS and JS files
-func Cwd() (string, error) {
-	dir, err := os.Getwd()
-	if err != nil {
-		return "", errors.Wrap(err, "Could not get the current working directory")
-	}
-	return dir, nil
+func main() {
+	fmt.Println("Mike-Sierra-Sierra CLI v0.1.0")
 }

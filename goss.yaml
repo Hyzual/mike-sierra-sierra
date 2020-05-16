@@ -6,14 +6,6 @@ file:
     group: mike
     filetype: directory
     contains: []
-  /app/secrets:
-    exists: true
-    mode: "0755"
-    size: 4096
-    owner: root
-    group: root
-    filetype: directory
-    contains: []
   /app/database/file:
     exists: true
     mode: "0755"
@@ -21,12 +13,12 @@ file:
     group: root
     filetype: directory
     contains: []
-  /app/main:
+  /app/secrets:
     exists: true
     mode: "0755"
-    owner: mike
-    group: mike
-    filetype: file
+    owner: root
+    group: root
+    filetype: directory
     contains: []
   /app/templates:
     exists: true
@@ -34,6 +26,13 @@ file:
     owner: mike
     group: mike
     filetype: directory
+    contains: []
+  /app/webserver:
+    exists: true
+    mode: "0755"
+    owner: mike
+    group: mike
+    filetype: file
     contains: []
 user:
   mike:
@@ -48,6 +47,13 @@ group:
   mike:
     exists: true
     gid: 101
+command:
+  mike:
+    exit-status: 0
+    stdout:
+    - Mike-Sierra-Sierra CLI
+    stderr: []
+    timeout: 5000
 http:
   http://localhost:8080/:
     status: 200

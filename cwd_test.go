@@ -15,14 +15,14 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package main
+package mike
 
 import (
 	"testing"
 )
 
 func TestCwd(t *testing.T) {
-	got, err := cwd()
+	got, err := Cwd()
 	if err != nil {
 		t.Errorf("did not expect an error, got one %v", err)
 	}
