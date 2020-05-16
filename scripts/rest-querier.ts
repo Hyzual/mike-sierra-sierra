@@ -16,6 +16,7 @@
  */
 
 import { ono } from "@jsdevtools/ono";
+import { Result, ok, err } from "neverthrow";
 
 interface Song {
     title: string;
@@ -26,29 +27,18 @@ interface Folder {
     items: Song[];
 }
 
-interface RESTResult<T> {
-    error: Error | null;
-    result: T | null;
-}
-
-export async function getFolder(folder_id: number): Promise<RESTResult<Folder>> {
+export async function getFolder(folder_id: number): Promise<Result<Folder, Error>> {
     const response = await fetch(`/api/folders/${folder_id}`, {
         method: "GET",
         headers: new Headers(),
     });
     if (!response.ok) {
-        return {
-            error: ono.error(`Could not GET /api/folders/${folder_id}`),
-            result: null,
-        };
+        return err(new Error(`Could not GET /api/folders/${folder_id}`));
     }
     try {
         const folder = await response.json();
-        return { error: null, result: folder };
+        return ok(folder)
     } catch (err) {
-        return {
-            error: ono(err, "Could not decode JSON into Folder"),
-            result: null,
-        };
+        return err(ono(err, "Could not decode JSON into Folder"));
     }
 }

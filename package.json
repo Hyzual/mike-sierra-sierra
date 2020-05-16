@@ -14,7 +14,8 @@
     "url": "https://github.com/Hyzual/mike-sierra-sierra/issues"
   },
   "dependencies": {
-    "@jsdevtools/ono": "^7.1.2"
+    "@jsdevtools/ono": "^7.1.2",
+    "neverthrow": "^2.2.1"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.33.0",

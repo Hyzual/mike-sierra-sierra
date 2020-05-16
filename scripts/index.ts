@@ -23,11 +23,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function printFolder(): Promise<void> {
     const res = await getFolder(0);
-    if (res.error) {
+    if (res.isErr()) {
         // eslint-disable-next-line no-console
         console.log(res.error);
         return;
     }
     // eslint-disable-next-line no-console
-    console.log(res.result)
+    console.log(res.value)
 }
