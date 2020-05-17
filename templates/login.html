@@ -5,15 +5,15 @@
         <title>Mike-Sierra-Sierra - Login</title>
         <link rel="stylesheet" href="{{.StylesheetURI}}" />
     </head>
-    <body class="login-body">
-        <main class="login-main" role="main">
-            <div class="login-form">
-                <h2 class="login-form-title">Please login:</h2>
+    <body class="mss-full-page-body">
+        <main class="mss-centered-main" role="main">
+            <div class="mss-login-form">
+                <h2 class="mss-login-form-title">Please login:</h2>
                 <form method="POST" action="/login">
-                    <div class="login-form-element">
-                        <label class="form-label" for="email">Email:</label>
+                    <div class="mss-form-element">
+                        <label class="mss-form-label" for="email">Email:</label>
                         <input
-                            class="form-input login-form-input"
+                            class="mss-form-input mss-form-input-large"
                             type="text"
                             name="email"
                             id="email"
@@ -22,12 +22,12 @@
                             tabindex="1"
                         />
                     </div>
-                    <div class="login-form-element">
-                        <label class="form-label" for="password"
+                    <div class="mss-form-element">
+                        <label class="mss-form-label" for="password"
                             >Password:</label
                         >
                         <input
-                            class="form-input login-form-input"
+                            class="mss-form-input mss-form-input-large"
                             type="password"
                             name="password"
                             id="password"
@@ -39,7 +39,7 @@
 
                     <button
                         type="submit"
-                        class="button-primary login-form-submit"
+                        class="mss-button-primary mss-button-wide mss-button-large"
                     >
                         Login
                     </button>

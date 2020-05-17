@@ -52,9 +52,9 @@ func main() {
 	assetsPath := path.Join(cwd, "assets")
 	assetsLoader := server.NewBasePathJoiner(cwd)
 	templatesPath := path.Join(cwd, "templates")
-	templateLoader := server.NewTemplateLoader(templatesPath)
+	templateExecutor := server.NewTemplateExecutor(templatesPath)
 	musicLoader := server.NewBasePathJoiner(musicPath)
-	assetsResolver := server.NewAssetsResolver(vfs.OS(), assetsPath)
+	assetsResolver := server.NewAssetsResolver(vfs.OS(), assetsPath, "/assets")
 
 	sessionStore := memstore.New(time.Minute * 5)
 	sessionManager := sessionup.NewManager(
@@ -65,7 +65,7 @@ func main() {
 	router := server.New(
 		sessionManager,
 		assetsLoader,
-		templateLoader,
+		templateExecutor,
 		musicLoader,
 		assetsResolver,
 		loginHandler,

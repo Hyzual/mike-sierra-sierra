@@ -15,20 +15,14 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-.app-body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
-.app-header {
+.mss-app-header {
     display: flex;
     flex: 0 0 auto;
     height: 40px;
     background: var(--darker-main-color);
 }
 
-.app-header-app-name {
+.mss-app-header-app-name {
     flex: 0 1 auto;
     padding: 4px;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
@@ -38,11 +32,11 @@
     text-shadow: 1px 1px 2px var(--dark-shades-color);
 }
 
-.app-header-spacer {
+.mss-app-header-spacer {
     flex: 1 1 0;
 }
 
-.app-header-current-user {
+.mss-app-header-current-user {
     display: flex;
     flex: 0 1 auto;
     flex-direction: row;
@@ -50,26 +44,26 @@
     margin: 0 16px 0 0;
 }
 
-.app-header-current-user-avatar {
+.mss-app-header-current-user-avatar {
     padding: 4px;
 }
 
-.app-header-logout {
+.mss-app-header-logout {
     display: flex;
     flex: 0 0 auto;
     align-items: center;
     padding: 0 8px;
 }
 
-.app-header-logout-link {
+.mss-app-header-logout-link {
     color: var(--darker-light-shades-color);
 }
 
-.app-header-logout-link:hover {
+.mss-app-header-logout-link:hover {
     color: var(--lighter-light-shades-color);
 }
 
-.app-main {
+.mss-app-main {
     display: grid;
     flex: 1 1 auto;
     background: var(--dark-shades-color);

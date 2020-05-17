@@ -15,12 +15,7 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-.login-body {
-    display: flex;
-    min-height: 100vh;
-}
-
-.login-main {
+.mss-centered-main {
     display: flex;
     flex: 1 0 auto;
     flex-direction: column;
@@ -29,32 +24,29 @@
     background: var(--dark-shades-color);
 }
 
-.login-form {
+.mss-login-form {
     padding: 40px;
     border: 1px solid var(--darker-main-color);
     border-radius: 5px;
     background: var(--lighter-dark-shades-color);
 }
 
-.login-form-title {
+.mss-login-form-title {
     color: var(--main-color);
     font-size: 24px;
     text-align: center;
 }
 
-.login-form-element {
-    margin: 0 0 20px;
+/* Register */
+.mss-register-form {
+    max-width: 450px;
+    padding: 40px;
+    border: 1px solid var(--darker-main-color);
+    border-radius: 5px;
+    background: var(--ligther-dark-shades-color);
 }
 
-.login-form-input {
-    border: 1px solid var(--main-color);
-}
-
-.login-form-submit {
-    width: 100%;
-    height: 48px;
-    border-radius: 4px;
-    font-size: 22px;
-    font-weight: 600;
-    text-align: center;
+.mss-register-form-title {
+    color: var(--main-color);
+    font-size: 24px;
 }

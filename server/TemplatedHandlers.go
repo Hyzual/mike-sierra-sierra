@@ -24,52 +24,74 @@ import (
 )
 
 type getLoginHandler struct {
-	templateLoader TemplateLoader
-	assetsResolver AssetsResolver
+	templateExecutor TemplateExecutor
+	assetsResolver   AssetsResolver
 }
 
 func (g *getLoginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) error {
-	hashedName, err := g.assetsResolver.GetHashedName("style.css")
+	hashedName, err := g.assetsResolver.GetAssetURI("style.css")
 	if err != nil {
 		return errors.Wrapf(err, "could not resolve assets %s", "style.css")
 	}
-	tmpl, err := g.templateLoader.Load("login.html")
+	presenter := &loginPresenter{StylesheetURI: hashedName}
+	err = g.templateExecutor.Load(writer, "login.html", presenter)
 	if err != nil {
 		return errors.Wrapf(err, "could not load template %s", "login.html")
 	}
-	presenter := &loginPresenter{StylesheetURI: "/assets/" + hashedName}
-	return tmpl.Execute(writer, presenter)
+	return nil
 }
 
 type loginPresenter struct {
 	StylesheetURI string
 }
 
-type homeHandler struct {
-	templateLoader TemplateLoader
-	assetsResolver AssetsResolver
+type firstTimeRegistrationHandler struct {
+	templateExecutor TemplateExecutor
+	assetsResolver   AssetsResolver
 }
 
-func (h *homeHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) error {
-	stylesheetHashedName, err := h.assetsResolver.GetHashedName("style.css")
+func (f *firstTimeRegistrationHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) error {
+	styleSheetURI, err := f.assetsResolver.GetAssetURI("style.css")
 	if err != nil {
 		return errors.Wrapf(err, "could not resolve asset %s", "style.css")
 	}
-	appHashedName, err := h.assetsResolver.GetHashedName("index.js")
+	presenter := &firstTimeRegistrationPresenter{StylesheetURI: styleSheetURI}
+	err = f.templateExecutor.Load(writer, "first-time-registration.html", presenter)
+	if err != nil {
+		return errors.Wrapf(err, "could not load template %s", "first-time-registration.html")
+	}
+	return nil
+}
+
+type firstTimeRegistrationPresenter struct {
+	StylesheetURI string // Public URI path to the stylesheet
+}
+
+type homeHandler struct {
+	templateExecutor TemplateExecutor
+	assetsResolver   AssetsResolver
+}
+
+func (h *homeHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) error {
+	styleSheetURI, err := h.assetsResolver.GetAssetURI("style.css")
+	if err != nil {
+		return errors.Wrapf(err, "could not resolve asset %s", "style.css")
+	}
+	scriptURI, err := h.assetsResolver.GetAssetURI("index.js")
 	if err != nil {
 		return errors.Wrapf(err, "could not resolve asset %s", "index.js")
 	}
-	tmpl, err := h.templateLoader.Load("app.html")
+	headerPresenter := &headerPresenter{"Hyzual"}
+	presenter := &homePresenter{
+		StylesheetURI:   styleSheetURI,
+		AppURI:          scriptURI,
+		HeaderPresenter: headerPresenter,
+	}
+	err = h.templateExecutor.Load(writer, "app.html", presenter)
 	if err != nil {
 		return errors.Wrapf(err, "could not load template %s", "app.html")
 	}
-	headerPresenter := &headerPresenter{"Hyzual"}
-	presenter := &homePresenter{
-		StylesheetURI:   "/assets/" + stylesheetHashedName,
-		AppURI:          "/assets/" + appHashedName,
-		HeaderPresenter: headerPresenter,
-	}
-	return tmpl.Execute(writer, presenter)
+	return nil
 }
 
 type homePresenter struct {

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Mike-Sierra-Sierra - First-Time-Registration</title>
+        <link rel="stylesheet" href="{{.StylesheetURI}}" />
+    </head>
+    <body class="mss-full-page-body">
+        <main class="mss-centered-main" role="main">
+            <div class="mss-register-form">
+                <h2 class="mss-register-form-title">
+                    Register the administrator account
+                </h2>
+                <p>
+                    Mike-Sierra-Sierra has been succesfully installed! Please
+                    create the first administrator account in order to proceed.
+                </p>
+                <form action="/first-time-registration" method="POST">
+                    <div class="mss-form-element">
+                        <label for="email" class="mss-form-label">Email:</label>
+                        <input
+                            class="mss-form-input mss-form-input-large"
+                            type="text"
+                            name="email"
+                            id="email"
+                            placeholder="mail@example.com"
+                            autocomplete="email"
+                            tabindex="1"
+                        />
+                        <p class="mss-text-help">
+                            We won't send you emails, the email address is only
+                            used to match an avatar on
+                            <a href="https://gravatar.com"
+                                >https://gravatar.com</a
+                            >.
+                        </p>
+                    </div>
+                    <div class="mss-form-element">
+                        <label for="password" class="mss-form-label"
+                            >Password:</label
+                        >
+                        <input
+                            class="mss-form-input mss-form-input-large"
+                            type="password"
+                            name="password"
+                            id="password"
+                            placeholder="Password"
+                            autocomplete="new-password"
+                            tabindex="2"
+                        />
+                    </div>
+                    <div class="mss-form-element">
+                        <label for="username" class="mss-form-label"
+                            >(Display-only) Username:</label
+                        >
+                        <input
+                            class="mss-form-input mss-form-input-large"
+                            type="text"
+                            name="username"
+                            id="username"
+                            placeholder="Username"
+                            autocomplete="username"
+                            tabindex="3"
+                        />
+                        <p class="mss-text-help">
+                            The Username is only for display purposes, it cannot
+                            be used to log in.
+                        </p>
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="mss-button-primary mss-button-wide mss-button-large"
+                    >
+                        Register
+                    </button>
+                </form>
+            </div>
+        </main>
+    </body>
+</html>

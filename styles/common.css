@@ -27,11 +27,16 @@ Used https://www.sassmeister.com/ to compute darker / lighter variants
 $main-color: #17161e;
 $darker-color: darken($main-color, 5%);
 $lighter-color: lighten($main-color, 5%);
+div {
+  --main-color: #{$main-color};
+  --darker-color: #{$darker-color};
+  --lighter-color: #{$lighter-color};
+}
 */
 body {
-    --light-shades-color: #faf7fa;
-    --darker-light-shades-color: #f0e7f0;
-    --lighter-light-shades-color: #fff;
+    --light-shades-color: #e6e1e6;
+    --darker-light-shades-color: #dad3da;
+    --lighter-light-shades-color: #f2eff2;
     --light-accent-color: #d09952;
     --darker-light-accent-color: #cb8d3e;
     --lighter-light-accent-color: #d5a566;
@@ -50,7 +55,13 @@ body {
     font-family: Arial, Helvetica, sans-serif;
 }
 
-.button-primary {
+.mss-full-page-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.mss-button-primary {
     display: inline-block;
     overflow: hidden;
     border-color: var(--main-color);
@@ -60,39 +71,65 @@ body {
     cursor: pointer;
 }
 
-.button-primary:hover {
+.mss-button-primary:hover {
     border-color: var(--lighter-main-color);
     background-color: var(--lighter-main-color);
 }
 
-.form-element-disabled {
+.mss-button-large {
+    height: 48px;
+    border-radius: 4px;
+    font-size: 22px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.mss-button-wide {
+    width: 100%;
+}
+
+.mss-form-element {
+    margin: 0 0 16px;
+}
+
+.mss-form-element-disabled {
     --disabled-color: #929292;
 
     color: var(--disabled-color);
 }
 
-.form-label {
+.mss-form-label {
     display: block;
     margin: 0 0 8px;
-    color: var(--dark-accent-color);
+    color: var(--light-shades-color);
     font-size: 14px;
     font-weight: 600;
 }
 
-.form-label[for] {
+.mss-form-label[for] {
     cursor: pointer;
 }
 
-.form-input {
+.mss-form-input {
+    border: 1px solid var(--darker-main-color);
+}
+
+.mss-form-input-large {
     height: 46px;
     padding: 0 16px;
     font-size: 18px;
 }
 
-.form-element-disabled > .form-label {
+.mss-form-element-disabled > .mss-form-label {
     color: var(--disabled-color);
 }
 
-.form-element-disabled > .form-input {
+.mss-form-element-disabled > .mss-form-input {
     border-color: var(--disabled-color);
+}
+
+.mss-text-help {
+    margin: 4px 0 0;
+    color: var(--darker-light-shades-color);
+    font-size: 13px;
 }

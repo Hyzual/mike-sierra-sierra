@@ -44,7 +44,7 @@ type MusicServer struct {
 func New(
 	sessionManager *sessionup.Manager,
 	assetsLoader PathJoiner,
-	templateLoader TemplateLoader,
+	templateExecutor TemplateExecutor,
 	musicLoader PathJoiner,
 	assetsResolver AssetsResolver,
 	postLoginHandler *user.LoginHandler,
@@ -54,14 +54,16 @@ func New(
 	s.assetsLoader = assetsLoader
 
 	homeHandler := sessionManager.Auth(
-		WrapErrors(&homeHandler{templateLoader, assetsResolver}),
+		WrapErrors(&homeHandler{templateExecutor, assetsResolver}),
 	)
-	getLoginHandler := WrapErrors(&getLoginHandler{templateLoader, assetsResolver})
+	getLoginHandler := WrapErrors(&getLoginHandler{templateExecutor, assetsResolver})
+	firstTimeRegistrationHandler := WrapErrors(&firstTimeRegistrationHandler{templateExecutor, assetsResolver})
 	musicHandler := &musicHandler{musicLoader}
 
 	router := mux.NewRouter()
 	router.HandleFunc("/", s.rootHandler)
 	router.Handle("/home", homeHandler)
+	router.Handle("/first-time-registration", firstTimeRegistrationHandler)
 	router.Handle("/login", getLoginHandler).Methods(http.MethodGet)
 	router.Handle("/login", postLoginHandler).Methods(http.MethodPost)
 	router.PathPrefix("/assets/").HandlerFunc(s.assetsHandler)

@@ -5,27 +5,30 @@
         <title>Mike-Sierra-Sierra - App</title>
         <link rel="stylesheet" href="{{.StylesheetURI}}" />
     </head>
-    <body class="app-body">
+    <body class="mss-full-page-body">
         {{with .HeaderPresenter}}
-        <header class="app-header">
-            <div class="app-header-app-name">Mike-Sierra-Sierra</div>
-            <div class="app-header-spacer"></div>
-            <div class="app-header-current-user">
+        <header class="mss-app-header">
+            <div class="mss-app-header-app-name">Mike-Sierra-Sierra</div>
+            <div class="mss-app-header-spacer"></div>
+            <div class="mss-app-header-current-user">
                 <img
                     src="https://www.gravatar.com/avatar/00000000000000000000000000000000?s=32"
                     alt="Gravatar profile picture"
-                    class="app-header-current-user-avatar"
+                    class="mss-app-header-current-user-avatar"
                 /><span>{{.Username}}</span>
             </div>
-            <div class="app-header-logout">
-                <a class="app-header-logout-link" href="/logout" tabindex="2"
+            <div class="mss-app-header-logout">
+                <a
+                    class="mss-app-header-logout-link"
+                    href="/logout"
+                    tabindex="2"
                     >Log out</a
                 >
             </div>
         </header>
         {{end}}
-        <main class="app-main" role="main">
-            <div class="player">
+        <main class="mss-app-main" role="main">
+            <div>
                 <audio controls>
                     <source
                         src="/music/12- Glenn Stafford - Zerg Two.flac"

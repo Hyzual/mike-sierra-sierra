@@ -20,6 +20,7 @@ package server_test
 import (
 	"encoding/json"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/blang/vfs"
@@ -49,20 +50,23 @@ func TestBasePathJoiner(t *testing.T) {
 	})
 }
 
-func TestTemplateLoader(t *testing.T) {
+func TestTemplateExecutor(t *testing.T) {
 	basePath, err := os.Getwd()
 	if err != nil {
 		t.Fatalf("Could not get the current working directory, '%v'", err)
 	}
-	loader := server.NewTemplateLoader(basePath)
+	loader := server.NewTemplateExecutor(basePath)
 
-	t.Run("it parses the template files relative to its base path", func(t *testing.T) {
-		_, err := loader.Load("../templates/login.html")
+	t.Run(`it parses the template file relative to its base path
+		and executes it with the given data`, func(t *testing.T) {
+		writer := &strings.Builder{}
+		err := loader.Load(writer, "../templates/login.html", nil)
 		tests.AssertNoError(t, err)
 	})
 
 	t.Run("when it cannot load a template, it returns an error", func(t *testing.T) {
-		_, err := loader.Load("./unknown-template.html")
+		writer := &strings.Builder{}
+		err := loader.Load(writer, "./unknown-template.html", nil)
 		tests.AssertError(t, err)
 	})
 }
@@ -72,39 +76,41 @@ func TestAssetsResolver(t *testing.T) {
 	t.Run("when there is no manifest.json file in the assets directory, it will return an error", func(t *testing.T) {
 		resolver := newResolverWithNoManifest(t)
 
-		_, err := resolver.GetHashedName("style.css")
+		_, err := resolver.GetAssetURI("style.css")
 		tests.AssertError(t, err)
 	})
 
 	t.Run("when the manifest.json file is not JSON-encoded, it will return an error", func(t *testing.T) {
 		resolver := newResolverWithBadlyEncodedManifest(t)
 
-		_, err := resolver.GetHashedName("style.css")
+		_, err := resolver.GetAssetURI("style.css")
 		tests.AssertError(t, err)
 	})
 
 	t.Run("given a baseName not found in the manifest.json file, it will return an error", func(t *testing.T) {
 		resolver := newResolverWithValidManifest(t)
 
-		_, err := resolver.GetHashedName("unknown/file.js")
+		_, err := resolver.GetAssetURI("unknown/file.js")
 		tests.AssertError(t, err)
 	})
 
-	t.Run("given a baseName, it will return the hashed file name from the manifest.json file", func(t *testing.T) {
+	t.Run(`given a baseName,
+		it will read the hashed file name from the manifest.json file,
+		and return it joined to its baseURI`, func(t *testing.T) {
 		resolver := newResolverWithValidManifest(t)
 
-		got, err := resolver.GetHashedName("style.css")
+		got, err := resolver.GetAssetURI("style.css")
 
 		tests.AssertNoError(t, err)
-		assertHashedNameEquals(t, got, "style.chunkhash.css")
+		assertHashedNameEquals(t, got, "/assets/style.chunkhash.css")
 	})
 
-	t.Run("when baseName contains a slash, it will return the hashed file name without error", func(t *testing.T) {
+	t.Run("when baseName contains a slash, it will return the joined hashed file name without error", func(t *testing.T) {
 		resolver := newResolverWithValidManifest(t)
 
-		got, err := resolver.GetHashedName("subdirectory/file.js")
+		got, err := resolver.GetAssetURI("subdirectory/file.js")
 		tests.AssertNoError(t, err)
-		assertHashedNameEquals(t, got, "subdirectory/file.chunkhash.js")
+		assertHashedNameEquals(t, got, "/assets/subdirectory/file.chunkhash.js")
 	})
 }
 
@@ -112,18 +118,24 @@ func newResolverWithNoManifest(t *testing.T) server.AssetsResolver {
 	t.Helper()
 
 	testFS := memfs.Create()
-	testFS.Mkdir("/assets", 0755)
+	err := vfs.MkdirAll(testFS, "/app/assets", 0755)
+	if err != nil {
+		t.Fatal("could not create the /app/assets folders")
+	}
 	// No manifest.json file
 
-	return server.NewAssetsResolver(testFS, "/assets")
+	return server.NewAssetsResolver(testFS, "/app/assets", "/assets")
 }
 
 func buildManifestFile(t *testing.T) (vfs.Filesystem, vfs.File, func()) {
 	t.Helper()
 
 	testFS := memfs.Create()
-	testFS.Mkdir("/assets", 0755)
-	manifest, err := testFS.OpenFile("/assets/manifest.json", os.O_CREATE|os.O_RDWR, 0755)
+	err := vfs.MkdirAll(testFS, "/app/assets", 0755)
+	if err != nil {
+		t.Fatal("could not create the /app/assets folders")
+	}
+	manifest, err := testFS.OpenFile("/app/assets/manifest.json", os.O_CREATE|os.O_RDWR, 0755)
 	if err != nil {
 		t.Fatalf("Could not setup test manifest file, '%v'", err)
 	}
@@ -140,7 +152,7 @@ func newResolverWithBadlyEncodedManifest(t *testing.T) server.AssetsResolver {
 	defer closeManifestFile()
 	// manifest is empty and does not contain JSON
 
-	return server.NewAssetsResolver(testFS, "/assets")
+	return server.NewAssetsResolver(testFS, "/app/assets", "/assets")
 }
 
 func newResolverWithValidManifest(t *testing.T) server.AssetsResolver {
@@ -153,7 +165,7 @@ func newResolverWithValidManifest(t *testing.T) server.AssetsResolver {
 	if err != nil {
 		t.Fatalf("Could not setup test manifest file, '%v'", err)
 	}
-	return server.NewAssetsResolver(testFS, "/assets")
+	return server.NewAssetsResolver(testFS, "/app/assets", "/assets")
 }
 
 func assertPathEquals(t *testing.T, got, want string) {

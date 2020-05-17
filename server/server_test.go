@@ -115,15 +115,15 @@ func newSessionManager() *sessionup.Manager {
 func newMusicServer() *MusicServer {
 	sessionManager := newSessionManager()
 	assetsIncluder := &stubPathJoiner{filename: ""}
-	templateLoader := &stubTemplateLoader{}
-	return New(sessionManager, assetsIncluder, templateLoader, nil, nil, nil)
+	templateExecutor := &stubTemplateExecutor{}
+	return New(sessionManager, assetsIncluder, templateExecutor, nil, nil, nil)
 }
 
 func newMusicServerWithAsset(filename string) *MusicServer {
 	sessionManager := newSessionManager()
 	assetsIncluder := &stubPathJoiner{filename}
-	templateLoader := &stubTemplateLoader{}
-	return New(sessionManager, assetsIncluder, templateLoader, nil, nil, nil)
+	templateExecutor := &stubTemplateExecutor{}
+	return New(sessionManager, assetsIncluder, templateExecutor, nil, nil, nil)
 }
 
 func newMusicServerWithMusic(filename string) *MusicServer {

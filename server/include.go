@@ -20,6 +20,7 @@ package server
 import (
 	"encoding/json"
 	"html/template"
+	"io"
 	"os"
 	"path"
 	"path/filepath"
@@ -53,55 +54,65 @@ func (b *basePathJoiner) Join(relativePath string) string {
 	return path.Join(b.basePath, relativePath)
 }
 
-// TemplateLoader resolves the given relative file path from the templates/ folder
-// and returns the template parsed from the file or an error
-type TemplateLoader interface {
-	Load(templatePath string) (*template.Template, error)
+// TemplateExecutor resolves the given relative file path from the templates/ folder,
+// parses the template from the file and executes it on the given writer.
+// It returns an error if the template can't be found or if the execution fails.
+type TemplateExecutor interface {
+	Load(writer io.Writer, templatePath string, data interface{}) error
 }
 
-// templateBaseLoader implements TemplateLoader for production code
-type templateBaseLoader struct {
+// templateBaseExecutor implements TemplateExecutor for production code
+type templateBaseExecutor struct {
 	basePath string // absolute path to the /templates directory
 }
 
-// NewTemplateLoader creates a new TemplateLoader
-func NewTemplateLoader(basePath string) TemplateLoader {
-	return &templateBaseLoader{basePath}
+// NewTemplateExecutor creates a new TemplateExecutor
+func NewTemplateExecutor(basePath string) TemplateExecutor {
+	return &templateBaseExecutor{basePath}
 }
 
-// Load loads the template at templatePath (relative path from the templates/ folder)
-// and returns it. It returns an error if any (for example no file exists at templatePath)
-func (t *templateBaseLoader) Load(templatePath string) (*template.Template, error) {
+// Load loads the template at templatePath (relative path from the templates/ folder),
+// parses the template from the file and executes it on the given writer.
+// It returns an error if the template can't be found or if the execution fails.
+func (t *templateBaseExecutor) Load(writer io.Writer, templatePath string, data interface{}) error {
 	cleanedPath := path.Join(t.basePath, filepath.Clean(templatePath))
 	tmpl, err := template.ParseFiles(cleanedPath)
-
 	if err != nil {
-		return nil, errors.Wrap(err, "could not load template")
+		return errors.Wrapf(err, "could not load the template %s", templatePath)
 	}
-	return tmpl, nil
+	err = tmpl.Execute(writer, data)
+	if err != nil {
+		return errors.Wrapf(err, "could not execute the template %s", templatePath)
+	}
+	return nil
 }
 
 // AssetsResolver reads the manifest.json file in the /assets directory
-// It is used by templates to resolve assets URLs with chunkhashes in their names.
-// For example, it translates "style.css" to "style-caf5894036274013394c.css".
+// It is used by templates to resolve asset URIs with chunkhashes in their names.
+// For example, it translates "style.css" to "/assets/style-caf5894036274013394c.css".
 // It returns an error if it can't find the manifest file or can't decode its contents
 // from JSON or can't find the given baseName in the manifest contents
 type AssetsResolver interface {
-	GetHashedName(baseName string) (string, error)
+	GetAssetURI(baseName string) (string, error)
 }
 
 // baseAssetsResoler inmplements AssetsResolver
 type baseAssetsResolver struct {
 	fs             vfs.Filesystem
 	assetsBasePath string
+	assetsBaseURI  string
 }
 
 // NewAssetsResolver creates a new AssetsResolver
-func NewAssetsResolver(fs vfs.Filesystem, assetsBasePath string) AssetsResolver {
-	return &baseAssetsResolver{fs, assetsBasePath}
+func NewAssetsResolver(fs vfs.Filesystem, assetsBasePath, assetsBaseURI string) AssetsResolver {
+	return &baseAssetsResolver{fs, assetsBasePath, assetsBaseURI}
 }
 
-func (b *baseAssetsResolver) GetHashedName(baseName string) (string, error) {
+// GetAssetURI returns the asset's URI from its baseName.
+// It reads the "manifest.json" file found at assetsBasePath and searches for baseName.
+// It then joins the corresponding "hashed file name" (read from the manifest.json file)
+// to its assetsBaseURI and returns the joined URI.
+func (b *baseAssetsResolver) GetAssetURI(baseName string) (string, error) {
 	manifestPath := path.Join(b.assetsBasePath, "./manifest.json")
 	manifestFile, err := b.fs.OpenFile(manifestPath, os.O_RDONLY, 0)
 	if err != nil {
@@ -119,7 +130,9 @@ func (b *baseAssetsResolver) GetHashedName(baseName string) (string, error) {
 	if !ok {
 		return "", errors.Errorf("Could not find %s in the manifest.json file", baseName)
 	}
-	return hashedFileName, nil
+	joinedURI := path.Join(b.assetsBaseURI, hashedFileName)
+
+	return joinedURI, nil
 }
 
 type assetsManifest = map[string]string
