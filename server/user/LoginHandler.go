@@ -15,73 +15,93 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*
-Package user groups together user authentication code.
-Authenticating the user, logging in, retrieving logged-in current user, etc.
-*/
 package user
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 
 	"github.com/gorilla/schema"
+	"github.com/hyzual/mike-sierra-sierra/server"
 	"github.com/pkg/errors"
 	"github.com/swithek/sessionup"
 )
 
 const userSessionName = "userSession"
 
-// LoginHandler handles POST /login route
-type LoginHandler struct {
+// NewLoginGetHandler creates a new handler for GET /login
+func NewLoginGetHandler(
+	te server.TemplateExecutor,
+	ar server.AssetsResolver,
+) http.Handler {
+	return server.WrapErrors(
+		&getLoginHandler{te, ar},
+	)
+}
+
+type getLoginHandler struct {
+	templateExecutor server.TemplateExecutor
+	assetsResolver   server.AssetsResolver
+}
+
+func (h *getLoginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) error {
+	hashedName, err := h.assetsResolver.GetAssetURI("style.css")
+	if err != nil {
+		return errors.Wrapf(err, "could not resolve assets %s", "style.css")
+	}
+	presenter := &loginPresenter{StylesheetURI: hashedName}
+	err = h.templateExecutor.Load(writer, "login.html", presenter)
+	if err != nil {
+		return errors.Wrapf(err, "could not load template %s", "login.html")
+	}
+	return nil
+}
+
+type loginPresenter struct {
+	StylesheetURI string
+}
+
+type postLoginHandler struct {
 	userStore      Store
 	sessionManager *sessionup.Manager
+	decoder        *schema.Decoder
 }
 
-// NewLoginHandler creates a new LoginHandler
-func NewLoginHandler(userStore Store, sessionManager *sessionup.Manager) *LoginHandler {
-	return &LoginHandler{userStore, sessionManager}
+// NewLoginPostHandler creates a new handler for POST /login
+func NewLoginPostHandler(
+	userStore Store,
+	sessionManager *sessionup.Manager,
+	decoder *schema.Decoder,
+) http.Handler {
+	return server.WrapErrors(
+		&postLoginHandler{userStore, sessionManager, decoder},
+	)
 }
 
-// ServeHTTP handles POST /login route
-func (l *LoginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	decoder := schema.NewDecoder()
+func (h *postLoginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) error {
 	err := request.ParseForm()
 	if err != nil {
-		log.Println(errors.Wrap(err, "Could not parse the login form"))
-		badRequest(writer, request)
-		return
+		return server.NewBadRequestError(err, "Could not parse the login form")
 	}
 
 	credentials := new(Credentials)
-	decoder.ZeroEmpty(true)
-	err = decoder.Decode(credentials, request.PostForm)
+	err = h.decoder.Decode(credentials, request.PostForm)
 	if err != nil {
-		log.Println(errors.Wrap(err, "Could not decode the login form into its representation"))
-		http.Error(writer, "Bad Request", http.StatusBadRequest)
-		return
+		return server.NewBadRequestError(err, "Could not decode the login form into its representation")
 	}
 
-	currentUser, err := l.userStore.GetUserMatchingCredentials(credentials)
+	currentUser, err := h.userStore.GetUserMatchingCredentials(request.Context(), credentials)
 	if err != nil {
-		http.Error(writer, "Forbidden", http.StatusForbidden)
-		return
+		return server.NewForbiddenError(errors.New("Invalid credentials"))
 	}
 	stringUserID := strconv.FormatUint(uint64(currentUser.ID), 10)
-	err = l.sessionManager.Init(writer, request, stringUserID)
+	err = h.sessionManager.Init(writer, request, stringUserID)
 	if err != nil {
-		log.Println(errors.Wrap(err, "Could not decode the user session"))
-		http.Error(writer, "Internal Server Errror", http.StatusInternalServerError)
-		return
+		return errors.Wrap(err, "Could not decode the user session")
 	}
 
 	http.Redirect(writer, request, "/home", http.StatusFound)
-}
-
-// badRequest replies to the request with an HTTP 400 Bad request error.
-func badRequest(writer http.ResponseWriter, request *http.Request) {
-	http.Error(writer, "Bad Request", http.StatusBadRequest)
+	return nil
 }
 
 // Credentials represents the user credentials required to log in

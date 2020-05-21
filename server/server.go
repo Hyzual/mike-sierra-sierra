@@ -26,8 +26,6 @@ import (
 	"path"
 
 	"github.com/gorilla/mux"
-	"github.com/hyzual/mike-sierra-sierra/server/rest"
-	"github.com/hyzual/mike-sierra-sierra/server/user"
 	"github.com/swithek/sessionup"
 )
 
@@ -42,12 +40,12 @@ type MusicServer struct {
 
 // New creates a new MusicServer
 func New(
+	router *mux.Router,
 	sessionManager *sessionup.Manager,
 	assetsLoader PathJoiner,
 	templateExecutor TemplateExecutor,
 	musicLoader PathJoiner,
 	assetsResolver AssetsResolver,
-	postLoginHandler *user.LoginHandler,
 ) *MusicServer {
 	s := new(MusicServer)
 	s.sessionManager = sessionManager
@@ -56,20 +54,12 @@ func New(
 	homeHandler := sessionManager.Auth(
 		WrapErrors(&homeHandler{templateExecutor, assetsResolver}),
 	)
-	getLoginHandler := WrapErrors(&getLoginHandler{templateExecutor, assetsResolver})
-	firstTimeRegistrationHandler := WrapErrors(&firstTimeRegistrationHandler{templateExecutor, assetsResolver})
 	musicHandler := &musicHandler{musicLoader}
 
-	router := mux.NewRouter()
 	router.HandleFunc("/", s.rootHandler)
 	router.Handle("/home", homeHandler)
-	router.Handle("/first-time-registration", firstTimeRegistrationHandler)
-	router.Handle("/login", getLoginHandler).Methods(http.MethodGet)
-	router.Handle("/login", postLoginHandler).Methods(http.MethodPost)
 	router.PathPrefix("/assets/").HandlerFunc(s.assetsHandler)
 	router.PathPrefix("/music/").Handler(http.StripPrefix("/music/", musicHandler))
-	// The REST API Subrouter registers itself
-	rest.Register(router, sessionManager)
 
 	s.Handler = router
 	return s
@@ -95,23 +85,6 @@ type musicHandler struct {
 
 func (m *musicHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	http.ServeFile(writer, request, m.pathJoiner.Join(request.URL.Path))
-}
-
-// ErroringHandler is a http.Handler that can return an error.
-// If the error is not nil, it will be output as a 500 Internal Server Error.
-type ErroringHandler interface {
-	ServeHTTP(writer http.ResponseWriter, request *http.Request) error
-}
-
-// WrapErrors wraps ErroringHandler, catches the error returned from its ServeHTTP function
-// and outputs a 500 Internal Server Error to the user with it.
-func WrapErrors(next ErroringHandler) http.Handler {
-	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		err := next.ServeHTTP(writer, request)
-		if err != nil {
-			http.Error(writer, err.Error(), http.StatusInternalServerError)
-		}
-	})
 }
 
 // HandleUnauthorized redirects to /login when users are not authenticated.

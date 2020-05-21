@@ -23,50 +23,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-type getLoginHandler struct {
-	templateExecutor TemplateExecutor
-	assetsResolver   AssetsResolver
-}
-
-func (g *getLoginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) error {
-	hashedName, err := g.assetsResolver.GetAssetURI("style.css")
-	if err != nil {
-		return errors.Wrapf(err, "could not resolve assets %s", "style.css")
-	}
-	presenter := &loginPresenter{StylesheetURI: hashedName}
-	err = g.templateExecutor.Load(writer, "login.html", presenter)
-	if err != nil {
-		return errors.Wrapf(err, "could not load template %s", "login.html")
-	}
-	return nil
-}
-
-type loginPresenter struct {
-	StylesheetURI string
-}
-
-type firstTimeRegistrationHandler struct {
-	templateExecutor TemplateExecutor
-	assetsResolver   AssetsResolver
-}
-
-func (f *firstTimeRegistrationHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) error {
-	styleSheetURI, err := f.assetsResolver.GetAssetURI("style.css")
-	if err != nil {
-		return errors.Wrapf(err, "could not resolve asset %s", "style.css")
-	}
-	presenter := &firstTimeRegistrationPresenter{StylesheetURI: styleSheetURI}
-	err = f.templateExecutor.Load(writer, "first-time-registration.html", presenter)
-	if err != nil {
-		return errors.Wrapf(err, "could not load template %s", "first-time-registration.html")
-	}
-	return nil
-}
-
-type firstTimeRegistrationPresenter struct {
-	StylesheetURI string // Public URI path to the stylesheet
-}
-
 type homeHandler struct {
 	templateExecutor TemplateExecutor
 	assetsResolver   AssetsResolver

@@ -30,8 +30,7 @@ import (
 // NewGetRequest simplifies creating a new GET request
 func NewGetRequest(t *testing.T, url string) *http.Request {
 	t.Helper()
-	req, _ := http.NewRequest(http.MethodGet, url, nil)
-	return req
+	return httptest.NewRequest(http.MethodGet, url, nil)
 }
 
 // AssertStatusEquals verifies that the request status code matches expectation

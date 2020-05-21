@@ -26,8 +26,11 @@ import (
 	"time"
 
 	"github.com/blang/vfs"
+	"github.com/gorilla/mux"
+	"github.com/gorilla/schema"
 	"github.com/hyzual/mike-sierra-sierra"
 	"github.com/hyzual/mike-sierra-sierra/server"
+	"github.com/hyzual/mike-sierra-sierra/server/rest"
 	"github.com/hyzual/mike-sierra-sierra/server/user"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/swithek/sessionup"
@@ -61,14 +64,25 @@ func main() {
 		sessionStore, sessionup.CookieName("id"),
 		sessionup.Reject(server.HandleUnauthorized),
 	)
-	loginHandler := user.NewLoginHandler(userStore, sessionManager)
-	router := server.New(
+	router := mux.NewRouter()
+	decoder := schema.NewDecoder()
+	user.Register(
+		router,
+		templateExecutor,
+		assetsResolver,
+		userStore,
+		sessionManager,
+		decoder,
+	)
+	// The REST API Subrouter registers itself
+	rest.Register(router, sessionManager)
+	server := server.New(
+		router,
 		sessionManager,
 		assetsLoader,
 		templateExecutor,
 		musicLoader,
 		assetsResolver,
-		loginHandler,
 	)
 
 	var port string
@@ -79,7 +93,7 @@ func main() {
 		port = "8443"
 	}
 	srv := &http.Server{
-		Handler:      router,
+		Handler:      server,
 		Addr:         ":" + port,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,

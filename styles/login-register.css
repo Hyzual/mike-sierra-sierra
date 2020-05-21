@@ -43,7 +43,7 @@
     padding: 40px;
     border: 1px solid var(--darker-main-color);
     border-radius: 5px;
-    background: var(--ligther-dark-shades-color);
+    background: var(--lighter-dark-shades-color);
 }
 
 .mss-register-form-title {

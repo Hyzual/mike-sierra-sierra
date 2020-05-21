@@ -18,14 +18,16 @@
 package user
 
 import (
+	"context"
 	"database/sql"
 
 	"github.com/pkg/errors"
 )
 
-// Store handles database operations linked to Users
+// Store handles database operations related to Users
 type Store interface {
-	GetUserMatchingCredentials(credentials *Credentials) (*Current, error)
+	GetUserMatchingCredentials(ctx context.Context, credentials *Credentials) (*Current, error)
+	SaveFirstAdministrator(ctx context.Context, form *RegistrationForm) error
 }
 
 // DAO implements Store
@@ -41,9 +43,9 @@ func NewDAO(db *sql.DB) Store {
 // GetUserMatchingCredentials retrieves the user matching the provided credentials.
 // If the credentials match credentials stored in the database, it will return a Current and nil error.
 // If they don't match, it will return an error
-func (d *DAO) GetUserMatchingCredentials(credentials *Credentials) (*Current, error) {
-	row := d.db.QueryRow(`SELECT user.id, user.email FROM user
-		WHERE user.email = ? AND user.password = ?`, credentials.Email, credentials.Password)
+func (d *DAO) GetUserMatchingCredentials(ctx context.Context, credentials *Credentials) (*Current, error) {
+	query := `SELECT user.id, user.email FROM user WHERE user.email = ? AND user.password = ?`
+	row := d.db.QueryRowContext(ctx, query, credentials.Email, credentials.Password)
 	var (
 		id    uint
 		email string
@@ -53,4 +55,12 @@ func (d *DAO) GetUserMatchingCredentials(credentials *Credentials) (*Current, er
 	}
 
 	return &Current{id, email}, nil
+}
+
+// SaveFirstAdministrator creates the first administrator account whose
+// credentials are given in the registration form.
+func (d *DAO) SaveFirstAdministrator(ctx context.Context, form *RegistrationForm) error {
+	query := `INSERT INTO user(email, password, username) VALUES (?, ?, ?)`
+	_, err := d.db.ExecContext(ctx, query, form.Email, form.Password, form.Username)
+	return err
 }

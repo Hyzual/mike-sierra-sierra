@@ -27,80 +27,6 @@ import (
 	"github.com/hyzual/mike-sierra-sierra/tests"
 )
 
-func TestGetLogin(t *testing.T) {
-	request := tests.NewGetRequest(t, "/login")
-
-	t.Run("when it cannot resolve assets, it will return a 500 error", func(t *testing.T) {
-		assetsResolver := &stubAssetsResolver{true, ""}
-		templateExecutor := newTemplateExecutorWithValidTemplate()
-		musicServer := newMusicServerWithDeps(assetsResolver, templateExecutor)
-
-		response := httptest.NewRecorder()
-		musicServer.ServeHTTP(response, request)
-
-		tests.AssertStatusEquals(t, response.Code, http.StatusInternalServerError)
-	})
-
-	t.Run("when it cannot load the template, it will return a 500 error", func(t *testing.T) {
-		assetsResolver := &stubAssetsResolver{false, "style.css"}
-		templateExecutor := newTemplateExecutorWithInvalidTemplate()
-		musicServer := newMusicServerWithDeps(assetsResolver, templateExecutor)
-
-		response := httptest.NewRecorder()
-		musicServer.ServeHTTP(response, request)
-
-		tests.AssertStatusEquals(t, response.Code, http.StatusInternalServerError)
-	})
-
-	t.Run("it will execute the template with its assets", func(t *testing.T) {
-		assetsResolver := &stubAssetsResolver{false, "style.css"}
-		templateExecutor := newTemplateExecutorWithValidTemplate()
-		musicServer := newMusicServerWithDeps(assetsResolver, templateExecutor)
-
-		response := httptest.NewRecorder()
-		musicServer.ServeHTTP(response, request)
-
-		tests.AssertStatusEquals(t, response.Code, http.StatusOK)
-	})
-}
-
-func TestFirstTimeRegistrationHandler(t *testing.T) {
-	request := tests.NewGetRequest(t, "/first-time-registration")
-
-	t.Run("when it cannot resolve assets, it will return a 500 error", func(t *testing.T) {
-		assetsResolver := &stubAssetsResolver{true, ""}
-		templateExecutor := newTemplateExecutorWithValidTemplate()
-		musicServer := newMusicServerWithDeps(assetsResolver, templateExecutor)
-
-		response := httptest.NewRecorder()
-		musicServer.ServeHTTP(response, request)
-
-		tests.AssertStatusEquals(t, response.Code, http.StatusInternalServerError)
-	})
-
-	t.Run("when it cannot load the template, it will return a 500 error", func(t *testing.T) {
-		assetsResolver := &stubAssetsResolver{false, "style.css"}
-		templateExecutor := newTemplateExecutorWithInvalidTemplate()
-		musicServer := newMusicServerWithDeps(assetsResolver, templateExecutor)
-
-		response := httptest.NewRecorder()
-		musicServer.ServeHTTP(response, request)
-
-		tests.AssertStatusEquals(t, response.Code, http.StatusInternalServerError)
-	})
-
-	t.Run("it will execute the template with its assets", func(t *testing.T) {
-		assetsResolver := &stubAssetsResolver{false, "style.css"}
-		templateExecutor := newTemplateExecutorWithValidTemplate()
-		musicServer := newMusicServerWithDeps(assetsResolver, templateExecutor)
-
-		response := httptest.NewRecorder()
-		musicServer.ServeHTTP(response, request)
-
-		tests.AssertStatusEquals(t, response.Code, http.StatusOK)
-	})
-}
-
 func TestGetHome(t *testing.T) {
 	request := tests.NewGetRequest(t, "/home")
 
@@ -137,18 +63,6 @@ func TestGetHome(t *testing.T) {
 		tests.AssertStatusEquals(t, response.Code, http.StatusOK)
 		tests.AssertNoError(t, err)
 	})
-}
-
-func newMusicServerWithDeps(assetsResolver AssetsResolver, templateExecutor TemplateExecutor) *MusicServer {
-	sessionManager := newSessionManager()
-	return New(
-		sessionManager,
-		nil,
-		templateExecutor,
-		nil,
-		assetsResolver,
-		nil,
-	)
 }
 
 func newTemplateExecutorWithInvalidTemplate() TemplateExecutor {

@@ -15,9 +15,10 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package user_test
+package user
 
 import (
+	"context"
 	"errors"
 	"io"
 	"net/http"
@@ -25,16 +26,53 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/swithek/sessionup"
-
-	"github.com/hyzual/mike-sierra-sierra/server/user"
+	"github.com/gorilla/schema"
+	"github.com/hyzual/mike-sierra-sierra/server"
 	"github.com/hyzual/mike-sierra-sierra/tests"
+	"github.com/swithek/sessionup"
 )
 
-func TestLoginHandler(t *testing.T) {
-	t.Run("when no request body is provided, it will return Bad Request", func(t *testing.T) {
+func TestGetLoginHandler(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "/login", nil)
+
+	t.Run("when it cannot resolve assets, it will return a 500 error", func(t *testing.T) {
+		assetsResolver := &stubAssetsResolver{true, ""}
+		templateExecutor := newTemplateExecutorWithValidTemplate()
+		handler := NewLoginGetHandler(templateExecutor, assetsResolver)
+
+		response := httptest.NewRecorder()
+		handler.ServeHTTP(response, request)
+
+		tests.AssertStatusEquals(t, response.Code, http.StatusInternalServerError)
+	})
+
+	t.Run("when it cannot load the template, it will return a 500 error", func(t *testing.T) {
+		assetsResolver := &stubAssetsResolver{false, "style.css"}
+		templateExecutor := newTemplateExecutorWithInvalidTemplate()
+		handler := NewLoginGetHandler(templateExecutor, assetsResolver)
+
+		response := httptest.NewRecorder()
+		handler.ServeHTTP(response, request)
+
+		tests.AssertStatusEquals(t, response.Code, http.StatusInternalServerError)
+	})
+
+	t.Run("it will execute the template with its assets", func(t *testing.T) {
+		assetsResolver := &stubAssetsResolver{false, "style.css"}
+		templateExecutor := newTemplateExecutorWithValidTemplate()
+		handler := NewLoginGetHandler(templateExecutor, assetsResolver)
+
+		response := httptest.NewRecorder()
+		handler.ServeHTTP(response, request)
+
+		tests.AssertStatusEquals(t, response.Code, http.StatusOK)
+	})
+}
+
+func TestPostLoginHandler(t *testing.T) {
+	t.Run("when the request cannot be parsed, it will return Bad Request", func(t *testing.T) {
 		handler := newLoginHandlerInvalidCredentials()
-		request, _ := http.NewRequest(http.MethodPost, "/login", nil)
+		request := httptest.NewRequest(http.MethodPost, "/login?bad-escaping-percent%", nil)
 		response := httptest.NewRecorder()
 
 		handler.ServeHTTP(response, request)
@@ -95,7 +133,7 @@ func TestLoginHandler(t *testing.T) {
 }
 
 func newPostLoginRequest(body io.Reader) *http.Request {
-	request, _ := http.NewRequest(http.MethodPost, "/login", body)
+	request := httptest.NewRequest(http.MethodPost, "/login", body)
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	return request
 }
@@ -104,34 +142,72 @@ func newValidPostLoginRequest() *http.Request {
 	return newPostLoginRequest(strings.NewReader("email=mike@example.com&password=welcome0"))
 }
 
-func newLoginHandlerInvalidCredentials() *user.LoginHandler {
-	dao := &StubUserDAO{false}
+func newLoginHandlerInvalidCredentials() http.Handler {
+	dao := &stubDAOForLogin{false}
 	sessionStore := tests.NewStubSessionStore(false)
 	sessionManager := sessionup.NewManager(sessionStore)
-	return user.NewLoginHandler(dao, sessionManager)
+	decoder := schema.NewDecoder()
+	return NewLoginPostHandler(dao, sessionManager, decoder)
 }
 
-func newLoginHandlerBadSession() *user.LoginHandler {
-	dao := &StubUserDAO{true}
+func newLoginHandlerBadSession() http.Handler {
+	dao := &stubDAOForLogin{true}
 	sessionStore := tests.NewStubSessionStore(true)
 	sessionManager := sessionup.NewManager(sessionStore)
-	return user.NewLoginHandler(dao, sessionManager)
+	decoder := schema.NewDecoder()
+	return NewLoginPostHandler(dao, sessionManager, decoder)
 }
 
-func newValidLoginHandler() *user.LoginHandler {
-	dao := &StubUserDAO{true}
+func newValidLoginHandler() http.Handler {
+	dao := &stubDAOForLogin{true}
 	sessionStore := tests.NewStubSessionStore(false)
 	sessionManager := sessionup.NewManager(sessionStore)
-	return user.NewLoginHandler(dao, sessionManager)
+	decoder := schema.NewDecoder()
+	return NewLoginPostHandler(dao, sessionManager, decoder)
 }
 
-type StubUserDAO struct {
+type stubDAOForLogin struct {
 	isAuthenticationAccepted bool
 }
 
-func (s *StubUserDAO) GetUserMatchingCredentials(credentials *user.Credentials) (*user.Current, error) {
+func (s *stubDAOForLogin) GetUserMatchingCredentials(_ context.Context, _ *Credentials) (*Current, error) {
 	if s.isAuthenticationAccepted {
-		return &user.Current{ID: 1, Email: "admin@example.comn"}, nil
+		return &Current{ID: 1, Email: "admin@example.comn"}, nil
 	}
 	return nil, errors.New("Credentials do not match")
+}
+
+func (s *stubDAOForLogin) SaveFirstAdministrator(_ context.Context, _ *RegistrationForm) error {
+	return errors.New("This method should not have been called in tests")
+}
+
+func newTemplateExecutorWithInvalidTemplate() server.TemplateExecutor {
+	return &stubTemplateExecutor{true}
+}
+
+func newTemplateExecutorWithValidTemplate() server.TemplateExecutor {
+	return &stubTemplateExecutor{false}
+}
+
+type stubTemplateExecutor struct {
+	shouldErrorOnLoad bool
+}
+
+func (s *stubTemplateExecutor) Load(_ io.Writer, path string, data interface{}) error {
+	if s.shouldErrorOnLoad {
+		return errors.New("Could not load template")
+	}
+	return nil
+}
+
+type stubAssetsResolver struct {
+	shouldErrorOnGet bool
+	filename         string
+}
+
+func (s *stubAssetsResolver) GetAssetURI(baseName string) (string, error) {
+	if s.shouldErrorOnGet {
+		return "", errors.New("Could not get hashed name")
+	}
+	return s.filename, nil
 }
