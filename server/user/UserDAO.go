@@ -26,8 +26,8 @@ import (
 
 // Store handles database operations related to Users
 type Store interface {
-	GetUserMatchingCredentials(ctx context.Context, credentials *Credentials) (*Current, error)
-	SaveFirstAdministrator(ctx context.Context, form *RegistrationForm) error
+	GetUserMatchingEmail(ctx context.Context, email string) (*PossibleMatch, error)
+	SaveFirstAdministrator(ctx context.Context, registration *Registration) error
 }
 
 // DAO implements Store
@@ -40,27 +40,42 @@ func NewDAO(db *sql.DB) Store {
 	return &DAO{db}
 }
 
-// GetUserMatchingCredentials retrieves the user matching the provided credentials.
-// If the credentials match credentials stored in the database, it will return a Current and nil error.
-// If they don't match, it will return an error
-func (d *DAO) GetUserMatchingCredentials(ctx context.Context, credentials *Credentials) (*Current, error) {
-	query := `SELECT user.id, user.email FROM user WHERE user.email = ? AND user.password = ?`
-	row := d.db.QueryRowContext(ctx, query, credentials.Email, credentials.Password)
+// GetUserMatchingEmail retrieves the user matching the provided email address.
+// If the email is found, it will return a PossibleMatch. If it isn't found, it will return an error.
+func (d *DAO) GetUserMatchingEmail(ctx context.Context, email string) (*PossibleMatch, error) {
+	query := `SELECT user.id, user.email, user.password FROM user WHERE user.email = ?`
+	row := d.db.QueryRowContext(ctx, query, email)
 	var (
-		id    uint
-		email string
+		id           uint
+		passwordHash []byte
 	)
-	if err := row.Scan(&id, &email); err != nil {
+	if err := row.Scan(&id, &email, &passwordHash); err != nil {
 		return nil, errors.Wrap(err, "Could not retrieve the current user by its credentials")
 	}
 
-	return &Current{id, email}, nil
+	return &PossibleMatch{id, email, passwordHash}, nil
+}
+
+// PossibleMatch represents a use with the same email credential as the one provided
+// in the login form. It still needs to check the password matches.
+type PossibleMatch struct {
+	ID           uint
+	Email        string
+	PasswordHash []byte
 }
 
 // SaveFirstAdministrator creates the first administrator account whose
-// credentials are given in the registration form.
-func (d *DAO) SaveFirstAdministrator(ctx context.Context, form *RegistrationForm) error {
+// credentials are given in the registration.
+func (d *DAO) SaveFirstAdministrator(ctx context.Context, registration *Registration) error {
 	query := `INSERT INTO user(email, password, username) VALUES (?, ?, ?)`
-	_, err := d.db.ExecContext(ctx, query, form.Email, form.Password, form.Username)
+	_, err := d.db.ExecContext(ctx, query, registration.Email, registration.PasswordHash, registration.Username)
 	return err
+}
+
+// Registration represents the data needed to save the user in databse. Instead of a password,
+// it needs a password hash.
+type Registration struct {
+	Email        string
+	PasswordHash []byte
+	Username     string
 }

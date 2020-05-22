@@ -108,6 +108,18 @@ func TestPostFirstTimeRegistrationHandler(t *testing.T) {
 		tests.AssertStatusEquals(t, response.Code, http.StatusBadRequest)
 	})
 
+	t.Run(`when the password is longer than 64 characters, it will return Bad Request`, func(t *testing.T) {
+		request := newPostFirstRegistrationRequest(
+			strings.NewReader("email=mike@example.com&username=mike&password=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
+		)
+		response := httptest.NewRecorder()
+		handler := newFirstTimeRegistrationHandler()
+
+		handler.ServeHTTP(response, request)
+
+		tests.AssertStatusEquals(t, response.Code, http.StatusBadRequest)
+	})
+
 	t.Run("when it can't register the admin in the database, it will return Internal Server Error", func(t *testing.T) {
 		request := newValidPostFirstRegistrationRequest()
 		response := httptest.NewRecorder()
@@ -156,13 +168,13 @@ type stubDAOForRegistration struct {
 	hasError bool
 }
 
-func (s *stubDAOForRegistration) SaveFirstAdministrator(_ context.Context, form *RegistrationForm) error {
+func (s *stubDAOForRegistration) SaveFirstAdministrator(_ context.Context, registration *Registration) error {
 	if s.hasError {
 		return errors.New("Could not register first administrator")
 	}
 	return nil
 }
 
-func (s *stubDAOForRegistration) GetUserMatchingCredentials(_ context.Context, _ *Credentials) (*Current, error) {
+func (s *stubDAOForRegistration) GetUserMatchingEmail(_ context.Context, _ string) (*PossibleMatch, error) {
 	return nil, errors.New("This method should not have been called in tests")
 }

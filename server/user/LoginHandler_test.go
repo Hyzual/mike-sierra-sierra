@@ -100,9 +100,19 @@ func TestPostLoginHandler(t *testing.T) {
 		tests.AssertStatusEquals(t, response.Code, http.StatusBadRequest)
 	})
 
-	t.Run("when credentials don't match those from the store, it will return Forbidden", func(t *testing.T) {
+	t.Run("when the email address doesn't match any from the store, it will return Forbidden", func(t *testing.T) {
 		handler := newLoginHandlerInvalidCredentials()
 		request := newPostLoginRequest(strings.NewReader("email=wrong.user@example.com&password=wrong_password"))
+		response := httptest.NewRecorder()
+
+		handler.ServeHTTP(response, request)
+
+		tests.AssertStatusEquals(t, response.Code, http.StatusForbidden)
+	})
+
+	t.Run("when the password does not match the password Hash from the store, it will return Forbidden", func(t *testing.T) {
+		handler := newLoginHandlerBadSession()
+		request := newPostLoginRequest(strings.NewReader("email=mike@example.com&password=wrong_password"))
 		response := httptest.NewRecorder()
 
 		handler.ServeHTTP(response, request)
@@ -170,14 +180,17 @@ type stubDAOForLogin struct {
 	isAuthenticationAccepted bool
 }
 
-func (s *stubDAOForLogin) GetUserMatchingCredentials(_ context.Context, _ *Credentials) (*Current, error) {
+// Corresponds to "welcome0" password with work = 4
+var testPasswordHash = []byte{36, 50, 97, 36, 48, 52, 36, 101, 74, 54, 110, 79, 74, 118, 115, 100, 68, 117, 86, 50, 76, 116, 65, 69, 55, 76, 76, 109, 46, 80, 85, 78, 98, 89, 120, 122, 72, 104, 117, 99, 50, 112, 72, 116, 100, 55, 122, 114, 76, 73, 106, 117, 46, 119, 100, 50, 87, 52, 118, 109}
+
+func (s *stubDAOForLogin) GetUserMatchingEmail(_ context.Context, _ string) (*PossibleMatch, error) {
 	if s.isAuthenticationAccepted {
-		return &Current{ID: 1, Email: "admin@example.comn"}, nil
+		return &PossibleMatch{ID: 1, Email: "admin@example.com", PasswordHash: testPasswordHash}, nil
 	}
 	return nil, errors.New("Credentials do not match")
 }
 
-func (s *stubDAOForLogin) SaveFirstAdministrator(_ context.Context, _ *RegistrationForm) error {
+func (s *stubDAOForLogin) SaveFirstAdministrator(_ context.Context, _ *Registration) error {
 	return errors.New("This method should not have been called in tests")
 }
 

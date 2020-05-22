@@ -23,7 +23,14 @@ import (
 	"github.com/gorilla/schema"
 	"github.com/hyzual/mike-sierra-sierra/server"
 	"github.com/pkg/errors"
+	"golang.org/x/crypto/bcrypt"
 )
+
+// Passwords are limited to 64 characters because bcrypt is limited to 72 characters
+// but we don't want to reveal we're using bcrypt.
+// See https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#maximum-password-lengths
+const maximumPasswordLength = 64
+const bcryptWork = 12
 
 // NewFirstTimeRegistrationGetHandler creates a new handler for GET /first-time-registration
 func NewFirstTimeRegistrationGetHandler(
@@ -83,7 +90,22 @@ func (h *postFirstTimeRegistrationHandler) ServeHTTP(writer http.ResponseWriter,
 	if err != nil {
 		return server.NewBadRequestError(err, "Could not decode the first-time registration form into its representation")
 	}
-	err = h.userStore.SaveFirstAdministrator(request.Context(), form)
+	if len([]rune(form.Password)) > maximumPasswordLength {
+		return server.NewBadRequestError(err, "Password cannot be longer than 64 characters")
+	}
+
+	passwordhash, err := bcrypt.GenerateFromPassword([]byte(form.Password), bcryptWork)
+	if err != nil {
+		return errors.Wrap(err, "Error while hashing the password")
+	}
+
+	registration := &Registration{
+		Email:        form.Email,
+		PasswordHash: passwordhash,
+		Username:     form.Username,
+	}
+
+	err = h.userStore.SaveFirstAdministrator(request.Context(), registration)
 	if err != nil {
 		return errors.Wrap(err, "Error while saving the first administrator account")
 	}
@@ -95,6 +117,7 @@ func (h *postFirstTimeRegistrationHandler) ServeHTTP(writer http.ResponseWriter,
 // RegistrationForm represents the registration information provided by users
 // to create their account
 type RegistrationForm struct {
-	Credentials
+	Email    string `schema:"email,required"`
+	Password string `schema:"password,required"`
 	Username string `schema:"username,required"`
 }

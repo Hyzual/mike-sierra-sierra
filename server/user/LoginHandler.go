@@ -25,6 +25,7 @@ import (
 	"github.com/hyzual/mike-sierra-sierra/server"
 	"github.com/pkg/errors"
 	"github.com/swithek/sessionup"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const userSessionName = "userSession"
@@ -84,17 +85,22 @@ func (h *postLoginHandler) ServeHTTP(writer http.ResponseWriter, request *http.R
 		return server.NewBadRequestError(err, "Could not parse the login form")
 	}
 
-	credentials := new(Credentials)
-	err = h.decoder.Decode(credentials, request.PostForm)
+	loginForm := new(LoginForm)
+	err = h.decoder.Decode(loginForm, request.PostForm)
 	if err != nil {
 		return server.NewBadRequestError(err, "Could not decode the login form into its representation")
 	}
 
-	currentUser, err := h.userStore.GetUserMatchingCredentials(request.Context(), credentials)
+	possibleUser, err := h.userStore.GetUserMatchingEmail(request.Context(), loginForm.Email)
 	if err != nil {
 		return server.NewForbiddenError(errors.New("Invalid credentials"))
 	}
-	stringUserID := strconv.FormatUint(uint64(currentUser.ID), 10)
+	err = bcrypt.CompareHashAndPassword(possibleUser.PasswordHash, []byte(loginForm.Password))
+	if err != nil {
+		return server.NewForbiddenError(errors.New("Invalid credentials"))
+	}
+
+	stringUserID := strconv.FormatUint(uint64(possibleUser.ID), 10)
 	err = h.sessionManager.Init(writer, request, stringUserID)
 	if err != nil {
 		return errors.Wrap(err, "Could not decode the user session")
@@ -104,14 +110,8 @@ func (h *postLoginHandler) ServeHTTP(writer http.ResponseWriter, request *http.R
 	return nil
 }
 
-// Credentials represents the user credentials required to log in
-type Credentials struct {
+// LoginForm represents the credentials provided by users to sign in
+type LoginForm struct {
 	Email    string `schema:"email,required"`
 	Password string `schema:"password,required"`
-}
-
-// Current represents the logged-in user
-type Current struct {
-	ID    uint
-	Email string
 }
