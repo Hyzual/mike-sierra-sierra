@@ -17,7 +17,9 @@
                 </p>
                 <form action="/first-time-registration" method="POST">
                     <div class="mss-form-element">
-                        <label for="email" class="mss-form-label">Email:</label>
+                        <label for="email" class="mss-form-label mss-required"
+                            >Email:</label
+                        >
                         <input
                             class="mss-form-input mss-form-input-large"
                             type="text"
@@ -26,6 +28,7 @@
                             placeholder="mail@example.com"
                             autocomplete="email"
                             tabindex="1"
+                            required
                         />
                         <p class="mss-text-help">
                             We won't send you emails, the email address is only
@@ -36,7 +39,9 @@
                         </p>
                     </div>
                     <div class="mss-form-element">
-                        <label for="password" class="mss-form-label"
+                        <label
+                            for="password"
+                            class="mss-form-label mss-required"
                             >Password:</label
                         >
                         <input
@@ -47,10 +52,13 @@
                             placeholder="Password"
                             autocomplete="new-password"
                             tabindex="2"
+                            required
                         />
                     </div>
                     <div class="mss-form-element">
-                        <label for="username" class="mss-form-label"
+                        <label
+                            for="username"
+                            class="mss-form-label mss-required"
                             >(Display-only) Username:</label
                         >
                         <input
@@ -61,6 +69,7 @@
                             placeholder="Username"
                             autocomplete="username"
                             tabindex="3"
+                            required
                         />
                         <p class="mss-text-help">
                             The Username is only for display purposes, it cannot

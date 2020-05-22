@@ -106,12 +106,19 @@ body {
     font-weight: 600;
 }
 
+.mss-required::after {
+    content: " *";
+    color: #d61a1a;
+    font-size: 20px;
+}
+
 .mss-form-label[for] {
     cursor: pointer;
 }
 
 .mss-form-input {
     border: 1px solid var(--darker-main-color);
+    border-radius: 4px;
 }
 
 .mss-form-input-large {
