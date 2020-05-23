@@ -79,7 +79,7 @@ describe(`rest-querier`, () => {
         });
     });
 
-    function mockFetchSuccess(return_json: object, headers = {}): void {
+    function mockFetchSuccess(return_json: unknown, headers = {}): void {
         fetchMock.mockImplementation(() =>
             Promise.resolve({
                 headers,
