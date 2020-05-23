@@ -17,8 +17,29 @@
 
 package main
 
-import "fmt"
+import (
+	"flag"
+	"fmt"
+	"log"
+
+	"github.com/hyzual/mike-sierra-sierra/scanner"
+)
+
+const musicPath = "/music" // It is a volume in the Docker image
 
 func main() {
-	fmt.Println("Mike-Sierra-Sierra CLI v0.1.0")
+	version := flag.Bool("version", false, "Show the program version")
+
+	flag.Parse()
+
+	if *version == true {
+		fmt.Println("Mike-Sierra-Sierra CLI v0.1.0")
+		return
+	}
+
+	arg := flag.Arg(0)
+	err := scanner.ScanMusicFiles(arg)
+	if err != nil {
+		log.Fatalf("Error while scanning music files: %v", err)
+	}
 }

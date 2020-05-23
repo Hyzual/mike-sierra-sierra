@@ -49,6 +49,7 @@ group:
     gid: 101
 command:
   mike:
+    exec: "mike -version"
     exit-status: 0
     stdout:
     - Mike-Sierra-Sierra CLI
