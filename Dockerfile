@@ -57,14 +57,13 @@ COPY --from=go-builder ["/app/cli", "/usr/local/bin/mike"]
 # Change to non-root user
 USER mike
 
-# Copy the compiled binary and assets (not the sources)
+# Copy the compiled binary and templates (not the sources)
 COPY --from=go-builder --chown=mike:mike ["/app/built.tar",  "./"]
-# Extract the tar once. It avoids having many COPY layers
-RUN tar -xf ./built.tar && rm ./built.tar
 # Copy the minified assets (not the sources)
 COPY --from=front-builder --chown=mike:mike ["/app/assets.tar", "./"]
-# Extract the tar assets
-RUN tar -xf ./assets.tar && rm ./assets.tar
+# Extract the compiled binary and assets tarballs. It avoids having many COPY layers
+RUN tar -xf ./built.tar && rm ./built.tar \
+  && tar -xf ./assets.tar && rm ./assets.tar
 
 EXPOSE 8080 8443
 
