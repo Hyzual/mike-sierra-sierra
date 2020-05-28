@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@jsdevtools/ono": "^7.1.2",
-    "neverthrow": "^2.3.0"
+    "neverthrow": "^2.3.2"
   },
   "devDependencies": {
     "@types/jest": "^25.2.3",
