@@ -15,10 +15,21 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+.mss-grid-body {
+    display: grid;
+    grid-template-areas:
+        "navbar navbar"
+        "sidebar breadcrumbs"
+        "sidebar main"
+        "footer footer";
+    grid-template-columns: minmax(300px, auto) 1fr;
+    grid-template-rows: 40px 40px 1fr 40px;
+    height: 100vh;
+}
+
 .mss-app-header {
     display: flex;
-    flex: 0 0 auto;
-    height: 40px;
+    grid-area: navbar;
     background: var(--darker-main-color);
 }
 
@@ -63,8 +74,51 @@
     color: var(--lighter-light-shades-color);
 }
 
+.mss-app-sidebar {
+    grid-area: sidebar;
+    background: var(--darker-dark-shades-color);
+}
+
+.mss-app-sidebar-title {
+    margin: 8px 0 0 12px;
+    font-size: 20px;
+}
+
+.mss-app-sidebar-menu {
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.mss-app-sidebar-link {
+    display: block;
+    padding: 4px 8px;
+    border-left: 4px solid transparent;
+    color: var(--dark-accent-color);
+}
+
+.mss-app-sidebar-link:active,
+.mss-app-sidebar-link:hover {
+    border-left: 4px solid var(--light-accent-color);
+    color: var(--lighter-dark-accent-color);
+}
+
+.mss-app-breadcrumbs {
+    grid-area: breadcrumbs;
+    background: var(--darker-dark-shades-color);
+}
+
 .mss-app-main {
-    display: grid;
-    flex: 1 1 auto;
+    grid-area: main;
     background: var(--dark-shades-color);
+}
+
+.mss-app-footer {
+    display: flex;
+    grid-area: footer;
+    background: var(--darker-dark-shades-color);
+}
+
+.mss-app-player {
+    flex: 1;
 }

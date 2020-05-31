@@ -55,10 +55,19 @@ body {
     font-family: Arial, Helvetica, sans-serif;
 }
 
-.mss-full-page-body {
+a {
+    color: var(--main-color);
+}
+
+a:hover,
+a:active {
+    color: var(--lighter-main-color);
+}
+
+.mss-flex-body {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    height: 100vh;
 }
 
 .mss-button-primary {
