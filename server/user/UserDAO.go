@@ -56,8 +56,8 @@ func (d *DAO) GetUserMatchingEmail(ctx context.Context, email string) (*Possible
 	return &PossibleMatch{id, email, passwordHash}, nil
 }
 
-// PossibleMatch represents a use with the same email credential as the one provided
-// in the login form. It still needs to check the password matches.
+// PossibleMatch represents a user with the same email credential as the one provided
+// in the sign-in form. It still needs to check the password matches.
 type PossibleMatch struct {
 	ID           uint
 	Email        string

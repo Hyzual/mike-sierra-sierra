@@ -24,14 +24,14 @@
     background: var(--dark-shades-color);
 }
 
-.mss-login-form {
+.mss-sign-in-form {
     padding: 40px;
     border: 1px solid var(--darker-main-color);
     border-radius: 5px;
     background: var(--lighter-dark-shades-color);
 }
 
-.mss-login-form-title {
+.mss-sign-in-form-title {
     color: var(--main-color);
     font-size: 24px;
     text-align: center;

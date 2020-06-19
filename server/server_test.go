@@ -101,7 +101,7 @@ func TestUnauthorized(t *testing.T) {
 	handler.ServeHTTP(response, request)
 
 	tests.AssertStatusEquals(t, response.Code, http.StatusFound)
-	tests.AssertLocationHeaderEquals(t, response, "/login")
+	tests.AssertLocationHeaderEquals(t, response, "/sign-in")
 }
 
 func newSessionManager() *sessionup.Manager {

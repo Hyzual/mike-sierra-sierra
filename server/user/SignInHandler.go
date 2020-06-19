@@ -30,72 +30,72 @@ import (
 
 const userSessionName = "userSession"
 
-// NewLoginGetHandler creates a new handler for GET /login
-func NewLoginGetHandler(
+// NewSignInGetHandler creates a new handler for GET /sign-in
+func NewSignInGetHandler(
 	te server.TemplateExecutor,
 	ar server.AssetsResolver,
 ) http.Handler {
 	return server.WrapErrors(
-		&getLoginHandler{te, ar},
+		&getSignInHandler{te, ar},
 	)
 }
 
-type getLoginHandler struct {
+type getSignInHandler struct {
 	templateExecutor server.TemplateExecutor
 	assetsResolver   server.AssetsResolver
 }
 
-func (h *getLoginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) error {
+func (h *getSignInHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) error {
 	hashedName, err := h.assetsResolver.GetAssetURI("style.css")
 	if err != nil {
 		return errors.Wrapf(err, "could not resolve assets %s", "style.css")
 	}
-	presenter := &loginPresenter{StylesheetURI: hashedName}
-	err = h.templateExecutor.Load(writer, "login.html", presenter)
+	presenter := &signInPresenter{StylesheetURI: hashedName}
+	err = h.templateExecutor.Load(writer, "sign-in.html", presenter)
 	if err != nil {
-		return errors.Wrapf(err, "could not load template %s", "login.html")
+		return errors.Wrapf(err, "could not load template %s", "sign-in.html")
 	}
 	return nil
 }
 
-type loginPresenter struct {
+type signInPresenter struct {
 	StylesheetURI string
 }
 
-type postLoginHandler struct {
+type postSignInHandler struct {
 	userStore      Store
 	sessionManager *sessionup.Manager
 	decoder        *schema.Decoder
 }
 
-// NewLoginPostHandler creates a new handler for POST /login
-func NewLoginPostHandler(
+// NewSignInPostHandler creates a new handler for POST /sign-in
+func NewSignInPostHandler(
 	userStore Store,
 	sessionManager *sessionup.Manager,
 	decoder *schema.Decoder,
 ) http.Handler {
 	return server.WrapErrors(
-		&postLoginHandler{userStore, sessionManager, decoder},
+		&postSignInHandler{userStore, sessionManager, decoder},
 	)
 }
 
-func (h *postLoginHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) error {
+func (h *postSignInHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) error {
 	err := request.ParseForm()
 	if err != nil {
-		return server.NewBadRequestError(err, "Could not parse the login form")
+		return server.NewBadRequestError(err, "Could not parse the sign-in form")
 	}
 
-	loginForm := new(LoginForm)
-	err = h.decoder.Decode(loginForm, request.PostForm)
+	signInForm := new(SignInForm)
+	err = h.decoder.Decode(signInForm, request.PostForm)
 	if err != nil {
-		return server.NewBadRequestError(err, "Could not decode the login form into its representation")
+		return server.NewBadRequestError(err, "Could not decode the sign-in form into its representation")
 	}
 
-	possibleUser, err := h.userStore.GetUserMatchingEmail(request.Context(), loginForm.Email)
+	possibleUser, err := h.userStore.GetUserMatchingEmail(request.Context(), signInForm.Email)
 	if err != nil {
 		return server.NewForbiddenError(errors.New("Invalid credentials"))
 	}
-	err = bcrypt.CompareHashAndPassword(possibleUser.PasswordHash, []byte(loginForm.Password))
+	err = bcrypt.CompareHashAndPassword(possibleUser.PasswordHash, []byte(signInForm.Password))
 	if err != nil {
 		return server.NewForbiddenError(errors.New("Invalid credentials"))
 	}
@@ -110,8 +110,8 @@ func (h *postLoginHandler) ServeHTTP(writer http.ResponseWriter, request *http.R
 	return nil
 }
 
-// LoginForm represents the credentials provided by users to sign in
-type LoginForm struct {
+// SignInForm represents the credentials provided by users to sign in
+type SignInForm struct {
 	Email    string `schema:"email,required"`
 	Password string `schema:"password,required"`
 }

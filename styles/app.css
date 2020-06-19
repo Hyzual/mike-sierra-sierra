@@ -59,18 +59,18 @@
     padding: 4px;
 }
 
-.mss-app-header-logout {
+.mss-app-header-sign-out {
     display: flex;
     flex: 0 0 auto;
     align-items: center;
     padding: 0 8px;
 }
 
-.mss-app-header-logout-link {
+.mss-app-header-sign-out-link {
     color: var(--darker-light-shades-color);
 }
 
-.mss-app-header-logout-link:hover {
+.mss-app-header-sign-out-link:hover {
     color: var(--lighter-light-shades-color);
 }
 

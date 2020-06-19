@@ -32,13 +32,13 @@ import (
 	"github.com/swithek/sessionup"
 )
 
-func TestGetLoginHandler(t *testing.T) {
-	request := httptest.NewRequest(http.MethodGet, "/login", nil)
+func TestGetSignInHandler(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "/sign-in", nil)
 
 	t.Run("when it cannot resolve assets, it will return a 500 error", func(t *testing.T) {
 		assetsResolver := &stubAssetsResolver{true, ""}
 		templateExecutor := newTemplateExecutorWithValidTemplate()
-		handler := NewLoginGetHandler(templateExecutor, assetsResolver)
+		handler := NewSignInGetHandler(templateExecutor, assetsResolver)
 
 		response := httptest.NewRecorder()
 		handler.ServeHTTP(response, request)
@@ -49,7 +49,7 @@ func TestGetLoginHandler(t *testing.T) {
 	t.Run("when it cannot load the template, it will return a 500 error", func(t *testing.T) {
 		assetsResolver := &stubAssetsResolver{false, "style.css"}
 		templateExecutor := newTemplateExecutorWithInvalidTemplate()
-		handler := NewLoginGetHandler(templateExecutor, assetsResolver)
+		handler := NewSignInGetHandler(templateExecutor, assetsResolver)
 
 		response := httptest.NewRecorder()
 		handler.ServeHTTP(response, request)
@@ -60,7 +60,7 @@ func TestGetLoginHandler(t *testing.T) {
 	t.Run("it will execute the template with its assets", func(t *testing.T) {
 		assetsResolver := &stubAssetsResolver{false, "style.css"}
 		templateExecutor := newTemplateExecutorWithValidTemplate()
-		handler := NewLoginGetHandler(templateExecutor, assetsResolver)
+		handler := NewSignInGetHandler(templateExecutor, assetsResolver)
 
 		response := httptest.NewRecorder()
 		handler.ServeHTTP(response, request)
@@ -69,10 +69,10 @@ func TestGetLoginHandler(t *testing.T) {
 	})
 }
 
-func TestPostLoginHandler(t *testing.T) {
+func TestPostSigninHandler(t *testing.T) {
 	t.Run("when the request cannot be parsed, it will return Bad Request", func(t *testing.T) {
-		handler := newLoginHandlerInvalidCredentials()
-		request := httptest.NewRequest(http.MethodPost, "/login?bad-escaping-percent%", nil)
+		handler := newSignInHandlerInvalidCredentials()
+		request := httptest.NewRequest(http.MethodPost, "/sign-in?bad-escaping-percent%", nil)
 		response := httptest.NewRecorder()
 
 		handler.ServeHTTP(response, request)
@@ -81,8 +81,8 @@ func TestPostLoginHandler(t *testing.T) {
 	})
 
 	t.Run("when no email is provided, it will return Bad Request", func(t *testing.T) {
-		handler := newLoginHandlerInvalidCredentials()
-		request := newPostLoginRequest(strings.NewReader("password=welcome0"))
+		handler := newSignInHandlerInvalidCredentials()
+		request := newPostSigninRequest(strings.NewReader("password=welcome0"))
 		response := httptest.NewRecorder()
 
 		handler.ServeHTTP(response, request)
@@ -91,8 +91,8 @@ func TestPostLoginHandler(t *testing.T) {
 	})
 
 	t.Run("when no password is provided, it will return Bad Request", func(t *testing.T) {
-		handler := newLoginHandlerInvalidCredentials()
-		request := newPostLoginRequest(strings.NewReader("email=mike@example.com"))
+		handler := newSignInHandlerInvalidCredentials()
+		request := newPostSigninRequest(strings.NewReader("email=mike@example.com"))
 		response := httptest.NewRecorder()
 
 		handler.ServeHTTP(response, request)
@@ -101,8 +101,8 @@ func TestPostLoginHandler(t *testing.T) {
 	})
 
 	t.Run("when the email address doesn't match any from the store, it will return Forbidden", func(t *testing.T) {
-		handler := newLoginHandlerInvalidCredentials()
-		request := newPostLoginRequest(strings.NewReader("email=wrong.user@example.com&password=wrong_password"))
+		handler := newSignInHandlerInvalidCredentials()
+		request := newPostSigninRequest(strings.NewReader("email=wrong.user@example.com&password=wrong_password"))
 		response := httptest.NewRecorder()
 
 		handler.ServeHTTP(response, request)
@@ -111,8 +111,8 @@ func TestPostLoginHandler(t *testing.T) {
 	})
 
 	t.Run("when the password does not match the password Hash from the store, it will return Forbidden", func(t *testing.T) {
-		handler := newLoginHandlerBadSession()
-		request := newPostLoginRequest(strings.NewReader("email=mike@example.com&password=wrong_password"))
+		handler := newSignInHandlerBadSession()
+		request := newPostSigninRequest(strings.NewReader("email=mike@example.com&password=wrong_password"))
 		response := httptest.NewRecorder()
 
 		handler.ServeHTTP(response, request)
@@ -121,8 +121,8 @@ func TestPostLoginHandler(t *testing.T) {
 	})
 
 	t.Run("when session cannot be initialized, it will return Internal Server Error", func(t *testing.T) {
-		handler := newLoginHandlerBadSession()
-		request := newValidPostLoginRequest()
+		handler := newSignInHandlerBadSession()
+		request := newValidPostSigninRequest()
 		response := httptest.NewRecorder()
 
 		handler.ServeHTTP(response, request)
@@ -130,9 +130,9 @@ func TestPostLoginHandler(t *testing.T) {
 		tests.AssertStatusEquals(t, response.Code, http.StatusInternalServerError)
 	})
 
-	t.Run("when successful, POST /login will redirect to /home", func(t *testing.T) {
-		handler := newValidLoginHandler()
-		request := newValidPostLoginRequest()
+	t.Run("when successful, POST /sign-in will redirect to /home", func(t *testing.T) {
+		handler := newValidSignInHandler()
+		request := newValidPostSigninRequest()
 		response := httptest.NewRecorder()
 
 		handler.ServeHTTP(response, request)
@@ -142,55 +142,55 @@ func TestPostLoginHandler(t *testing.T) {
 	})
 }
 
-func newPostLoginRequest(body io.Reader) *http.Request {
-	request := httptest.NewRequest(http.MethodPost, "/login", body)
+func newPostSigninRequest(body io.Reader) *http.Request {
+	request := httptest.NewRequest(http.MethodPost, "/sign-in", body)
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	return request
 }
 
-func newValidPostLoginRequest() *http.Request {
-	return newPostLoginRequest(strings.NewReader("email=mike@example.com&password=welcome0"))
+func newValidPostSigninRequest() *http.Request {
+	return newPostSigninRequest(strings.NewReader("email=mike@example.com&password=welcome0"))
 }
 
-func newLoginHandlerInvalidCredentials() http.Handler {
-	dao := &stubDAOForLogin{false}
+func newSignInHandlerInvalidCredentials() http.Handler {
+	dao := &stubDAOForSignIn{false}
 	sessionStore := tests.NewStubSessionStore(false)
 	sessionManager := sessionup.NewManager(sessionStore)
 	decoder := schema.NewDecoder()
-	return NewLoginPostHandler(dao, sessionManager, decoder)
+	return NewSignInPostHandler(dao, sessionManager, decoder)
 }
 
-func newLoginHandlerBadSession() http.Handler {
-	dao := &stubDAOForLogin{true}
+func newSignInHandlerBadSession() http.Handler {
+	dao := &stubDAOForSignIn{true}
 	sessionStore := tests.NewStubSessionStore(true)
 	sessionManager := sessionup.NewManager(sessionStore)
 	decoder := schema.NewDecoder()
-	return NewLoginPostHandler(dao, sessionManager, decoder)
+	return NewSignInPostHandler(dao, sessionManager, decoder)
 }
 
-func newValidLoginHandler() http.Handler {
-	dao := &stubDAOForLogin{true}
+func newValidSignInHandler() http.Handler {
+	dao := &stubDAOForSignIn{true}
 	sessionStore := tests.NewStubSessionStore(false)
 	sessionManager := sessionup.NewManager(sessionStore)
 	decoder := schema.NewDecoder()
-	return NewLoginPostHandler(dao, sessionManager, decoder)
+	return NewSignInPostHandler(dao, sessionManager, decoder)
 }
 
-type stubDAOForLogin struct {
+type stubDAOForSignIn struct {
 	isAuthenticationAccepted bool
 }
 
 // Corresponds to "welcome0" password with work = 4
 var testPasswordHash = []byte{36, 50, 97, 36, 48, 52, 36, 101, 74, 54, 110, 79, 74, 118, 115, 100, 68, 117, 86, 50, 76, 116, 65, 69, 55, 76, 76, 109, 46, 80, 85, 78, 98, 89, 120, 122, 72, 104, 117, 99, 50, 112, 72, 116, 100, 55, 122, 114, 76, 73, 106, 117, 46, 119, 100, 50, 87, 52, 118, 109}
 
-func (s *stubDAOForLogin) GetUserMatchingEmail(_ context.Context, _ string) (*PossibleMatch, error) {
+func (s *stubDAOForSignIn) GetUserMatchingEmail(_ context.Context, _ string) (*PossibleMatch, error) {
 	if s.isAuthenticationAccepted {
 		return &PossibleMatch{ID: 1, Email: "admin@example.com", PasswordHash: testPasswordHash}, nil
 	}
 	return nil, errors.New("Credentials do not match")
 }
 
-func (s *stubDAOForLogin) SaveFirstAdministrator(_ context.Context, _ *Registration) error {
+func (s *stubDAOForSignIn) SaveFirstAdministrator(_ context.Context, _ *Registration) error {
 	return errors.New("This method should not have been called in tests")
 }
 

@@ -87,10 +87,10 @@ func (m *musicHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reque
 	http.ServeFile(writer, request, m.pathJoiner.Join(request.URL.Path))
 }
 
-// HandleUnauthorized redirects to /login when users are not authenticated.
+// HandleUnauthorized redirects to /sign-in when users are not authenticated.
 // It is used by sessionup's Auth middleware.
 func HandleUnauthorized(_ error) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		http.Redirect(writer, request, "/login", http.StatusFound)
+		http.Redirect(writer, request, "/sign-in", http.StatusFound)
 	})
 }

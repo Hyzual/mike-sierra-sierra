@@ -110,7 +110,7 @@ func (h *postFirstTimeRegistrationHandler) ServeHTTP(writer http.ResponseWriter,
 		return errors.Wrap(err, "Error while saving the first administrator account")
 	}
 
-	http.Redirect(writer, request, "/login", http.StatusFound)
+	http.Redirect(writer, request, "/sign-in", http.StatusFound)
 	return nil
 }
 

@@ -39,13 +39,13 @@ func Register(
 	sessionManager *sessionup.Manager,
 	decoder *schema.Decoder,
 ) {
-	getLoginHandler := NewLoginGetHandler(templateExecutor, assetsResolver)
-	postLoginHandler := NewLoginPostHandler(userStore, sessionManager, decoder)
+	getSignInHandler := NewSignInGetHandler(templateExecutor, assetsResolver)
+	postSignInHandler := NewSignInPostHandler(userStore, sessionManager, decoder)
 	getFirstTimeRegistrationHandler := NewFirstTimeRegistrationGetHandler(templateExecutor, assetsResolver)
 	postFirstTimeRegistrationHandler := NewFirstTimeRegistrationPostHandler(userStore, decoder)
 
 	router.Handle("/first-time-registration", getFirstTimeRegistrationHandler).Methods(http.MethodGet)
 	router.Handle("/first-time-registration", postFirstTimeRegistrationHandler).Methods(http.MethodPost)
-	router.Handle("/login", getLoginHandler).Methods(http.MethodGet)
-	router.Handle("/login", postLoginHandler).Methods(http.MethodPost)
+	router.Handle("/sign-in", getSignInHandler).Methods(http.MethodGet)
+	router.Handle("/sign-in", postSignInHandler).Methods(http.MethodPost)
 }

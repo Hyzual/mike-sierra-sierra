@@ -130,7 +130,7 @@ func TestPostFirstTimeRegistrationHandler(t *testing.T) {
 		tests.AssertStatusEquals(t, response.Code, http.StatusInternalServerError)
 	})
 
-	t.Run("when successful, POST /first-time-registration will redirect to /login", func(t *testing.T) {
+	t.Run("when successful, POST /first-time-registration will redirect to /sign-in", func(t *testing.T) {
 		request := newValidPostFirstRegistrationRequest()
 		response := httptest.NewRecorder()
 		handler := newFirstTimeRegistrationHandler()
@@ -138,7 +138,7 @@ func TestPostFirstTimeRegistrationHandler(t *testing.T) {
 		handler.ServeHTTP(response, request)
 
 		tests.AssertStatusEquals(t, response.Code, http.StatusFound)
-		tests.AssertLocationHeaderEquals(t, response, "/login")
+		tests.AssertLocationHeaderEquals(t, response, "/sign-in")
 	})
 }
 

@@ -60,7 +60,7 @@ func TestTemplateExecutor(t *testing.T) {
 	t.Run(`it parses the template file relative to its base path
 		and executes it with the given data`, func(t *testing.T) {
 		writer := &strings.Builder{}
-		err := loader.Load(writer, "../templates/login.html", nil)
+		err := loader.Load(writer, "../templates/sign-in.html", nil)
 		tests.AssertNoError(t, err)
 	})
 
