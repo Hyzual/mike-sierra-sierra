@@ -43,9 +43,7 @@ const manifest_plugin = new WebpackAssetsManifest({
     writeToDisk: true,
 });
 
-const typescript_type_check_plugin = new ForkTsCheckerWebpackPlugin({
-    reportFiles: ["**"],
-});
+const typescript_type_check_plugin = new ForkTsCheckerWebpackPlugin();
 
 const typescript_rule = {
     test: /\.ts(x?)$/,
