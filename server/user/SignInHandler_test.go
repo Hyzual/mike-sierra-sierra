@@ -130,7 +130,7 @@ func TestPostSigninHandler(t *testing.T) {
 		tests.AssertStatusEquals(t, response.Code, http.StatusInternalServerError)
 	})
 
-	t.Run("when successful, POST /sign-in will redirect to /home", func(t *testing.T) {
+	t.Run("when successful, POST /sign-in will redirect to /app", func(t *testing.T) {
 		handler := newValidSignInHandler()
 		request := newValidPostSigninRequest()
 		response := httptest.NewRecorder()
@@ -138,7 +138,7 @@ func TestPostSigninHandler(t *testing.T) {
 		handler.ServeHTTP(response, request)
 
 		tests.AssertStatusEquals(t, response.Code, http.StatusFound)
-		tests.AssertLocationHeaderEquals(t, response, "/home")
+		tests.AssertLocationHeaderEquals(t, response, "/app")
 	})
 }
 
@@ -206,7 +206,7 @@ type stubTemplateExecutor struct {
 	shouldErrorOnLoad bool
 }
 
-func (s *stubTemplateExecutor) Load(_ io.Writer, path string, data interface{}) error {
+func (s *stubTemplateExecutor) Load(_ io.Writer, data interface{}, templatePaths ...string) error {
 	if s.shouldErrorOnLoad {
 		return errors.New("Could not load template")
 	}

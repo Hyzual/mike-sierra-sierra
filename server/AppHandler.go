@@ -23,12 +23,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-type homeHandler struct {
+type appHandler struct {
 	templateExecutor TemplateExecutor
 	assetsResolver   AssetsResolver
 }
 
-func (h *homeHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) error {
+func (h *appHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) error {
 	styleSheetURI, err := h.assetsResolver.GetAssetURI("style.css")
 	if err != nil {
 		return errors.Wrapf(err, "could not resolve asset %s", "style.css")
@@ -38,19 +38,19 @@ func (h *homeHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 		return errors.Wrapf(err, "could not resolve asset %s", "index.js")
 	}
 	headerPresenter := &headerPresenter{"Hyzual"}
-	presenter := &homePresenter{
+	presenter := &appPresenter{
 		StylesheetURI:   styleSheetURI,
 		AppURI:          scriptURI,
 		HeaderPresenter: headerPresenter,
 	}
-	err = h.templateExecutor.Load(writer, "app.html", presenter)
+	err = h.templateExecutor.Load(writer, presenter, "app.html", "sidebar.html")
 	if err != nil {
-		return errors.Wrapf(err, "could not load template %s", "app.html")
+		return errors.Wrapf(err, "could not load templates app.html and sidebar.html")
 	}
 	return nil
 }
 
-type homePresenter struct {
+type appPresenter struct {
 	StylesheetURI   string // Public URI path to the stylesheet
 	AppURI          string // Public URI path to the javascript app
 	HeaderPresenter *headerPresenter

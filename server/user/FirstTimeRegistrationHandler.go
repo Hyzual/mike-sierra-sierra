@@ -53,7 +53,7 @@ func (h *getFirstTimeRegistrationHandler) ServeHTTP(writer http.ResponseWriter, 
 		return errors.Wrapf(err, "could not resolve asset %s", "style.css")
 	}
 	presenter := &firstTimeRegistrationPresenter{StylesheetURI: styleSheetURI}
-	err = h.templateExecutor.Load(writer, "first-time-registration.html", presenter)
+	err = h.templateExecutor.Load(writer, presenter, "first-time-registration.html")
 	if err != nil {
 		return errors.Wrapf(err, "could not load template %s", "first-time-registration.html")
 	}

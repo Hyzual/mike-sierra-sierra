@@ -27,13 +27,13 @@ import (
 	"github.com/hyzual/mike-sierra-sierra/tests"
 )
 
-func TestGetHome(t *testing.T) {
-	request := tests.NewGetRequest(t, "/home")
+func TestGetApp(t *testing.T) {
+	request := tests.NewGetRequest(t, "/app")
 
 	t.Run("when it cannot resolve assets, it will return an error", func(t *testing.T) {
 		assetsResolver := &stubAssetsResolver{true, ""}
 		templateExecutor := newTemplateExecutorWithValidTemplate()
-		handler := &homeHandler{templateExecutor, assetsResolver}
+		handler := &appHandler{templateExecutor, assetsResolver}
 
 		response := httptest.NewRecorder()
 		err := handler.ServeHTTP(response, request)
@@ -44,7 +44,7 @@ func TestGetHome(t *testing.T) {
 	t.Run("when it cannot load the template, it will return an error", func(t *testing.T) {
 		assetsResolver := &stubAssetsResolver{false, "asset"}
 		templateExecutor := newTemplateExecutorWithInvalidTemplate()
-		handler := &homeHandler{templateExecutor, assetsResolver}
+		handler := &appHandler{templateExecutor, assetsResolver}
 
 		response := httptest.NewRecorder()
 		err := handler.ServeHTTP(response, request)
@@ -55,7 +55,7 @@ func TestGetHome(t *testing.T) {
 	t.Run("it will execute the template with its assets", func(t *testing.T) {
 		assetsResolver := &stubAssetsResolver{filename: "asset"}
 		templateExecutor := newTemplateExecutorWithValidTemplate()
-		handler := &homeHandler{templateExecutor, assetsResolver}
+		handler := &appHandler{templateExecutor, assetsResolver}
 
 		response := httptest.NewRecorder()
 		err := handler.ServeHTTP(response, request)
@@ -77,7 +77,7 @@ type stubTemplateExecutor struct {
 	shouldErrorOnLoad bool
 }
 
-func (s *stubTemplateExecutor) Load(_ io.Writer, path string, data interface{}) error {
+func (s *stubTemplateExecutor) Load(_ io.Writer, data interface{}, templatePaths ...string) error {
 	if s.shouldErrorOnLoad {
 		return errors.New("Could not load template")
 	}

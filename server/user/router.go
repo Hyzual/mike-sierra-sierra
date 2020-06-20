@@ -17,7 +17,7 @@
 
 /*
 Package user groups together user authentication code.
-Authenticating the user, logging in, retrieving logged-in current user, etc.
+Authenticating the user, signing in, retrieving signed-in current user, etc.
 */
 package user
 

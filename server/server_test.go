@@ -44,13 +44,25 @@ func TestUnkwnownRoute(t *testing.T) {
 func TestGetRoot(t *testing.T) {
 	musicServer := newMusicServer()
 
-	t.Run("/ redirects to /home", func(t *testing.T) {
+	t.Run("/ redirects to /app", func(t *testing.T) {
 		request := tests.NewGetRequest(t, "/")
 		response := httptest.NewRecorder()
 		musicServer.ServeHTTP(response, request)
 
 		tests.AssertStatusEquals(t, response.Code, http.StatusFound)
-		tests.AssertLocationHeaderEquals(t, response, "/home")
+		tests.AssertLocationHeaderEquals(t, response, "/app")
+	})
+}
+
+func TestGetAppWithSuffix(t *testing.T) {
+	musicServer := newMusicServer()
+
+	t.Run("/app/suffix is handled by AppHandler", func(t *testing.T) {
+		request := tests.NewGetRequest(t, "/app/suffix")
+		response := httptest.NewRecorder()
+		musicServer.ServeHTTP(response, request)
+
+		tests.AssertStatusEquals(t, response.Code, http.StatusFound)
 	})
 }
 
@@ -95,7 +107,7 @@ func TestGetMusic(t *testing.T) {
 
 func TestUnauthorized(t *testing.T) {
 	handler := HandleUnauthorized(errors.New("Error"))
-	request := tests.NewGetRequest(t, "/home")
+	request := tests.NewGetRequest(t, "/app")
 	response := httptest.NewRecorder()
 
 	handler.ServeHTTP(response, request)

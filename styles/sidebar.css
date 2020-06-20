@@ -1,0 +1,45 @@
+/*
+ *   Copyright (C) 2020  Joris MASSON
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU Affero General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Affero General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Affero General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+.mss-app-sidebar {
+    grid-area: sidebar;
+    background: var(--darker-dark-shades-color);
+}
+
+.mss-app-sidebar-title {
+    margin: 8px 0 0 12px;
+    font-size: 20px;
+}
+
+.mss-app-sidebar-menu {
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.mss-app-sidebar-link {
+    display: block;
+    padding: 4px 8px;
+    border-left: 4px solid transparent;
+    color: var(--dark-accent-color);
+}
+
+.mss-app-sidebar-link:active,
+.mss-app-sidebar-link:hover {
+    border-left: 4px solid var(--light-accent-color);
+    color: var(--lighter-dark-accent-color);
+}

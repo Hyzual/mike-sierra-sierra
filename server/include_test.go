@@ -60,13 +60,20 @@ func TestTemplateExecutor(t *testing.T) {
 	t.Run(`it parses the template file relative to its base path
 		and executes it with the given data`, func(t *testing.T) {
 		writer := &strings.Builder{}
-		err := loader.Load(writer, "../templates/sign-in.html", nil)
+		err := loader.Load(writer, nil, "../templates/sign-in.html")
+		tests.AssertNoError(t, err)
+	})
+
+	t.Run(`it parses multiple template files relative to its base path
+		and executes them with the given data`, func(t *testing.T) {
+		writer := &strings.Builder{}
+		err := loader.Load(writer, nil, "../templates/app.html", "../templates/sidebar.html")
 		tests.AssertNoError(t, err)
 	})
 
 	t.Run("when it cannot load a template, it returns an error", func(t *testing.T) {
 		writer := &strings.Builder{}
-		err := loader.Load(writer, "./unknown-template.html", nil)
+		err := loader.Load(writer, nil, "./unknown-template.html")
 		tests.AssertError(t, err)
 	})
 }

@@ -16,10 +16,33 @@
  */
 
 import { getFolder } from "./rest-querier";
+import { initSidebarLinks } from "./router";
+
+const APP_MOUNT_POINT = "#app-mount-point";
 
 document.addEventListener("DOMContentLoaded", () => {
+    let error = initSidebarLinks(document, window);
+    if (error) {
+        throw error;
+    }
+    error = init(document);
+    if (error) {
+        throw error;
+    }
     printFolder();
 });
+
+//TODO: UT
+function init(doc: Document): Error | null {
+    const mount_point = doc.querySelector(APP_MOUNT_POINT);
+    if (!mount_point) {
+        return new Error(
+            `Could not get the app mount point at id ${APP_MOUNT_POINT}`
+        );
+    }
+
+    return null;
+}
 
 async function printFolder(): Promise<void> {
     const res = await getFolder(0);

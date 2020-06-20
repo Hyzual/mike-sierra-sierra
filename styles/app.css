@@ -15,6 +15,8 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+@import "./sidebar.css";
+
 .mss-grid-body {
     display: grid;
     grid-template-areas:
@@ -72,35 +74,6 @@
 
 .mss-app-header-sign-out-link:hover {
     color: var(--lighter-light-shades-color);
-}
-
-.mss-app-sidebar {
-    grid-area: sidebar;
-    background: var(--darker-dark-shades-color);
-}
-
-.mss-app-sidebar-title {
-    margin: 8px 0 0 12px;
-    font-size: 20px;
-}
-
-.mss-app-sidebar-menu {
-    margin: 8px 0 0;
-    padding: 0;
-    list-style: none;
-}
-
-.mss-app-sidebar-link {
-    display: block;
-    padding: 4px 8px;
-    border-left: 4px solid transparent;
-    color: var(--dark-accent-color);
-}
-
-.mss-app-sidebar-link:active,
-.mss-app-sidebar-link:hover {
-    border-left: 4px solid var(--light-accent-color);
-    color: var(--lighter-dark-accent-color);
 }
 
 .mss-app-breadcrumbs {

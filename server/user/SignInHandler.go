@@ -51,7 +51,7 @@ func (h *getSignInHandler) ServeHTTP(writer http.ResponseWriter, request *http.R
 		return errors.Wrapf(err, "could not resolve assets %s", "style.css")
 	}
 	presenter := &signInPresenter{StylesheetURI: hashedName}
-	err = h.templateExecutor.Load(writer, "sign-in.html", presenter)
+	err = h.templateExecutor.Load(writer, presenter, "sign-in.html")
 	if err != nil {
 		return errors.Wrapf(err, "could not load template %s", "sign-in.html")
 	}
@@ -106,7 +106,7 @@ func (h *postSignInHandler) ServeHTTP(writer http.ResponseWriter, request *http.
 		return errors.Wrap(err, "Could not decode the user session")
 	}
 
-	http.Redirect(writer, request, "/home", http.StatusFound)
+	http.Redirect(writer, request, "/app", http.StatusFound)
 	return nil
 }
 

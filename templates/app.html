@@ -27,37 +27,9 @@
             </div>
         </header>
         {{end}}
-        <nav class="mss-app-sidebar">
-            <section>
-                <h3 class="mss-app-sidebar-title">Music</h3>
-                <ul class="mss-app-sidebar-menu">
-                    <li>
-                        <a href="/home" class="mss-app-sidebar-link">Home</a>
-                    </li>
-                    <li>
-                        <a href="/home" class="mss-app-sidebar-link"
-                            >All Songs</a
-                        >
-                    </li>
-                    <li>
-                        <a href="/folders" class="mss-app-sidebar-link"
-                            >Browse by Folder</a
-                        >
-                    </li>
-                    <li>
-                        <a href="/home" class="mss-app-sidebar-link">Albums</a>
-                    </li>
-                    <li>
-                        <a href="/home" class="mss-app-sidebar-link">Artists</a>
-                    </li>
-                    <li>
-                        <a href="/home" class="mss-app-sidebar-link">Genres</a>
-                    </li>
-                </ul>
-            </section>
-        </nav>
+        {{template "sidebar.html" .}}
         <nav class="mss-app-breadcrumbs">Breadcrumbs</nav>
-        <main class="mss-app-main">Main</main>
+        <main class="mss-app-main" id="app-mount-point"></main>
         <footer class="mss-app-footer">
             <audio controls class="mss-app-player">
                 <source

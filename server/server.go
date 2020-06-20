@@ -51,13 +51,13 @@ func New(
 	s.sessionManager = sessionManager
 	s.assetsLoader = assetsLoader
 
-	homeHandler := sessionManager.Auth(
-		WrapErrors(&homeHandler{templateExecutor, assetsResolver}),
+	appHandler := sessionManager.Auth(
+		WrapErrors(&appHandler{templateExecutor, assetsResolver}),
 	)
 	musicHandler := &musicHandler{musicLoader}
 
 	router.HandleFunc("/", s.rootHandler)
-	router.Handle("/home", homeHandler)
+	router.PathPrefix("/app").Handler(appHandler)
 	router.PathPrefix("/assets/").HandlerFunc(s.assetsHandler)
 	router.PathPrefix("/music/").Handler(http.StripPrefix("/music/", musicHandler))
 
@@ -66,7 +66,7 @@ func New(
 }
 
 func (s *MusicServer) rootHandler(writer http.ResponseWriter, request *http.Request) {
-	http.Redirect(writer, request, "/home", http.StatusFound)
+	http.Redirect(writer, request, "/app", http.StatusFound)
 }
 
 func (s *MusicServer) assetsHandler(writer http.ResponseWriter, request *http.Request) {

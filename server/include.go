@@ -54,11 +54,11 @@ func (b *basePathJoiner) Join(relativePath string) string {
 	return path.Join(b.basePath, relativePath)
 }
 
-// TemplateExecutor resolves the given relative file path from the templates/ folder,
-// parses the template from the file and executes it on the given writer.
-// It returns an error if the template can't be found or if the execution fails.
+// TemplateExecutor resolves the given relative template paths from the templates/ folder,
+// parses the templates from the resolved files and executes them on the given writer.
+// It returns an error if a template can't be found or if the execution fails.
 type TemplateExecutor interface {
-	Load(writer io.Writer, templatePath string, data interface{}) error
+	Load(writer io.Writer, data interface{}, templatePaths ...string) error
 }
 
 // templateBaseExecutor implements TemplateExecutor for production code
@@ -71,18 +71,22 @@ func NewTemplateExecutor(basePath string) TemplateExecutor {
 	return &templateBaseExecutor{basePath}
 }
 
-// Load loads the template at templatePath (relative path from the templates/ folder),
-// parses the template from the file and executes it on the given writer.
-// It returns an error if the template can't be found or if the execution fails.
-func (t *templateBaseExecutor) Load(writer io.Writer, templatePath string, data interface{}) error {
-	cleanedPath := path.Join(t.basePath, filepath.Clean(templatePath))
-	tmpl, err := template.ParseFiles(cleanedPath)
+// Load resolves the given relative template paths from the templates/ folder,
+// parses the templates from the resolved files and executes them on the given writer.
+// It returns an error if a template can't be found or if the execution fails.
+func (t *templateBaseExecutor) Load(writer io.Writer, data interface{}, templatePaths ...string) error {
+	var cleanedPaths []string
+	for _, templatePath := range templatePaths {
+		cleanedPaths = append(cleanedPaths, path.Join(t.basePath, filepath.Clean(templatePath)))
+	}
+
+	tmpl, err := template.ParseFiles(cleanedPaths...)
 	if err != nil {
-		return errors.Wrapf(err, "could not load the template %s", templatePath)
+		return errors.Wrapf(err, "could not load the templates %v", templatePaths)
 	}
 	err = tmpl.Execute(writer, data)
 	if err != nil {
-		return errors.Wrapf(err, "could not execute the template %s", templatePath)
+		return errors.Wrapf(err, "could not execute the templates %v", templatePaths)
 	}
 	return nil
 }
