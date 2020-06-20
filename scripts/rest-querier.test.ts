@@ -61,13 +61,15 @@ describe(`rest-querier`, () => {
             if (!result.isErr()) {
                 throw new Error("Expected an error but did not get one");
             }
-            expect(result.error.message).toMatch("Could not decode JSON into Folder");
+            expect(result.error.message).toMatch(
+                "Could not decode JSON into Folder"
+            );
         });
 
         it(`will return a JSON Folder`, async () => {
             const expected_folder = {
                 name: "Edith Chapman",
-                items: []
+                items: [],
             };
             mockFetchSuccess(expected_folder);
 

@@ -27,7 +27,9 @@ interface Folder {
     items: Song[];
 }
 
-export async function getFolder(folder_id: number): Promise<Result<Folder, Error>> {
+export async function getFolder(
+    folder_id: number
+): Promise<Result<Folder, Error>> {
     const response = await fetch(`/api/folders/${folder_id}`, {
         method: "GET",
         headers: new Headers(),

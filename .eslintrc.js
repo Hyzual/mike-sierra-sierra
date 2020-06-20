@@ -16,7 +16,7 @@
  */
 
 module.exports = {
-    plugins: ["@typescript-eslint", "no-unsanitized", "jest"],
+    plugins: ["@typescript-eslint", "no-unsanitized", "prettier", "jest"],
     extends: [
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
@@ -105,6 +105,8 @@ module.exports = {
                 },
             },
         ],
+        // Prettier
+        "prettier/prettier": "error",
     },
     overrides: [
         {
