@@ -64,8 +64,10 @@ describe(`router`, () => {
                 expect(error).toBeNull();
 
                 const pushState = jest.spyOn(window.history, "pushState");
+                const forward = jest.spyOn(window.history, "forward");
                 anchor_tag.dispatchEvent(new Event("click"));
                 expect(pushState).toHaveBeenCalledWith("", "", "/app/folders");
+                expect(forward).toHaveBeenCalled();
             });
         });
     });

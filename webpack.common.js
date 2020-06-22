@@ -38,6 +38,10 @@ const css_style_only_plugin = new FixStyleOnlyEntriesPlugin({
     silent: true,
 });
 
+const clean_plugin = new CleanWebpackPlugin({
+    cleanAfterEveryBuildPatterns: ["!css-assets/", "!css-assets/**"],
+});
+
 const manifest_plugin = new WebpackAssetsManifest({
     output: "manifest.json",
     writeToDisk: true,
@@ -61,6 +65,18 @@ const css_rule = {
     use: [MiniCssExtractPlugin.loader, "css-loader"],
 };
 
+const css_assets_rule = {
+    test: /\.svg$/,
+    use: [
+        {
+            loader: "file-loader",
+            options: {
+                name: "css-assets/[name]-[sha256:hash:hex:16].[ext]",
+            },
+        },
+    ],
+};
+
 const configuration = {
     entry: {
         index: "./scripts/index.ts",
@@ -69,10 +85,10 @@ const configuration = {
     context,
     output,
     module: {
-        rules: [typescript_rule, css_rule],
+        rules: [typescript_rule, css_rule, css_assets_rule],
     },
     plugins: [
-        new CleanWebpackPlugin(),
+        clean_plugin,
         manifest_plugin,
         typescript_type_check_plugin,
         css_style_only_plugin,

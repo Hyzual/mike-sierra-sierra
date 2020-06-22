@@ -11,4 +11,4 @@ database/file/mike.db-journal
 secrets/*
 !secrets/.gitkeep
 # Ignore built assets files
-assets/
+/assets/

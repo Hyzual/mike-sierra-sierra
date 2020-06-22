@@ -15,27 +15,7 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { getFolder } from "./rest-querier";
-import { initSidebarLinks } from "./router";
-import { init as initFontAwesome } from "./fontawesome";
-import "./components/AppRoot";
-
-document.addEventListener("DOMContentLoaded", () => {
-    initFontAwesome();
-    const error = initSidebarLinks(document);
-    if (error) {
-        throw error;
-    }
-    printFolder();
-});
-
-async function printFolder(): Promise<void> {
-    const res = await getFolder(0);
-    if (res.isErr()) {
-        // eslint-disable-next-line no-console
-        console.log(res.error);
-        return;
-    }
-    // eslint-disable-next-line no-console
-    console.log(res.value);
+declare module "*.svg" {
+    const content: string;
+    export default content;
 }

@@ -15,9 +15,13 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import Navigo from "navigo";
+
 const SIDEBAR_MENU_APP_LINKS = "#sidebar-menu-app-links";
 
-export function initSidebarLinks(doc: Document, win: Window): Error | null {
+export const router = new Navigo();
+
+export function initSidebarLinks(doc: Document): Error | null {
     const sidebar_menu = doc.querySelector(SIDEBAR_MENU_APP_LINKS);
     if (!sidebar_menu) {
         return new Error(
@@ -33,10 +37,17 @@ export function initSidebarLinks(doc: Document, win: Window): Error | null {
             );
         }
 
+        const location = link.getAttribute("href");
+        if (location === null) {
+            return new Error(
+                `Could not get the href attribute of a data-router-link <a> tag`
+            );
+        }
+
+        //TODO: mark the active link with css
         link.addEventListener("click", (event: Event) => {
             event.preventDefault();
-
-            win.history.pushState("", "", link.href);
+            router.navigate(location);
         });
     }
 
