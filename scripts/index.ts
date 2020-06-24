@@ -17,10 +17,12 @@
 
 import { getFolder } from "./rest-querier";
 import { initSidebarLinks } from "./router";
+import { init as initFontAwesome } from "./fontawesome";
 
 const APP_MOUNT_POINT = "#app-mount-point";
 
 document.addEventListener("DOMContentLoaded", () => {
+    initFontAwesome();
     let error = initSidebarLinks(document, window);
     if (error) {
         throw error;

@@ -149,3 +149,7 @@ a:active {
     color: var(--darker-light-shades-color);
     font-size: 13px;
 }
+
+.mss-button-icon {
+    margin: 0 4px 0 0;
+}
