@@ -4,35 +4,34 @@ updates:
   directory: "/"
   schedule:
     interval: daily
-    time: "04:00"
   open-pull-requests-limit: 10
+  assignees:
+  - "Hyzual"
 - package-ecosystem: docker
   directory: "/"
   schedule:
     interval: daily
-    time: "04:00"
   open-pull-requests-limit: 10
   assignees:
-  - Hyzual
-- package-ecosystem: gomod
-  directory: "/"
-  schedule:
-    interval: daily
-    time: "04:00"
-  open-pull-requests-limit: 10
+  - "Hyzual"
 - package-ecosystem: docker
   directory: "/tools/docker-dev"
   schedule:
     interval: daily
-    time: "04:00"
   open-pull-requests-limit: 10
   assignees:
-  - Hyzual
+  - "Hyzual"
+- package-ecosystem: gomod
+  directory: "/"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  assignees:
+  - "Hyzual"
 - package-ecosystem: npm
   directory: "/"
   schedule:
     interval: daily
-    time: "04:00"
   open-pull-requests-limit: 10
   assignees:
-  - Hyzual
+  - "Hyzual"
