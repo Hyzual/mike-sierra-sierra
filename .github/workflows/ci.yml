@@ -36,7 +36,7 @@ jobs:
     # Static analysis and conformity to coding style
 
     - name: Go lint
-      uses: Jerome1337/golint-action@v1.0.1
+      uses: Jerome1337/golint-action@v1.0.2
 
     - name: Go format
       run: make goformat-ci
