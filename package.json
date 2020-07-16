@@ -16,7 +16,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.30",
     "@fortawesome/free-solid-svg-icons": "^5.13.1",
-    "@jsdevtools/ono": "^7.1.2",
+    "@jsdevtools/ono": "^7.1.3",
     "neverthrow": "^2.7.0"
   },
   "devDependencies": {
