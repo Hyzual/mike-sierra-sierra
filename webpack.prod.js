@@ -15,7 +15,7 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const mergeWebpackConfig = require("webpack-merge");
+const { merge } = require("webpack-merge");
 const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const cssNano = require("cssnano");
 
@@ -29,7 +29,7 @@ const cssOptimizerPlugin = new OptimizeCssAssetsPlugin({
 });
 
 const prod_configurations = common_configurations.map((config) =>
-    mergeWebpackConfig(config, {
+    merge(config, {
         mode: "production",
         plugins: [cssOptimizerPlugin],
         stats: {

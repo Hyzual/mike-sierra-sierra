@@ -15,11 +15,11 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-const mergeWebpackConfig = require("webpack-merge");
+const { merge } = require("webpack-merge");
 
 const common_configurations = require("./webpack.common.js");
 const dev_configurations = common_configurations.map((config) =>
-    mergeWebpackConfig(config, {
+    merge(config, {
         mode: "development",
         devtool: "inline-source-map",
     })
