@@ -16,16 +16,11 @@
  */
 
 import { getFolder } from "./rest-querier";
-import { initSidebarLinks } from "./router";
 import { init as initFontAwesome } from "./fontawesome";
 import "./components/AppRoot";
 
 document.addEventListener("DOMContentLoaded", () => {
     initFontAwesome();
-    const error = initSidebarLinks(document);
-    if (error) {
-        throw error;
-    }
     printFolder();
 });
 

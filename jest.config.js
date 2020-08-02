@@ -18,7 +18,7 @@
 // For a detailed explanation regarding each configuration property, visit:
 // https://jestjs.io/docs/en/configuration.html
 module.exports = {
-    preset: "ts-jest",
+    preset: "ts-jest/presets/js-with-ts",
 
     // The root directory that Jest should scan for tests and modules within
     rootDir: __dirname,
@@ -48,4 +48,9 @@ module.exports = {
 
     // The test environment that will be used for testing
     testEnvironment: "jest-environment-jsdom",
+
+    // Transpile lit-html for tests because it uses ES modules
+    transformIgnorePatterns: [
+        "/node_modules/(?!(lit-html|lit-element)).+\\.js",
+    ],
 };

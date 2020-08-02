@@ -30,16 +30,3 @@
     padding: 0;
     list-style: none;
 }
-
-.mss-app-sidebar-link {
-    display: block;
-    padding: 4px 8px;
-    border-left: 4px solid transparent;
-    color: var(--dark-accent-color);
-}
-
-.mss-app-sidebar-link:active,
-.mss-app-sidebar-link:hover {
-    border-left: 4px solid var(--light-accent-color);
-    color: var(--lighter-dark-accent-color);
-}

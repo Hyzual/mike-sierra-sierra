@@ -18,6 +18,7 @@
 import { LitElement, html, TemplateResult } from "lit-element";
 import { router } from "../router";
 import "./FoldersList";
+import "./SideBarLink";
 
 const DEFAULT_PAGE = "default";
 const FOLDERS_PAGE = "folders";

@@ -1,40 +1,54 @@
 <nav class="mss-app-sidebar">
     <section>
         <h3 class="mss-app-sidebar-title">Music</h3>
-        <ul class="mss-app-sidebar-menu" id="sidebar-menu-app-links">
+        <ul class="mss-app-sidebar-menu">
             <li>
-                <a href="/" class="mss-app-sidebar-link" data-router-link
-                    ><i class="fas fa-fw fa-home mss-button-icon"></i>Home</a
-                >
+                <side-bar-link uri="/" label="Home">
+                    <i
+                        class="fas fa-fw fa-home mss-button-icon"
+                        slot="icon"
+                    ></i>
+                </side-bar-link>
             </li>
             <li>
-                <a href="/" class="mss-app-sidebar-link" data-router-link
-                    ><i class="fas fa-fw fa-music mss-button-icon"></i>All
-                    Songs</a
-                >
+                <side-bar-link uri="/" label="All Songs">
+                    <i
+                        class="fas fa-fw fa-music mss-button-icon"
+                        slot="icon"
+                    ></i>
+                </side-bar-link>
             </li>
             <li>
-                <a href="folders" class="mss-app-sidebar-link" data-router-link>
-                    <i class="fas fa-fw fa-folder mss-button-icon"></i>Browse by
-                    Folder</a
-                >
+                <side-bar-link uri="folders" label="Browse by Folder">
+                    <i
+                        class="fas fa-fw fa-folder mss-button-icon"
+                        slot="icon"
+                    ></i>
+                </side-bar-link>
             </li>
             <li>
-                <a href="/" class="mss-app-sidebar-link" data-router-link
-                    ><i class="fas fa-fw fa-compact-disc mss-button-icon"></i
-                    >Albums</a
-                >
+                <side-bar-link uri="/" label="Albums">
+                    <i
+                        class="fas fa-fw fa-compact-disc mss-button-icon"
+                        slot="icon"
+                    ></i>
+                </side-bar-link>
             </li>
             <li>
-                <a href="/" class="mss-app-sidebar-link" data-router-link
-                    ><i class="fas fa-fw fa-user-circle mss-button-icon"></i
-                    >Artists</a
-                >
+                <side-bar-link uri="/" label="Artists">
+                    <i
+                        class="fas fa-fw fa-user-circle mss-button-icon"
+                        slot="icon"
+                    ></i>
+                </side-bar-link>
             </li>
             <li>
-                <a href="/" class="mss-app-sidebar-link" data-router-link
-                    ><i class="fas fa-fw fa-tags mss-button-icon"></i>Genres</a
-                >
+                <side-bar-link uri="/" label="Genres">
+                    <i
+                        class="fas fa-fw fa-tags mss-button-icon"
+                        slot="icon"
+                    ></i>
+                </side-bar-link>
             </li>
         </ul>
     </section>
