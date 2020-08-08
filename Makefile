@@ -12,17 +12,13 @@ get_ip_addr = `docker inspect -f '{{.NetworkSettings.Networks.tuleap_default.IPA
 all: start
 
 lint-go: ## Lint the files
-	@golint -set_exit_status ${PKG_LIST}
+	@golangci-lint run
 
 test-go: ## Run Go unit tests
 	@go test -short ${PKG_LIST}
 
 race: ## Run data race detector
 	@go test -race -short ${PKG_LIST}
-
-# test -z returns code 1 when its argument is not empty. gofmt -l returns the files that are not well-formatted
-goformat-ci: ## Test whether the Go code is well-formatted
-	@test -z $$(gofmt -l .)
 
 coverage-go: ## Generate global code coverage report
 	./tools/coverage.sh;

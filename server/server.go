@@ -34,7 +34,6 @@ import (
 type MusicServer struct {
 	sessionManager *sessionup.Manager
 	assetsLoader   PathJoiner
-	assetsResolver AssetsResolver
 	http.Handler
 }
 

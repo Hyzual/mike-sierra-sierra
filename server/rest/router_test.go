@@ -32,10 +32,11 @@ func TestGetSong(t *testing.T) {
 		request := tests.NewGetRequest(t, "/api/songs/15")
 		response := httptest.NewRecorder()
 
-		handler.ServeHTTP(response, request)
+		err := handler.ServeHTTP(response, request)
+		tests.AssertNoError(t, err)
 
 		var got Song
-		err := json.NewDecoder(response.Body).Decode(&got)
+		err = json.NewDecoder(response.Body).Decode(&got)
 
 		if err != nil {
 			t.Fatalf("could not decode the response body from server %q into a Song, '%v'", response.Body, err)
@@ -53,10 +54,11 @@ func TestGetFolder(t *testing.T) {
 		request := tests.NewGetRequest(t, "/api/folders/0")
 		response := httptest.NewRecorder()
 
-		handler.ServeHTTP(response, request)
+		err := handler.ServeHTTP(response, request)
+		tests.AssertNoError(t, err)
 
 		var got Folder
-		err := json.NewDecoder(response.Body).Decode(&got)
+		err = json.NewDecoder(response.Body).Decode(&got)
 		if err != nil {
 			t.Fatalf("Unable to parse response from server %q into slice of Folder, '%v'", response.Body, err)
 		}

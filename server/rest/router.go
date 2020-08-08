@@ -25,6 +25,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/hyzual/mike-sierra-sierra/server"
+	"github.com/pkg/errors"
 	"github.com/swithek/sessionup"
 )
 
@@ -34,8 +36,8 @@ func Register(router *mux.Router, sessionManager *sessionup.Manager) {
 	folderHandler := &folderHandler{}
 
 	apiRouter := router.PathPrefix("/api/").Subrouter()
-	apiRouter.Handle("/songs/{songId}", sessionManager.Auth(songHandler))
-	apiRouter.Handle("/folders/{folderId}", sessionManager.Auth(folderHandler))
+	apiRouter.Handle("/songs/{songId}", sessionManager.Auth(server.WrapErrors(songHandler)))
+	apiRouter.Handle("/folders/{folderId}", sessionManager.Auth(server.WrapErrors(folderHandler)))
 }
 
 // Song represents a music file. It is distinguished by media type (audio/mp3, audio/flac, etc.)
@@ -50,18 +52,21 @@ type Song struct {
 	Type        string `json:"type"`        // MIME type of the song E.g. "audio/flac"
 }
 
-const contentTypeHeader = "Content-Type"
 const jsonMediaType = "application/json; charset=utf-8"
 
 type songHandler struct {
 }
 
-func (s *songHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+func (s *songHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) error {
 	response := &Song{Title: "Hello World"}
-	json.NewEncoder(writer).Encode(response)
+	err := json.NewEncoder(writer).Encode(response)
+	if err != nil {
+		return errors.Wrapf(err, "could not encode the song %v to JSON", response)
+	}
 
 	writer.Header().Set("Content-Type", jsonMediaType)
 	writer.WriteHeader(http.StatusOK)
+	return nil
 }
 
 // Folder represents a music folder. It can be any folder in the filesystem hierarchy
@@ -75,11 +80,15 @@ type Folder struct {
 type folderHandler struct {
 }
 
-func (f *folderHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+func (f *folderHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) error {
 	songs := []Song{{Title: "Hello World"}}
 	response := &Folder{Name: "Music", Items: songs}
-	json.NewEncoder(writer).Encode(response)
+	err := json.NewEncoder(writer).Encode(response)
+	if err != nil {
+		return errors.Wrapf(err, "could not encode the folder %v to JSON", response)
+	}
 
 	writer.Header().Set("Content-Type", jsonMediaType)
 	writer.WriteHeader(http.StatusOK)
+	return nil
 }

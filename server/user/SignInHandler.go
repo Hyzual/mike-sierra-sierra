@@ -28,8 +28,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-const userSessionName = "userSession"
-
 // NewSignInGetHandler creates a new handler for GET /sign-in
 func NewSignInGetHandler(
 	te server.TemplateExecutor,
