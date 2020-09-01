@@ -22,7 +22,7 @@
     "neverthrow": "^2.7.1"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.10",
+    "@types/jest": "^26.0.12",
     "@types/navigo": "^7.0.1",
     "@typescript-eslint/eslint-plugin": "^3.10.1",
     "@typescript-eslint/parser": "^3.10.1",
