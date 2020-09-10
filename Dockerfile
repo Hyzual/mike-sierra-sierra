@@ -1,5 +1,5 @@
 # Builder image for Golang
-FROM golang:1.14.8-alpine3.11 as go-builder
+FROM golang:1.14.9-alpine3.11 as go-builder
 # Install dependencies. gcc and musl-dev are needed for go-sqlite3 (cgo)
 RUN apk --no-cache add git gcc musl-dev
 
