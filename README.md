@@ -12,8 +12,8 @@ Then, run the following commands:
 ```sh
 $ mkcert -install
 $ mkcert localhost ::1
-$ mv localhost+1.pem ./certs/cert.pem
-$ mv localhost+1-key.pem ./certs/key.pem
+$ mv localhost+1.pem ./secrets/cert.pem
+$ mv localhost+1-key.pem ./secrets/key.pem
 ```
 
 > Warning: the rootCA-key.pem file that mkcert automatically generates gives complete power to intercept secure requests from your machine. Do not share it.
@@ -26,6 +26,16 @@ $ make start
 $ make watch
 # Then, access https://localhost:8443
 ```
+
+#### Database
+
+Mike-sierra-sierra uses [SQLite](https://www.sqlite.org) to persist data.
+The database file is located at ./database/file/mike.db
+You must create the database file yourself and run the database/schema/install.sql script on it in order to create the DB tables.
+
+#### First-time registration
+
+Upon first starting the container, go to https://localhost:8443/first-time-registration to register your admin user.
 
 #### Go commands
 
@@ -50,13 +60,7 @@ $ make coverage-jest
 # Build and watch (for development)
 $ make watch
 ```
-
-#### Database
-
-Mike-sierra-sierra uses [SQLite](https://www.sqlite.org) to persist data.
-The database file is located at ./database/file/mike.db
-If it does not exist (it is gitignored), the server will create it on first run.
-
+s
 #### Add music files to the dev Docker image
 
 ```sh
