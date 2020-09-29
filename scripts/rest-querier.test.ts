@@ -18,15 +18,15 @@
 import { getFolder } from "./rest-querier";
 
 describe(`rest-querier`, () => {
-    let fetchMock: jest.SpyInstance;
+    let globalFetch: jest.SpyInstance;
     beforeEach(() => {
-        // fetch does not exist in jsdom, so we must create it
-        // eslint-disable-next-line jest/prefer-spy-on
-        fetchMock = window.fetch = jest.fn();
+        window.fetch = globalFetch = jest.fn();
     });
 
     afterEach(() => {
-        delete window.fetch;
+        window.fetch = (): Promise<Response> => {
+            throw new Error("Not supposed to happen");
+        };
     });
 
     describe(`getFolder()`, () => {
@@ -35,7 +35,7 @@ describe(`rest-querier`, () => {
                 ok: false,
                 statusText: "Not found",
             };
-            fetchMock.mockImplementation(() =>
+            globalFetch.mockImplementation(() =>
                 Promise.resolve(expected_response)
             );
 
@@ -50,7 +50,7 @@ describe(`rest-querier`, () => {
         });
 
         it(`when there is a JSON decoding error, it will return an error`, async () => {
-            fetchMock.mockImplementation(() =>
+            globalFetch.mockImplementation(() =>
                 Promise.resolve({
                     ok: true,
                     json: () => Promise.reject(new Error("Error in JSON")),
@@ -82,7 +82,7 @@ describe(`rest-querier`, () => {
     });
 
     function mockFetchSuccess(return_json: unknown, headers = {}): void {
-        fetchMock.mockImplementation(() =>
+        globalFetch.mockImplementation(() =>
             Promise.resolve({
                 headers,
                 ok: true,
