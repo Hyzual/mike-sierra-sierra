@@ -14,7 +14,7 @@
     "url": "https://github.com/Hyzual/mike-sierra-sierra/issues"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^1.2.30",
+    "@fortawesome/fontawesome-svg-core": "^1.2.31",
     "@fortawesome/free-solid-svg-icons": "^5.14.0",
     "@jsdevtools/ono": "^7.1.3",
     "lit-element": "^2.4.0",
