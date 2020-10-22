@@ -44,12 +44,13 @@ RUN apk --no-cache add ca-certificates
 
 WORKDIR /app
 
-# Database volume, TLS cert and key volume, music volume
-VOLUME ["/app/database/file/", "/app/secrets/", "/music/"]
-
-# Create a non-root group and user and give the user permissions on /app
+# Create a non-root group and user, create the volume folders with the right
+# permissions (otherwise VOLUME writes them as root) and give the user
+# permissions on /app
 RUN addgroup -S mike && adduser -S mike -G mike \
-  && chown -R mike:mike /app
+  && mkdir -p /app/database/file /app/secrets /music \
+  && touch /app/database/file/mike.db \
+  && chown -R mike:mike /app /music
 
 # Copy the CLI app so that it is in the PATH
 COPY --from=go-builder ["/app/cli", "/usr/local/bin/mike"]
@@ -66,6 +67,12 @@ RUN tar -xf ./built.tar && rm ./built.tar \
   && tar -xf ./assets.tar && rm ./assets.tar
 
 EXPOSE 8080 8443
+
+# Database volume, TLS cert and key volume, music volume
+# This needs to be AFTER creating the folders and setting their permissions
+# and AFTER changing to non-root user.
+# Otherwise, they are owned by root and the user cannot write to them.
+VOLUME ["/app/database/file", "/app/secrets", "/music"]
 
 CMD ["./webserver"]
 

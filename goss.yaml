@@ -9,15 +9,15 @@ file:
   /app/database/file:
     exists: true
     mode: "0755"
-    owner: root
-    group: root
+    owner: mike
+    group: mike
     filetype: directory
     contains: []
   /app/secrets:
     exists: true
     mode: "0755"
-    owner: root
-    group: root
+    owner: mike
+    group: mike
     filetype: directory
     contains: []
   /app/templates:
@@ -33,6 +33,13 @@ file:
     owner: mike
     group: mike
     filetype: file
+    contains: []
+  /music:
+    exists: true
+    mode: "0755"
+    owner: mike
+    group: mike
+    filetype: directory
     contains: []
 user:
   mike:
