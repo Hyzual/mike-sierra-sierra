@@ -78,11 +78,12 @@ func AssertError(t *testing.T, err error) {
 // StubSessionStore mocks a sessionup Store
 type StubSessionStore struct {
 	shouldThrowOnCreate bool
+	shouldThrowOnDelete bool
 }
 
 // NewStubSessionStore creates a new Stub store
-func NewStubSessionStore(shouldThrowOnCreate bool) *StubSessionStore {
-	return &StubSessionStore{shouldThrowOnCreate}
+func NewStubSessionStore(shouldThrowOnCreate bool, shouldThrowOnDelete bool) *StubSessionStore {
+	return &StubSessionStore{shouldThrowOnCreate, shouldThrowOnDelete}
 }
 
 // Create mocks sessionup Store's method. It throws an error when StubSessionStore.shouldThrowOnCreate is true
@@ -105,7 +106,10 @@ func (s *StubSessionStore) FetchByUserKey(ctx context.Context, key string) ([]se
 
 // DeleteByID mocks sessionup Store's method
 func (s *StubSessionStore) DeleteByID(ctx context.Context, id string) error {
-	return errors.New("This method is not supposed to be call in the tests")
+	if s.shouldThrowOnDelete {
+		return errors.New("Could not delete the session")
+	}
+	return nil
 }
 
 // DeleteByUserKey mocks sessionup Store's method

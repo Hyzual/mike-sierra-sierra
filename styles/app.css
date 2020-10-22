@@ -68,12 +68,8 @@
     padding: 0 8px;
 }
 
-.mss-app-header-sign-out-link {
-    color: var(--darker-light-shades-color);
-}
-
-.mss-app-header-sign-out-link:hover {
-    color: var(--lighter-light-shades-color);
+.mss-app-header-sign-out-button {
+    border-radius: 4px;
 }
 
 .mss-app-breadcrumbs {

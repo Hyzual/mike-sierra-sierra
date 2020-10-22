@@ -18,12 +18,14 @@
                 /><span>{{.Username}}</span>
             </div>
             <div class="mss-app-header-sign-out">
-                <a
-                    class="mss-app-header-sign-out-link"
-                    href="/sign-out"
-                    tabindex="2"
-                    >Sign out</a
-                >
+                <form action="/sign-out" method="POST">
+                    <button
+                        class="mss-button-secondary mss-app-header-sign-out-button"
+                        type="submit"
+                    >
+                        Sign out
+                    </button>
+                </form>
             </div>
         </header>
         {{end}} {{template "sidebar.html" .}}

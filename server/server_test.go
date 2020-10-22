@@ -117,7 +117,7 @@ func TestUnauthorized(t *testing.T) {
 }
 
 func newSessionManager() *sessionup.Manager {
-	sessionStore := tests.NewStubSessionStore(false)
+	sessionStore := tests.NewStubSessionStore(false, false)
 	return sessionup.NewManager(
 		sessionStore,
 		sessionup.CookieName("id"),

@@ -85,6 +85,21 @@ a:active {
     background-color: var(--lighter-main-color);
 }
 
+.mss-button-secondary {
+    display: inline-block;
+    overflow: hidden;
+    border-color: var(--dark-accent-color);
+    background: var(--dark-accent-color);
+    color: var(--light-shades-color);
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+
+.mss-button-secondary:hover {
+    border-color: var(--lighter-dark-accent-color);
+    background-color: var(--lighter-dark-accent-color);
+}
+
 .mss-button-large {
     height: 48px;
     border-radius: 4px;

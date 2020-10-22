@@ -154,7 +154,7 @@ func newValidPostSigninRequest() *http.Request {
 
 func newSignInHandlerInvalidCredentials() http.Handler {
 	dao := &stubDAOForSignIn{false}
-	sessionStore := tests.NewStubSessionStore(false)
+	sessionStore := tests.NewStubSessionStore(false, false)
 	sessionManager := sessionup.NewManager(sessionStore)
 	decoder := schema.NewDecoder()
 	return NewSignInPostHandler(dao, sessionManager, decoder)
@@ -162,7 +162,7 @@ func newSignInHandlerInvalidCredentials() http.Handler {
 
 func newSignInHandlerBadSession() http.Handler {
 	dao := &stubDAOForSignIn{true}
-	sessionStore := tests.NewStubSessionStore(true)
+	sessionStore := tests.NewStubSessionStore(true, false)
 	sessionManager := sessionup.NewManager(sessionStore)
 	decoder := schema.NewDecoder()
 	return NewSignInPostHandler(dao, sessionManager, decoder)
@@ -170,7 +170,7 @@ func newSignInHandlerBadSession() http.Handler {
 
 func newValidSignInHandler() http.Handler {
 	dao := &stubDAOForSignIn{true}
-	sessionStore := tests.NewStubSessionStore(false)
+	sessionStore := tests.NewStubSessionStore(false, false)
 	sessionManager := sessionup.NewManager(sessionStore)
 	decoder := schema.NewDecoder()
 	return NewSignInPostHandler(dao, sessionManager, decoder)
