@@ -16,12 +16,10 @@
  */
 
 /*
-Generated the theme with http://colormind.io
-light shades #faf7fa
-light accent #d09952
-main brand color #a51313 <- lock this one
-dark accent #7c7898
-dark shades #17161e
+The theme colors have been built with https://www.canva.com/colors/color-wheel/
+The light and dark shades colors are monochromatic variations on the main color,
+with adjusted saturation and luminance.
+The light accent color is "Complementary". The dark accent color is "Analogous".
 
 Used https://www.sassmeister.com/ to compute darker / lighter variants
 $main-color: #17161e;
@@ -34,21 +32,21 @@ div {
 }
 */
 body {
-    --light-shades-color: #e6e1e6;
-    --darker-light-shades-color: #dad3da;
-    --lighter-light-shades-color: #f2eff2;
-    --light-accent-color: #d09952;
-    --darker-light-accent-color: #cb8d3e;
-    --lighter-light-accent-color: #d5a566;
+    --light-shades-color: #e5dada;
+    --darker-light-shades-color: #dacbcb;
+    --lighter-light-shades-color: #f0e9e9;
+    --light-accent-color: #13a5a5;
+    --darker-light-accent-color: #108e8e;
+    --lighter-light-accent-color: #16bcbc;
     --main-color: #a51313;
     --darker-main-color: #8e1010;
     --lighter-main-color: #bc1616;
-    --dark-accent-color: #7c7898;
-    --darker-dark-accent-color: #6f6b8c;
-    --lighter-dark-accent-color: #8a86a3;
-    --dark-shades-color: #17161e;
-    --darker-dark-shades-color: #0c0b0f;
-    --lighter-dark-shades-color: #22212d;
+    --dark-accent-color: #a55c13;
+    --darker-dark-accent-color: #8e4f10;
+    --lighter-dark-accent-color: #bc6916;
+    --dark-shades-color: #110b0b;
+    --darker-dark-shades-color: #020101;
+    --lighter-dark-shades-color: #201515;
 
     margin: 0;
     color: var(--light-shades-color);

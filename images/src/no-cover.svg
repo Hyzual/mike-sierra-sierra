@@ -82,21 +82,21 @@
      inkscape:label="Background"
      style="display:inline">
     <rect
-       style="fill:#17161e;fill-opacity:1;fill-rule:evenodd;stroke-width:1.024"
+       style="fill:#110b0b;fill-opacity:1;fill-rule:evenodd;stroke-width:1.024"
        id="rect14"
        width="256"
        height="256"
        x="-0.5"
        y="-0.5" />
     <circle
-       style="fill:#7c7898;fill-opacity:1;stroke-width:0.975517"
+       style="fill:#a55c13;fill-opacity:1;stroke-width:0.975517"
        id="path849"
        cx="127.5"
        cy="127.5"
        r="121.93982" />
     <path
        sodipodi:type="star"
-       style="fill:#e6e1e6;fill-opacity:1;fill-rule:nonzero;stroke-width:1.024"
+       style="fill:#e5dada;fill-opacity:1;fill-rule:nonzero;stroke-width:1.024"
        id="path882"
        sodipodi:sides="3"
        sodipodi:cx="126.732"
