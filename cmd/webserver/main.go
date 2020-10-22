@@ -32,9 +32,9 @@ import (
 	"github.com/hyzual/mike-sierra-sierra/server"
 	"github.com/hyzual/mike-sierra-sierra/server/rest"
 	"github.com/hyzual/mike-sierra-sierra/server/user"
+	sqlitestore "github.com/hyzual/sessionup-sqlitestore"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/swithek/sessionup"
-	"github.com/swithek/sessionup/memstore"
 )
 
 const disableHTTPSEnv = "MIKE_DISABLE_HTTPS"
@@ -43,11 +43,11 @@ const musicPath = "/music" // It is a volume in the Docker image
 func main() {
 	cwd, err := mike.Cwd()
 	if err != nil {
-		log.Fatalf("could not read the current working directory %v", err)
+		log.Fatalf("could not read the current working directory: %v", err)
 	}
 	db, err := sql.Open("sqlite3", "file:database/file/mike.db?mode=rwc&cache=shared")
 	if err != nil {
-		log.Fatalf("could not connect to the database %v", err)
+		log.Fatalf("could not connect to the database: %v", err)
 	}
 	db.SetConnMaxLifetime(1 * time.Hour)
 
@@ -59,7 +59,10 @@ func main() {
 	musicLoader := server.NewBasePathJoiner(musicPath)
 	assetsResolver := server.NewAssetsResolver(vfs.OS(), assetsPath, "/assets")
 
-	sessionStore := memstore.New(time.Minute * 5)
+	sessionStore, err := sqlitestore.New(db, "sessions", time.Minute*30)
+	if err != nil {
+		log.Fatalf("error while creating a new sessions Store: %v", err)
+	}
 	sessionManager := sessionup.NewManager(
 		sessionStore, sessionup.CookieName("id"),
 		sessionup.Reject(server.HandleUnauthorized),
