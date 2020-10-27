@@ -37,8 +37,10 @@ import (
 	"github.com/swithek/sessionup"
 )
 
-const disableHTTPSEnv = "MIKE_DISABLE_HTTPS"
-const musicPath = "/music" // It is a volume in the Docker image
+const (
+	disableHTTPSEnv = "MIKE_DISABLE_HTTPS"
+	musicPath       = "/music" // It is a volume in the Docker image
+)
 
 func main() {
 	cwd, err := mike.Cwd()

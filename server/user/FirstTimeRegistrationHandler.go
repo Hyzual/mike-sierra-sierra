@@ -29,8 +29,10 @@ import (
 // Passwords are limited to 64 characters because bcrypt is limited to 72 characters
 // but we don't want to reveal we're using bcrypt.
 // See https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#maximum-password-lengths
-const maximumPasswordLength = 64
-const bcryptWork = 12
+const (
+	maximumPasswordLength = 64
+	bcryptWork            = 12
+)
 
 // NewFirstTimeRegistrationGetHandler creates a new handler for GET /first-time-registration
 func NewFirstTimeRegistrationGetHandler(

@@ -79,7 +79,6 @@ func TestTemplateExecutor(t *testing.T) {
 }
 
 func TestAssetsResolver(t *testing.T) {
-
 	t.Run("when there is no manifest.json file in the assets directory, it will return an error", func(t *testing.T) {
 		resolver := newResolverWithNoManifest(t)
 
@@ -125,7 +124,7 @@ func newResolverWithNoManifest(t *testing.T) server.AssetsResolver {
 	t.Helper()
 
 	testFS := memfs.Create()
-	err := vfs.MkdirAll(testFS, "/app/assets", 0755)
+	err := vfs.MkdirAll(testFS, "/app/assets", 0o755)
 	if err != nil {
 		t.Fatal("could not create the /app/assets folders")
 	}
@@ -138,11 +137,11 @@ func buildManifestFile(t *testing.T) (vfs.Filesystem, vfs.File, func()) {
 	t.Helper()
 
 	testFS := memfs.Create()
-	err := vfs.MkdirAll(testFS, "/app/assets", 0755)
+	err := vfs.MkdirAll(testFS, "/app/assets", 0o755)
 	if err != nil {
 		t.Fatal("could not create the /app/assets folders")
 	}
-	manifest, err := testFS.OpenFile("/app/assets/manifest.json", os.O_CREATE|os.O_RDWR, 0755)
+	manifest, err := testFS.OpenFile("/app/assets/manifest.json", os.O_CREATE|os.O_RDWR, 0o755)
 	if err != nil {
 		t.Fatalf("Could not setup test manifest file, '%v'", err)
 	}
@@ -165,7 +164,7 @@ func newResolverWithBadlyEncodedManifest(t *testing.T) server.AssetsResolver {
 func newResolverWithValidManifest(t *testing.T) server.AssetsResolver {
 	testFS, manifest, closeManifestFile := buildManifestFile(t)
 	defer closeManifestFile()
-	var manifestContent = make(map[string]string)
+	manifestContent := make(map[string]string)
 	manifestContent["style.css"] = "style.chunkhash.css"
 	manifestContent["subdirectory/file.js"] = "subdirectory/file.chunkhash.js"
 	err := json.NewEncoder(manifest).Encode(manifestContent)
