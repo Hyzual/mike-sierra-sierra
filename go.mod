@@ -6,7 +6,7 @@ require (
 	github.com/blang/vfs v1.0.0
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/schema v1.2.0
-	github.com/hyzual/sessionup-sqlitestore v1.0.0
+	github.com/hyzual/sessionup-sqlitestore v1.0.1
 	github.com/mattn/go-sqlite3 v1.14.4
 	github.com/pkg/errors v0.9.1
 	github.com/swithek/sessionup v1.3.1
