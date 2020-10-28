@@ -16,14 +16,13 @@
  */
 
 const { merge } = require("webpack-merge");
-const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
-const cssNano = require("cssnano");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 
 const common_configurations = require("./webpack.common.js");
 
-const cssOptimizerPlugin = new OptimizeCssAssetsPlugin({
-    cssProcessor: cssNano,
-    cssProcessorPluginOptions: {
+const css_minimizer_plugin = new CssMinimizerPlugin({
+    minimizerOptions: {
         preset: ["default", { discardComments: { removeAll: true } }],
     },
 });
@@ -31,7 +30,10 @@ const cssOptimizerPlugin = new OptimizeCssAssetsPlugin({
 const prod_configurations = common_configurations.map((config) =>
     merge(config, {
         mode: "production",
-        plugins: [cssOptimizerPlugin],
+        optimization: {
+            minimize: true,
+            minimizer: [css_minimizer_plugin, new TerserPlugin()],
+        },
         stats: {
             all: false,
             assets: true,
