@@ -17,7 +17,6 @@
 
 const { merge } = require("webpack-merge");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
-const TerserPlugin = require("terser-webpack-plugin");
 
 const common_configurations = require("./webpack.common.js");
 
@@ -32,7 +31,7 @@ const prod_configurations = common_configurations.map((config) =>
         mode: "production",
         optimization: {
             minimize: true,
-            minimizer: [css_minimizer_plugin, new TerserPlugin()],
+            minimizer: ["...", css_minimizer_plugin],
         },
         stats: {
             all: false,

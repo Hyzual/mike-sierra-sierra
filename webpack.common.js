@@ -83,6 +83,7 @@ const configuration = {
         style: "./styles/style.css",
     },
     context,
+    target: ["web"],
     output,
     module: {
         rules: [typescript_rule, css_rule, css_assets_rule],
@@ -96,6 +97,7 @@ const configuration = {
     ],
     resolve: {
         extensions: [".ts", ".js"],
+        fallback: { util: false },
     },
 };
 
