@@ -18,10 +18,10 @@
 package user
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/hyzual/mike-sierra-sierra/server"
-	"github.com/pkg/errors"
 	"github.com/swithek/sessionup"
 )
 
@@ -39,7 +39,7 @@ func NewSignOutPostHandler(
 func (h *postSignOutHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) error {
 	err := h.sessionManager.Revoke(request.Context(), writer)
 	if err != nil {
-		return errors.Wrap(err, "Could not revoke the user session")
+		return fmt.Errorf("could not revoke the user session: %w", err)
 	}
 	http.Redirect(writer, request, "/sign-in", http.StatusFound)
 	return nil

@@ -18,9 +18,8 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
-
-	"github.com/pkg/errors"
 )
 
 type appHandler struct {
@@ -31,11 +30,11 @@ type appHandler struct {
 func (h *appHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) error {
 	styleSheetURI, err := h.assetsResolver.GetAssetURI("style.css")
 	if err != nil {
-		return errors.Wrapf(err, "could not resolve asset %s", "style.css")
+		return fmt.Errorf("could not resolve asset %s: %w", "style.css", err)
 	}
 	scriptURI, err := h.assetsResolver.GetAssetURI("index.js")
 	if err != nil {
-		return errors.Wrapf(err, "could not resolve asset %s", "index.js")
+		return fmt.Errorf("could not resolve asset %s: %w", "index.js", err)
 	}
 	headerPresenter := &headerPresenter{"Hyzual"}
 	presenter := &appPresenter{
@@ -45,7 +44,7 @@ func (h *appHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request
 	}
 	err = h.templateExecutor.Load(writer, presenter, "app.html", "sidebar.html")
 	if err != nil {
-		return errors.Wrapf(err, "could not load templates app.html and sidebar.html")
+		return fmt.Errorf("could not load templates %s and %s", "app.html", "sidebar.html")
 	}
 	return nil
 }

@@ -20,8 +20,7 @@ package user
 import (
 	"context"
 	"database/sql"
-
-	"github.com/pkg/errors"
+	"fmt"
 )
 
 // Store handles database operations related to Users
@@ -50,7 +49,7 @@ func (d *DAO) GetUserMatchingEmail(ctx context.Context, email string) (*Possible
 		passwordHash []byte
 	)
 	if err := row.Scan(&id, &email, &passwordHash); err != nil {
-		return nil, errors.Wrap(err, "Could not retrieve the current user by its credentials")
+		return nil, fmt.Errorf("Could not retrieve the user by its credentials: %w", err)
 	}
 
 	return &PossibleMatch{id, email, passwordHash}, nil

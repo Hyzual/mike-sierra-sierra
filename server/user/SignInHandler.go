@@ -18,12 +18,13 @@
 package user
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/gorilla/schema"
 	"github.com/hyzual/mike-sierra-sierra/server"
-	"github.com/pkg/errors"
 	"github.com/swithek/sessionup"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -46,12 +47,12 @@ type getSignInHandler struct {
 func (h *getSignInHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) error {
 	hashedName, err := h.assetsResolver.GetAssetURI("style.css")
 	if err != nil {
-		return errors.Wrapf(err, "could not resolve assets %s", "style.css")
+		return fmt.Errorf("could not resolve asset %s: %w", "style.css", err)
 	}
 	presenter := &signInPresenter{StylesheetURI: hashedName}
 	err = h.templateExecutor.Load(writer, presenter, "sign-in.html")
 	if err != nil {
-		return errors.Wrapf(err, "could not load template %s", "sign-in.html")
+		return fmt.Errorf("could not load template %s: %w", "sign-in.html", err)
 	}
 	return nil
 }
@@ -101,7 +102,7 @@ func (h *postSignInHandler) ServeHTTP(writer http.ResponseWriter, request *http.
 	stringUserID := strconv.FormatUint(uint64(possibleUser.ID), 10)
 	err = h.sessionManager.Init(writer, request, stringUserID)
 	if err != nil {
-		return errors.Wrap(err, "Could not decode the user session")
+		return fmt.Errorf("could not decode the user session: %w", err)
 	}
 
 	http.Redirect(writer, request, "/app", http.StatusFound)

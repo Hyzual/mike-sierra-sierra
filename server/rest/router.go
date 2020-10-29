@@ -22,11 +22,11 @@ package rest
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
 	"github.com/hyzual/mike-sierra-sierra/server"
-	"github.com/pkg/errors"
 	"github.com/swithek/sessionup"
 )
 
@@ -61,7 +61,7 @@ func (s *songHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 	response := &Song{Title: "Hello World"}
 	err := json.NewEncoder(writer).Encode(response)
 	if err != nil {
-		return errors.Wrapf(err, "could not encode the song %v to JSON", response)
+		return fmt.Errorf("could not encode the song %v to JSON: %w", response, err)
 	}
 
 	writer.Header().Set("Content-Type", jsonMediaType)
@@ -85,7 +85,7 @@ func (f *folderHandler) ServeHTTP(writer http.ResponseWriter, request *http.Requ
 	response := &Folder{Name: "Music", Items: songs}
 	err := json.NewEncoder(writer).Encode(response)
 	if err != nil {
-		return errors.Wrapf(err, "could not encode the folder %v to JSON", response)
+		return fmt.Errorf("could not encode the folder %v to JSON: %w", response, err)
 	}
 
 	writer.Header().Set("Content-Type", jsonMediaType)

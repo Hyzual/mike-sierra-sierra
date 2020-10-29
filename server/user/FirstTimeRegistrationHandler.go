@@ -18,11 +18,11 @@
 package user
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/schema"
 	"github.com/hyzual/mike-sierra-sierra/server"
-	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -52,12 +52,12 @@ type getFirstTimeRegistrationHandler struct {
 func (h *getFirstTimeRegistrationHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) error {
 	styleSheetURI, err := h.assetsResolver.GetAssetURI("style.css")
 	if err != nil {
-		return errors.Wrapf(err, "could not resolve asset %s", "style.css")
+		return fmt.Errorf("could not resolve asset %s: %w", "style.css", err)
 	}
 	presenter := &firstTimeRegistrationPresenter{StylesheetURI: styleSheetURI}
 	err = h.templateExecutor.Load(writer, presenter, "first-time-registration.html")
 	if err != nil {
-		return errors.Wrapf(err, "could not load template %s", "first-time-registration.html")
+		return fmt.Errorf("could not load template %s: %w", "first-time-registration.html", err)
 	}
 	return nil
 }
@@ -98,7 +98,7 @@ func (h *postFirstTimeRegistrationHandler) ServeHTTP(writer http.ResponseWriter,
 
 	passwordhash, err := bcrypt.GenerateFromPassword([]byte(form.Password), bcryptWork)
 	if err != nil {
-		return errors.Wrap(err, "Error while hashing the password")
+		return fmt.Errorf("error while hashing the password: %w", err)
 	}
 
 	registration := &Registration{
@@ -109,7 +109,7 @@ func (h *postFirstTimeRegistrationHandler) ServeHTTP(writer http.ResponseWriter,
 
 	err = h.userStore.SaveFirstAdministrator(request.Context(), registration)
 	if err != nil {
-		return errors.Wrap(err, "Error while saving the first administrator account")
+		return fmt.Errorf("error while saving the first administrator account: %w", err)
 	}
 
 	http.Redirect(writer, request, "/sign-in", http.StatusFound)

@@ -19,6 +19,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"io"
 	"os"
@@ -26,7 +27,6 @@ import (
 	"path/filepath"
 
 	"github.com/blang/vfs"
-	"github.com/pkg/errors"
 )
 
 // PathJoiner joins the given relative path to its base path
@@ -82,11 +82,11 @@ func (t *templateBaseExecutor) Load(writer io.Writer, data interface{}, template
 
 	tmpl, err := template.ParseFiles(cleanedPaths...)
 	if err != nil {
-		return errors.Wrapf(err, "could not load the templates %v", templatePaths)
+		return fmt.Errorf("could not load the templates %v: %w", templatePaths, err)
 	}
 	err = tmpl.Execute(writer, data)
 	if err != nil {
-		return errors.Wrapf(err, "could not execute the templates %v", templatePaths)
+		return fmt.Errorf("could not execute the templates %v: %w", templatePaths, err)
 	}
 	return nil
 }
@@ -120,19 +120,19 @@ func (b *baseAssetsResolver) GetAssetURI(baseName string) (string, error) {
 	manifestPath := path.Join(b.assetsBasePath, "./manifest.json")
 	manifestFile, err := b.fs.OpenFile(manifestPath, os.O_RDONLY, 0)
 	if err != nil {
-		return "", errors.Wrapf(err, "Could not read the manifest.json file in this folder: %s. Did you run 'npm run build' ?", b.assetsBasePath)
+		return "", fmt.Errorf("Could not read the manifest.json file in this folder: %s. Did you run 'npm run build' ?: %w", b.assetsBasePath, err)
 	}
 	defer manifestFile.Close()
 
 	var manifestContents assetsManifest
 	err = json.NewDecoder(manifestFile).Decode(&manifestContents)
 	if err != nil {
-		return "", errors.Wrap(err, "Could not decode the manifest.json file")
+		return "", fmt.Errorf("Could not decode the manifest.json file: %w", err)
 	}
 
 	hashedFileName, ok := manifestContents[baseName]
 	if !ok {
-		return "", errors.Errorf("Could not find %s in the manifest.json file", baseName)
+		return "", fmt.Errorf("Could not find %s in the manifest.json file: %w", baseName, err)
 	}
 	joinedURI := path.Join(b.assetsBaseURI, hashedFileName)
 

@@ -18,9 +18,8 @@
 package mike
 
 import (
+	"fmt"
 	"os"
-
-	"github.com/pkg/errors"
 )
 
 // Cwd returns the current working directory of the server
@@ -28,7 +27,7 @@ import (
 func Cwd() (string, error) {
 	dir, err := os.Getwd()
 	if err != nil {
-		return "", errors.Wrap(err, "Could not get the current working directory")
+		return "", fmt.Errorf("could not get the current working directory: %w", err)
 	}
 	return dir, nil
 }
