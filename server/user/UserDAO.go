@@ -21,11 +21,14 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+
+	"github.com/swithek/sessionup"
 )
 
 // Store handles database operations related to Users
 type Store interface {
 	GetUserMatchingEmail(ctx context.Context, email string) (*PossibleMatch, error)
+	GetUserMatchingSession(ctx context.Context) (*CurrentUser, error)
 	SaveFirstAdministrator(ctx context.Context, registration *Registration) error
 }
 
@@ -61,6 +64,30 @@ type PossibleMatch struct {
 	ID           uint
 	Email        string
 	PasswordHash []byte
+}
+
+// GetUserMatchingSession retrieves the current user from the current session attached to
+// the request context.
+func (d *DAO) GetUserMatchingSession(ctx context.Context) (*CurrentUser, error) {
+	session, _ := sessionup.FromContext(ctx)
+	query := `SELECT user.id, user.email, user.username FROM user WHERE user.id = ?`
+	row := d.db.QueryRowContext(ctx, query, session.UserKey)
+	var (
+		id       uint
+		email    string
+		username string
+	)
+	if err := row.Scan(&id, &email, &username); err != nil {
+		return nil, fmt.Errorf("Could not retrieve current user from session: %w", err)
+	}
+	return &CurrentUser{id, email, username}, nil
+}
+
+// CurrentUser represents the currently signed-in user authentified by its session.
+type CurrentUser struct {
+	ID       uint
+	Email    string
+	Username string
 }
 
 // SaveFirstAdministrator creates the first administrator account whose

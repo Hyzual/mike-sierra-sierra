@@ -15,16 +15,20 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package server
+package app
 
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/hyzual/mike-sierra-sierra/server"
+	"github.com/hyzual/mike-sierra-sierra/server/user"
 )
 
 type appHandler struct {
-	templateExecutor TemplateExecutor
-	assetsResolver   AssetsResolver
+	templateExecutor server.TemplateExecutor
+	assetsResolver   server.AssetsResolver
+	userStore        user.Store
 }
 
 func (h *appHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) error {
@@ -36,7 +40,11 @@ func (h *appHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request
 	if err != nil {
 		return fmt.Errorf("could not resolve asset %s: %w", "index.js", err)
 	}
-	headerPresenter := &headerPresenter{"Hyzual"}
+	currentUser, err := h.userStore.GetUserMatchingSession(request.Context())
+	if err != nil {
+		return fmt.Errorf("could not retrieve the current user: %w", err)
+	}
+	headerPresenter := &headerPresenter{currentUser.Username}
 	presenter := &appPresenter{
 		StylesheetURI:   styleSheetURI,
 		AppURI:          scriptURI,

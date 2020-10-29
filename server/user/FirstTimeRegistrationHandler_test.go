@@ -178,3 +178,7 @@ func (s *stubDAOForRegistration) SaveFirstAdministrator(_ context.Context, regis
 func (s *stubDAOForRegistration) GetUserMatchingEmail(_ context.Context, _ string) (*PossibleMatch, error) {
 	return nil, errors.New("This method should not have been called in tests")
 }
+
+func (s *stubDAOForRegistration) GetUserMatchingSession(_ context.Context) (*CurrentUser, error) {
+	return nil, errors.New("This method should not have been called in tests")
+}

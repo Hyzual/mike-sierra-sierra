@@ -82,8 +82,12 @@ type StubSessionStore struct {
 }
 
 // NewStubSessionStore creates a new Stub store
-func NewStubSessionStore(shouldThrowOnCreate bool, shouldThrowOnDelete bool) *StubSessionStore {
+func NewStubSessionStore(shouldThrowOnCreate bool, shouldThrowOnDelete bool) sessionup.Store {
 	return &StubSessionStore{shouldThrowOnCreate, shouldThrowOnDelete}
+}
+
+func NewStoreWithValidSession(sessionID string) sessionup.Store {
+	return &StubSessionStore{false, false}
 }
 
 // Create mocks sessionup Store's method. It throws an error when StubSessionStore.shouldThrowOnCreate is true
@@ -96,7 +100,7 @@ func (s *StubSessionStore) Create(ctx context.Context, session sessionup.Session
 
 // FetchByID mocks sessionup Store's method
 func (s *StubSessionStore) FetchByID(ctx context.Context, id string) (sessionup.Session, bool, error) {
-	return sessionup.Session{}, false, errors.New("This method is not supposed to be call in the tests")
+	return sessionup.Session{ID: id}, true, nil
 }
 
 // FetchByUserKey mocks sessionup Store's method

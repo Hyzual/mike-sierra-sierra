@@ -27,7 +27,6 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/hyzual/mike-sierra-sierra/tests"
-	"github.com/swithek/sessionup"
 )
 
 func TestUnkwnownRoute(t *testing.T) {
@@ -51,18 +50,6 @@ func TestGetRoot(t *testing.T) {
 
 		tests.AssertStatusEquals(t, response.Code, http.StatusFound)
 		tests.AssertLocationHeaderEquals(t, response, "/app")
-	})
-}
-
-func TestGetAppWithSuffix(t *testing.T) {
-	musicServer := newMusicServer()
-
-	t.Run("/app/suffix is handled by AppHandler", func(t *testing.T) {
-		request := tests.NewGetRequest(t, "/app/suffix")
-		response := httptest.NewRecorder()
-		musicServer.ServeHTTP(response, request)
-
-		tests.AssertStatusEquals(t, response.Code, http.StatusFound)
 	})
 }
 
@@ -116,36 +103,22 @@ func TestUnauthorized(t *testing.T) {
 	tests.AssertLocationHeaderEquals(t, response, "/sign-in")
 }
 
-func newSessionManager() *sessionup.Manager {
-	sessionStore := tests.NewStubSessionStore(false, false)
-	return sessionup.NewManager(
-		sessionStore,
-		sessionup.CookieName("id"),
-		sessionup.Reject(HandleUnauthorized),
-	)
-}
-
 func newMusicServer() *MusicServer {
 	router := mux.NewRouter()
-	sessionManager := newSessionManager()
-	assetsIncluder := &stubPathJoiner{filename: ""}
-	templateExecutor := &stubTemplateExecutor{}
-	return New(router, sessionManager, assetsIncluder, templateExecutor, nil, nil)
+	assetsLoader := &stubPathJoiner{filename: ""}
+	return New(router, assetsLoader, nil)
 }
 
 func newMusicServerWithAsset(filename string) *MusicServer {
 	router := mux.NewRouter()
-	sessionManager := newSessionManager()
-	assetsIncluder := &stubPathJoiner{filename}
-	templateExecutor := &stubTemplateExecutor{}
-	return New(router, sessionManager, assetsIncluder, templateExecutor, nil, nil)
+	assetsLoader := &stubPathJoiner{filename}
+	return New(router, assetsLoader, nil)
 }
 
 func newMusicServerWithMusic(filename string) *MusicServer {
 	router := mux.NewRouter()
-	sessionManager := newSessionManager()
 	musicLoader := &stubPathJoiner{filename}
-	return New(router, sessionManager, nil, nil, musicLoader, nil)
+	return New(router, nil, musicLoader)
 }
 
 type stubPathJoiner struct {

@@ -194,6 +194,10 @@ func (s *stubDAOForSignIn) SaveFirstAdministrator(_ context.Context, _ *Registra
 	return errors.New("This method should not have been called in tests")
 }
 
+func (s *stubDAOForSignIn) GetUserMatchingSession(_ context.Context) (*CurrentUser, error) {
+	return nil, errors.New("This method should not have been called in tests")
+}
+
 func newTemplateExecutorWithInvalidTemplate() server.TemplateExecutor {
 	return &stubTemplateExecutor{true}
 }

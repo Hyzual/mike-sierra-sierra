@@ -26,38 +26,27 @@ import (
 	"path"
 
 	"github.com/gorilla/mux"
-	"github.com/swithek/sessionup"
 )
 
 // MusicServer serves HTTP requests.
 // It serves the HTML pages, the REST routes and the media files as well.
 type MusicServer struct {
-	sessionManager *sessionup.Manager
-	assetsLoader   PathJoiner
 	http.Handler
 }
 
 // New creates a new MusicServer
 func New(
 	router *mux.Router,
-	sessionManager *sessionup.Manager,
 	assetsLoader PathJoiner,
-	templateExecutor TemplateExecutor,
 	musicLoader PathJoiner,
-	assetsResolver AssetsResolver,
 ) *MusicServer {
 	s := new(MusicServer)
-	s.sessionManager = sessionManager
-	s.assetsLoader = assetsLoader
 
-	appHandler := sessionManager.Auth(
-		WrapErrors(&appHandler{templateExecutor, assetsResolver}),
-	)
 	musicHandler := &musicHandler{musicLoader}
+	assetsHandler := &assetsHandler{assetsLoader}
 
 	router.HandleFunc("/", s.rootHandler)
-	router.PathPrefix("/app").Handler(appHandler)
-	router.PathPrefix("/assets/").HandlerFunc(s.assetsHandler)
+	router.PathPrefix("/assets/").Handler(assetsHandler)
 	router.PathPrefix("/music/").Handler(http.StripPrefix("/music/", musicHandler))
 
 	s.Handler = router
@@ -68,14 +57,18 @@ func (s *MusicServer) rootHandler(writer http.ResponseWriter, request *http.Requ
 	http.Redirect(writer, request, "/app", http.StatusFound)
 }
 
-func (s *MusicServer) assetsHandler(writer http.ResponseWriter, request *http.Request) {
+type assetsHandler struct {
+	assetsLoader PathJoiner
+}
+
+func (a *assetsHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	cleanedPath := path.Clean(request.URL.Path)
 	if cleanedPath == "/assets" {
 		http.NotFound(writer, request)
 		return
 	}
 
-	http.ServeFile(writer, request, s.assetsLoader.Join(cleanedPath))
+	http.ServeFile(writer, request, a.assetsLoader.Join(cleanedPath))
 }
 
 type musicHandler struct {

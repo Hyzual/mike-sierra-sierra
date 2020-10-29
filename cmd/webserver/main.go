@@ -30,6 +30,7 @@ import (
 	"github.com/gorilla/schema"
 	"github.com/hyzual/mike-sierra-sierra"
 	"github.com/hyzual/mike-sierra-sierra/server"
+	"github.com/hyzual/mike-sierra-sierra/server/app"
 	"github.com/hyzual/mike-sierra-sierra/server/rest"
 	"github.com/hyzual/mike-sierra-sierra/server/user"
 	sqlitestore "github.com/hyzual/sessionup-sqlitestore"
@@ -66,7 +67,8 @@ func main() {
 		log.Fatalf("error while creating a new sessions Store: %v", err)
 	}
 	sessionManager := sessionup.NewManager(
-		sessionStore, sessionup.CookieName("id"),
+		sessionStore,
+		sessionup.CookieName("id"),
 		sessionup.Reject(server.HandleUnauthorized),
 	)
 	router := mux.NewRouter()
@@ -81,13 +83,17 @@ func main() {
 	)
 	// The REST API Subrouter registers itself
 	rest.Register(router, sessionManager)
+	app.Register(
+		router,
+		templateExecutor,
+		assetsResolver,
+		userStore,
+		sessionManager,
+	)
 	server := server.New(
 		router,
-		sessionManager,
 		assetsLoader,
-		templateExecutor,
 		musicLoader,
-		assetsResolver,
 	)
 
 	var port string
