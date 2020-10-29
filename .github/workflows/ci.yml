@@ -1,37 +1,34 @@
 name: CI pipeline
-on:
-  push:
-    branches-ignore: [ master ]
+on: [push, pull_request]
 jobs:
   backend_tests:
     name: Test Go server
     runs-on: ubuntu-latest
     steps:
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.15
+        id: go
 
-    - name: Set up Go 1.x
-      uses: actions/setup-go@v2
-      with:
-        go-version: ^1.14
-      id: go
+      - name: Check out the code
+        uses: actions/checkout@v2.3.3
 
-    - name: Check out the code
-      uses: actions/checkout@v2.3.3
+      # Install dependencies
 
-    # Install dependencies
+      - name: Go dependencies
+        run: make dep
 
-    - name: Go dependencies
-      run: make dep
+      # Build and test Go code
 
-    # Build and test Go code
+      - name: Build
+        run: make build-ci
 
-    - name: Build
-      run: make build-ci
+      - name: Go test coverage
+        run: make coverage-go
 
-    - name: Go test coverage
-      run: make coverage-go
-
-    - name: Test race conditions
-      run: make race
+      - name: Test race conditions
+        run: make race
 
   backend_lint:
     name: Lint Go server
@@ -44,53 +41,72 @@ jobs:
         uses: golangci/golangci-lint-action@v2.3.0
         with:
           version: v1.32
-          args: --enable goimports
 
   frontend_tests:
     name: Test Front-end
     runs-on: ubuntu-latest
     steps:
+      - name: Check out the code
+        uses: actions/checkout@v2.3.3
 
-    - name: Check out the code
-      uses: actions/checkout@v2.3.3
+      # Install dependencies
 
-    # Install dependencies
+      - name: NPM dependencies
+        run: make npm-dep
 
-    - name: NPM dependencies
-      run: make npm-dep
+      # Run Jest tests
 
-    # Run Jest tests
+      - name: Jest test coverage
+        run: make coverage-jest
 
-    - name: Jest test coverage
-      run: make coverage-jest
+      # Static analysis and conformity to coding style
 
-    # Static analysis and conformity to coding style
+      - name: eslint
+        run: make eslint-ci
 
-    - name: eslint
-      run: make eslint-ci
+      - name: Stylelint
+        run: make stylelint-ci
 
-    - name: Stylelint
-      run: make stylelint-ci
-
-    - name: Prettier for HTML and Javascript config
-      run: make prettier-ci
+      - name: Prettier for HTML and Javascript config
+        run: make prettier-ci
 
   docker_image:
     name: Test Docker image
     runs-on: ubuntu-latest
     steps:
+      - name: Install goss and dgoss
+        uses: e1himself/goss-installation-action@v1.0.1
+        with:
+          # Goss release version to install
+          version: 'v0.3.13'
 
-    - name: Install goss and dgoss
-      uses: e1himself/goss-installation-action@v1.0.1
-      with:
-        # Goss release version to install
-        version: 'v0.3.13'
+      - name: Check out the code
+        uses: actions/checkout@v2.3.3
 
-    - name: Check out the code
-      uses: actions/checkout@v2.3.3
+      - name: Build the Docker image
+        run: make build-docker-image
 
-    - name: Build the Docker image
-      run: make build-docker-image
+      - name: Run goss tests
+        run: make dgoss-ci
 
-    - name: Run goss tests
-      run: make dgoss-ci
+  publish_image:
+    name: Publish to Docker Hub
+    runs-on: ubuntu-latest
+    # Publish docker image if all tests succeed and push is on master branch
+    needs: ['backend_tests', 'backend_lint', 'frontend_tests', 'docker_image']
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v2.3.3
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+
+      - name: Build and push the production image
+        uses: docker/build-push-action@v2.0.1
+        with:
+          push: true
+          tags: hyzual/mike-sierra-sierra:latest
