@@ -150,3 +150,24 @@ func (s *stubDAOForApp) GetUserMatchingEmail(_ context.Context, _ string) (*user
 func (s *stubDAOForApp) SaveFirstAdministrator(_ context.Context, _ *user.Registration) error {
 	return errors.New("This method should not have been called in tests")
 }
+
+func TestGenerateGravatarHash(t *testing.T) {
+	t.Run("it generates a md5 hash of the trimmed and lowercased email from the current user", func(t *testing.T) {
+		currentUser := &user.CurrentUser{Email: "Valid.Email@example.com"}
+		expected := "cef5ba9259f7619f438306c020cda589"
+
+		actual := generateGravatarHash(currentUser)
+		if actual != expected {
+			t.Errorf("expected hash %s to be %s", actual, expected)
+		}
+	})
+
+	t.Run("it returns zeroes when there is no email", func(t *testing.T) {
+		currentUser := &user.CurrentUser{}
+		expected := "00000000000000000000000000000000"
+		actual := generateGravatarHash(currentUser)
+		if actual != expected {
+			t.Errorf("expected hash %s to be %s", actual, expected)
+		}
+	})
+}

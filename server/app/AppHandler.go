@@ -18,8 +18,11 @@
 package app
 
 import (
+	"crypto/md5" //nolint gosec //md5 is required for Gravatar and is not used for sensitive crypto here
+	"encoding/hex"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/hyzual/mike-sierra-sierra/server"
 	"github.com/hyzual/mike-sierra-sierra/server/user"
@@ -44,7 +47,7 @@ func (h *appHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request
 	if err != nil {
 		return fmt.Errorf("could not retrieve the current user: %w", err)
 	}
-	headerPresenter := &headerPresenter{currentUser.Username}
+	headerPresenter := &headerPresenter{currentUser.Username, generateGravatarHash(currentUser)}
 	presenter := &appPresenter{
 		StylesheetURI:   styleSheetURI,
 		AppURI:          scriptURI,
@@ -57,6 +60,20 @@ func (h *appHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request
 	return nil
 }
 
+// See https://gravatar.com/site/implement/hash/
+func generateGravatarHash(currentUser *user.CurrentUser) string {
+	hasher := md5.New() //nolint gosec //md5 is required for Gravatar and is not used for sensitive crypto here
+	email := strings.ToLower(strings.TrimSpace(currentUser.Email))
+	if email == "" {
+		return "00000000000000000000000000000000"
+	}
+	_, err := hasher.Write([]byte(email))
+	if err != nil {
+		return "00000000000000000000000000000000"
+	}
+	return hex.EncodeToString(hasher.Sum(nil))
+}
+
 type appPresenter struct {
 	StylesheetURI   string // Public URI path to the stylesheet
 	AppURI          string // Public URI path to the javascript app
@@ -64,5 +81,6 @@ type appPresenter struct {
 }
 
 type headerPresenter struct {
-	Username string // Username of the current logged-in user
+	Username     string // Username of the current logged-in user
+	GravatarHash string // Gravatar hash of the current logged-in user email.
 }
