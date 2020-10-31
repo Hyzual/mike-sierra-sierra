@@ -15,17 +15,17 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { getFolder } from "./rest-querier";
+import { getTopFolders } from "./api/rest-querier";
 import { init as initFontAwesome } from "./fontawesome";
 import "./components/AppRoot";
 
 document.addEventListener("DOMContentLoaded", () => {
     initFontAwesome();
-    printFolder();
+    printTopFolders();
 });
 
-async function printFolder(): Promise<void> {
-    const res = await getFolder(0);
+async function printTopFolders(): Promise<void> {
+    const res = await getTopFolders();
     if (res.isErr()) {
         // eslint-disable-next-line no-console
         console.log(res.error);

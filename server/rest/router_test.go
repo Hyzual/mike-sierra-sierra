@@ -32,6 +32,14 @@ func TestRouter(t *testing.T) {
 	sessionManager := tests.NewValidSessionManager(t)
 	Register(router, sessionManager)
 
+	t.Run("/api/folders is handled", func(t *testing.T) {
+		request := tests.NewAuthenticatedGetRequest(t, "/api/folders")
+		response := httptest.NewRecorder()
+		router.ServeHTTP(response, request)
+
+		tests.AssertStatusEquals(t, response.Code, http.StatusOK)
+	})
+
 	t.Run("/api/folders/1 is handled by FolderHandler", func(t *testing.T) {
 		request := tests.NewAuthenticatedGetRequest(t, "/api/folders/1")
 		response := httptest.NewRecorder()

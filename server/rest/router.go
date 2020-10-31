@@ -34,10 +34,14 @@ import (
 func Register(router *mux.Router, sessionManager *sessionup.Manager) {
 	songHandler := &songHandler{}
 	folderHandler := &folderHandler{}
+	topFolderHandler := &topFolderHandler{}
 
 	apiRouter := router.PathPrefix("/api/").Subrouter()
-	apiRouter.Handle("/songs/{songId}", sessionManager.Auth(server.WrapErrors(songHandler)))
-	apiRouter.Handle("/folders/{folderId}", sessionManager.Auth(server.WrapErrors(folderHandler)))
+	// All requests to the REST API must be authenticated
+	apiRouter.Use(sessionManager.Auth)
+	apiRouter.Handle("/songs/{songId}", server.WrapErrors(songHandler))
+	apiRouter.Handle("/folders", server.WrapErrors(topFolderHandler))
+	apiRouter.Handle("/folders/{folderId}", server.WrapErrors(folderHandler))
 }
 
 // Song represents a music file. It is distinguished by media type (audio/mp3, audio/flac, etc.)

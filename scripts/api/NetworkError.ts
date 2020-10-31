@@ -15,32 +15,19 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ono } from "@jsdevtools/ono";
-import { Result, ok, err } from "neverthrow";
+import { Ono } from "@jsdevtools/ono";
 
-interface Song {
-    title: string;
-}
+type HTTPMethod = "GET";
 
-interface Folder {
-    name: string;
-    items: Song[];
-}
+export class NetworkError extends Error {
+    constructor(
+        method: HTTPMethod,
+        uri: string,
+        statusCode: number,
+        statusText: string
+    ) {
+        super(`Could not ${method} ${uri}`);
 
-export async function getFolder(
-    folder_id: number
-): Promise<Result<Folder, Error>> {
-    const response = await fetch(`/api/folders/${folder_id}`, {
-        method: "GET",
-        headers: new Headers(),
-    });
-    if (!response.ok) {
-        return err(new Error(`Could not GET /api/folders/${folder_id}`));
-    }
-    try {
-        const folder = await response.json();
-        return ok(folder);
-    } catch (error) {
-        return err(ono(error, "Could not decode JSON into Folder"));
+        Ono.extend(this, { statusCode, statusText });
     }
 }
