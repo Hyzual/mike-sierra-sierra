@@ -123,7 +123,7 @@ func (s *stubAssetsResolver) GetAssetURI(baseName string) (string, error) {
 }
 
 func newValidUserStore() user.Store {
-	currentUser := &user.CurrentUser{ID: 27, Email: "testuser@example.com", Username: "Test User"}
+	currentUser := &user.Current{ID: 27, Email: "testuser@example.com", Username: "Test User"}
 	return &stubDAOForApp{false, currentUser}
 }
 
@@ -133,10 +133,10 @@ func newInvalidUserStore() user.Store {
 
 type stubDAOForApp struct {
 	shouldErrorOnGet bool
-	currentUser      *user.CurrentUser
+	currentUser      *user.Current
 }
 
-func (s *stubDAOForApp) GetUserMatchingSession(_ context.Context) (*user.CurrentUser, error) {
+func (s *stubDAOForApp) GetUserMatchingSession(_ context.Context) (*user.Current, error) {
 	if s.shouldErrorOnGet {
 		return nil, errors.New("Could not get current user")
 	}
@@ -153,7 +153,7 @@ func (s *stubDAOForApp) SaveFirstAdministrator(_ context.Context, _ *user.Regist
 
 func TestGenerateGravatarHash(t *testing.T) {
 	t.Run("it generates a md5 hash of the trimmed and lowercased email from the current user", func(t *testing.T) {
-		currentUser := &user.CurrentUser{Email: "Valid.Email@example.com"}
+		currentUser := &user.Current{Email: "Valid.Email@example.com"}
 		expected := "cef5ba9259f7619f438306c020cda589"
 
 		actual := generateGravatarHash(currentUser)
@@ -163,7 +163,7 @@ func TestGenerateGravatarHash(t *testing.T) {
 	})
 
 	t.Run("it returns zeroes when there is no email", func(t *testing.T) {
-		currentUser := &user.CurrentUser{}
+		currentUser := &user.Current{}
 		expected := "00000000000000000000000000000000"
 		actual := generateGravatarHash(currentUser)
 		if actual != expected {

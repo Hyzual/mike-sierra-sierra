@@ -61,7 +61,7 @@ func (h *appHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request
 }
 
 // See https://gravatar.com/site/implement/hash/
-func generateGravatarHash(currentUser *user.CurrentUser) string {
+func generateGravatarHash(currentUser *user.Current) string {
 	hasher := md5.New() //nolint gosec //md5 is required for Gravatar and is not used for sensitive crypto here
 	email := strings.ToLower(strings.TrimSpace(currentUser.Email))
 	if email == "" {

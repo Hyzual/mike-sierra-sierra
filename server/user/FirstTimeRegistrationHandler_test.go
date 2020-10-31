@@ -179,6 +179,6 @@ func (s *stubDAOForRegistration) GetUserMatchingEmail(_ context.Context, _ strin
 	return nil, errors.New("This method should not have been called in tests")
 }
 
-func (s *stubDAOForRegistration) GetUserMatchingSession(_ context.Context) (*CurrentUser, error) {
+func (s *stubDAOForRegistration) GetUserMatchingSession(_ context.Context) (*Current, error) {
 	return nil, errors.New("This method should not have been called in tests")
 }

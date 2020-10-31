@@ -194,7 +194,7 @@ func (s *stubDAOForSignIn) SaveFirstAdministrator(_ context.Context, _ *Registra
 	return errors.New("This method should not have been called in tests")
 }
 
-func (s *stubDAOForSignIn) GetUserMatchingSession(_ context.Context) (*CurrentUser, error) {
+func (s *stubDAOForSignIn) GetUserMatchingSession(_ context.Context) (*Current, error) {
 	return nil, errors.New("This method should not have been called in tests")
 }
 
