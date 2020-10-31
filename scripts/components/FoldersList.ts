@@ -22,39 +22,13 @@ import {
     PropertyDeclarations,
     TemplateResult,
 } from "lit-element";
-import "./FolderCover";
-
-interface Folder {
-    id: number;
-    title: string;
-}
-
-//TODO: This list of folders must come from the REST API
-const folders = [
-    { id: 1, title: "Ghost in the Shell - Stand Alone Complex OST 3" },
-    { id: 2, title: "Call To Power 2" },
-    { id: 3, title: "Civilization: Call To Power" },
-    { id: 4, title: "Medieval II Total War" },
-    { id: 5, title: "Age of Empires Definitive Edition (Original Soundtrack)" },
-    { id: 6, title: "Stellaris Digital Soundtrack" },
-    { id: 7, title: "WarCraft III: Reign of Chaos [Ripped]" },
-    { id: 8, title: "Zeus: Master of Olympus" },
-    { id: 9, title: "Il était une fois... l'Homme" },
-    {
-        id: 10,
-        title: "Ghost in the Shell - Stand Alone Complex : Solid State Society",
-    },
-    { id: 11, title: "Final Fantasy X OST" },
-    { id: 12, title: "Video Games Music" },
-    { id: 13, title: "Trance" },
-    { id: 14, title: "Starcraft OST" },
-];
+import { SubFolder } from "../types";
 
 class FoldersList extends LitElement {
+    folders: SubFolder[] = [];
+
     static get properties(): PropertyDeclarations {
-        return {
-            folders: { type: Array },
-        };
+        return { folders: { type: Array } };
     }
 
     static readonly styles = css`
@@ -68,11 +42,11 @@ class FoldersList extends LitElement {
     `;
 
     render(): TemplateResult {
-        return html`${folders.map(
-            (folder: Folder) =>
+        return html`${this.folders.map(
+            (folder: SubFolder) =>
                 html`<folder-cover
                     folder_id="${folder.id}"
-                    folder_title="${folder.title}"
+                    folder_title="${folder.name}"
                 ></folder-cover>`
         )}`;
     }

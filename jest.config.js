@@ -53,4 +53,9 @@ module.exports = {
     transformIgnorePatterns: [
         "/node_modules/(?!(lit-html|lit-element)).+\\.js",
     ],
+
+    moduleNameMapper: {
+        // Ignore SVG imports in code under test
+        "^.+\\.svg": "identity-obj-proxy",
+    },
 };

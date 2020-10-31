@@ -17,25 +17,8 @@
 
 import { ono } from "@jsdevtools/ono";
 import { ok, err, ResultAsync } from "neverthrow";
+import { Folder, TopLevelFolders } from "../types";
 import { NetworkError } from "./NetworkError";
-
-interface Song {
-    title: string;
-}
-
-export interface Folder {
-    name: string;
-    items: Song[];
-}
-
-interface SubFolder {
-    id: number;
-    name: string;
-}
-
-export interface TopLevelFolders {
-    folders: SubFolder[];
-}
 
 const wrapError = (e: unknown): Error =>
     e instanceof Error ? e : ono("Unknown error");

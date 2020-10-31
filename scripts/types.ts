@@ -15,9 +15,20 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { init as initFontAwesome } from "./fontawesome";
-import "./components/AppRoot";
+export interface Song {
+    title: string;
+}
 
-document.addEventListener("DOMContentLoaded", () => {
-    initFontAwesome();
-});
+export interface Folder {
+    name: string;
+    items: Song[];
+}
+
+export interface SubFolder {
+    id: number;
+    name: string;
+}
+
+export interface TopLevelFolders {
+    folders: SubFolder[];
+}

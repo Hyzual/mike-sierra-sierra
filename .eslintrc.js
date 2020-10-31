@@ -113,6 +113,11 @@ module.exports = {
             files: ["*.test.ts"],
             extends: ["plugin:jest/recommended"],
             rules: {
+                // Allow type assertions for tests
+                "@typescript-eslint/consistent-type-assertions": [
+                    "error",
+                    { assertionStyle: "as" },
+                ],
                 "jest/consistent-test-it": "error",
                 "jest/valid-title": "error",
                 "jest/no-restricted-matchers": [

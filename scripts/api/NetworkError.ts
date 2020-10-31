@@ -23,8 +23,8 @@ export class NetworkError extends Error {
     constructor(
         method: HTTPMethod,
         uri: string,
-        statusCode: number,
-        statusText: string
+        public readonly statusCode: number,
+        public readonly statusText: string
     ) {
         super(`Could not ${method} ${uri}`);
 

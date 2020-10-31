@@ -15,14 +15,9 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {
-    getFolder,
-    getTopFolders,
-    Folder,
-    TopLevelFolders,
-} from "./rest-querier";
 import { ResultAsync } from "neverthrow";
-import { NetworkError } from "./NetworkError";
+import { getFolder, getTopFolders } from "./rest-querier";
+import { Folder, TopLevelFolders } from "scripts/types";
 
 describe(`rest-querier`, () => {
     let globalFetch: jest.SpyInstance;
@@ -50,12 +45,12 @@ describe(`rest-querier`, () => {
         [
             "getFolder()",
             "Could not GET /api/folders/1",
-            (): ResultAsync<unknown, NetworkError> => getFolder(1),
+            (): ResultAsync<unknown, Error> => getFolder(1),
         ],
         [
             "getTopFolders()",
             "Could not GET /api/folders",
-            (): ResultAsync<unknown, NetworkError> => getTopFolders(),
+            (): ResultAsync<unknown, Error> => getTopFolders(),
         ],
     ])(
         `when there is a network error, %s will return an error`,

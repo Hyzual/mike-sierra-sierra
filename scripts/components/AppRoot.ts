@@ -17,8 +17,10 @@
 
 import { LitElement, html, TemplateResult } from "lit-element";
 import { router } from "../router";
-import "./FoldersList";
 import "./SideBarLink";
+import "./TopLevelFolders";
+import "./FoldersList";
+import "./FolderCover";
 
 const DEFAULT_PAGE = "default";
 const FOLDERS_PAGE = "folders";
@@ -44,7 +46,7 @@ class AppRoot extends LitElement {
     render(): TemplateResult {
         switch (this.current_page) {
             case FOLDERS_PAGE:
-                return html`<folders-list></folders-list>`;
+                return html`<mss-top-level-folders></mss-top-level-folders> `;
             case DEFAULT_PAGE:
             default:
                 return html`Home`;

@@ -47,6 +47,7 @@ body {
     --dark-shades-color: #110b0b;
     --darker-dark-shades-color: #020101;
     --lighter-dark-shades-color: #201515;
+    --error-color: #d31818;
 
     margin: 0;
     color: var(--light-shades-color);
