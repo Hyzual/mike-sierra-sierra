@@ -29,7 +29,7 @@ import (
 
 func TestPostSignOutHandler(t *testing.T) {
 	t.Run("when the session manager cannot revoke the user session, it will return Internal Server Error", func(t *testing.T) {
-		handler := newSignOutHandlerBadSession()
+		handler := newSignOutHandlerBadSession(t)
 		request := newPostSignOutRequest()
 		response := httptest.NewRecorder()
 
@@ -39,7 +39,7 @@ func TestPostSignOutHandler(t *testing.T) {
 	})
 
 	t.Run("when succesful, POST /sign-out will redirect to /sign-in", func(t *testing.T) {
-		handler := newValidSignOutHandler()
+		handler := newValidSignOutHandler(t)
 		request := newPostSignOutRequest()
 		response := httptest.NewRecorder()
 
@@ -50,15 +50,14 @@ func TestPostSignOutHandler(t *testing.T) {
 	})
 }
 
-func newSignOutHandlerBadSession() http.Handler {
-	sessionStore := tests.NewStubSessionStore(false, true)
+func newSignOutHandlerBadSession(t *testing.T) http.Handler {
+	sessionStore := tests.NewSessionStoreWithErrorOnDelete(t)
 	sessionManager := sessionup.NewManager(sessionStore)
 	return NewSignOutPostHandler(sessionManager)
 }
 
-func newValidSignOutHandler() http.Handler {
-	sessionStore := tests.NewStubSessionStore(false, false)
-	sessionManager := sessionup.NewManager(sessionStore)
+func newValidSignOutHandler(t *testing.T) http.Handler {
+	sessionManager := tests.NewValidSessionManager(t)
 	return NewSignOutPostHandler(sessionManager)
 }
 

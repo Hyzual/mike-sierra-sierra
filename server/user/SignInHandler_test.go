@@ -71,7 +71,7 @@ func TestGetSignInHandler(t *testing.T) {
 
 func TestPostSigninHandler(t *testing.T) {
 	t.Run("when the request cannot be parsed, it will return Bad Request", func(t *testing.T) {
-		handler := newSignInHandlerInvalidCredentials()
+		handler := newSignInHandlerInvalidCredentials(t)
 		request := httptest.NewRequest(http.MethodPost, "/sign-in?bad-escaping-percent%", nil)
 		response := httptest.NewRecorder()
 
@@ -81,7 +81,7 @@ func TestPostSigninHandler(t *testing.T) {
 	})
 
 	t.Run("when no email is provided, it will return Bad Request", func(t *testing.T) {
-		handler := newSignInHandlerInvalidCredentials()
+		handler := newSignInHandlerInvalidCredentials(t)
 		request := newPostSigninRequest(strings.NewReader("password=welcome0"))
 		response := httptest.NewRecorder()
 
@@ -91,7 +91,7 @@ func TestPostSigninHandler(t *testing.T) {
 	})
 
 	t.Run("when no password is provided, it will return Bad Request", func(t *testing.T) {
-		handler := newSignInHandlerInvalidCredentials()
+		handler := newSignInHandlerInvalidCredentials(t)
 		request := newPostSigninRequest(strings.NewReader("email=mike@example.com"))
 		response := httptest.NewRecorder()
 
@@ -101,7 +101,7 @@ func TestPostSigninHandler(t *testing.T) {
 	})
 
 	t.Run("when the email address doesn't match any from the store, it will return Forbidden", func(t *testing.T) {
-		handler := newSignInHandlerInvalidCredentials()
+		handler := newSignInHandlerInvalidCredentials(t)
 		request := newPostSigninRequest(strings.NewReader("email=wrong.user@example.com&password=wrong_password"))
 		response := httptest.NewRecorder()
 
@@ -111,7 +111,7 @@ func TestPostSigninHandler(t *testing.T) {
 	})
 
 	t.Run("when the password does not match the password Hash from the store, it will return Forbidden", func(t *testing.T) {
-		handler := newSignInHandlerBadSession()
+		handler := newSignInHandlerBadSession(t)
 		request := newPostSigninRequest(strings.NewReader("email=mike@example.com&password=wrong_password"))
 		response := httptest.NewRecorder()
 
@@ -121,7 +121,7 @@ func TestPostSigninHandler(t *testing.T) {
 	})
 
 	t.Run("when session cannot be initialized, it will return Internal Server Error", func(t *testing.T) {
-		handler := newSignInHandlerBadSession()
+		handler := newSignInHandlerBadSession(t)
 		request := newValidPostSigninRequest()
 		response := httptest.NewRecorder()
 
@@ -131,7 +131,7 @@ func TestPostSigninHandler(t *testing.T) {
 	})
 
 	t.Run("when successful, POST /sign-in will redirect to /app", func(t *testing.T) {
-		handler := newValidSignInHandler()
+		handler := newValidSignInHandler(t)
 		request := newValidPostSigninRequest()
 		response := httptest.NewRecorder()
 
@@ -152,26 +152,27 @@ func newValidPostSigninRequest() *http.Request {
 	return newPostSigninRequest(strings.NewReader("email=mike@example.com&password=welcome0"))
 }
 
-func newSignInHandlerInvalidCredentials() http.Handler {
+func newSignInHandlerInvalidCredentials(t *testing.T) http.Handler {
+	t.Helper()
 	dao := &stubDAOForSignIn{false}
-	sessionStore := tests.NewStubSessionStore(false, false)
+	sessionManager := tests.NewValidSessionManager(t)
+	decoder := schema.NewDecoder()
+	return NewSignInPostHandler(dao, sessionManager, decoder)
+}
+
+func newSignInHandlerBadSession(t *testing.T) http.Handler {
+	t.Helper()
+	dao := &stubDAOForSignIn{true}
+	sessionStore := tests.NewStoreWithErrorOnCreate(t)
 	sessionManager := sessionup.NewManager(sessionStore)
 	decoder := schema.NewDecoder()
 	return NewSignInPostHandler(dao, sessionManager, decoder)
 }
 
-func newSignInHandlerBadSession() http.Handler {
+func newValidSignInHandler(t *testing.T) http.Handler {
+	t.Helper()
 	dao := &stubDAOForSignIn{true}
-	sessionStore := tests.NewStubSessionStore(true, false)
-	sessionManager := sessionup.NewManager(sessionStore)
-	decoder := schema.NewDecoder()
-	return NewSignInPostHandler(dao, sessionManager, decoder)
-}
-
-func newValidSignInHandler() http.Handler {
-	dao := &stubDAOForSignIn{true}
-	sessionStore := tests.NewStubSessionStore(false, false)
-	sessionManager := sessionup.NewManager(sessionStore)
+	sessionManager := tests.NewValidSessionManager(t)
 	decoder := schema.NewDecoder()
 	return NewSignInPostHandler(dao, sessionManager, decoder)
 }

@@ -23,8 +23,31 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/gorilla/mux"
 	"github.com/hyzual/mike-sierra-sierra/tests"
 )
+
+func TestRouter(t *testing.T) {
+	router := mux.NewRouter()
+	sessionManager := tests.NewValidSessionManager(t)
+	Register(router, sessionManager)
+
+	t.Run("/api/folders/1 is handled by FolderHandler", func(t *testing.T) {
+		request := tests.NewAuthenticatedGetRequest(t, "/api/folders/1")
+		response := httptest.NewRecorder()
+		router.ServeHTTP(response, request)
+
+		tests.AssertStatusEquals(t, response.Code, http.StatusOK)
+	})
+
+	t.Run("/api/songs/1 is handled by SongHandler", func(t *testing.T) {
+		request := tests.NewAuthenticatedGetRequest(t, "/api/songs/1")
+		response := httptest.NewRecorder()
+		router.ServeHTTP(response, request)
+
+		tests.AssertStatusEquals(t, response.Code, http.StatusOK)
+	})
+}
 
 func TestGetSong(t *testing.T) {
 	handler := &songHandler{}
@@ -42,26 +65,6 @@ func TestGetSong(t *testing.T) {
 			t.Fatalf("could not decode the response body from server %q into a Song, '%v'", response.Body, err)
 		}
 
-		tests.AssertStatusEquals(t, response.Code, http.StatusOK)
-		tests.AssertContentTypeHeaderEquals(t, response, jsonMediaType)
-	})
-}
-
-func TestGetFolder(t *testing.T) {
-	handler := &folderHandler{}
-	t.Run(`when folder id 0 is given,
-		it will return the representation of the top-level music folder`, func(t *testing.T) {
-		request := tests.NewGetRequest(t, "/api/folders/0")
-		response := httptest.NewRecorder()
-
-		err := handler.ServeHTTP(response, request)
-		tests.AssertNoError(t, err)
-
-		var got Folder
-		err = json.NewDecoder(response.Body).Decode(&got)
-		if err != nil {
-			t.Fatalf("Unable to parse response from server %q into slice of Folder, '%v'", response.Body, err)
-		}
 		tests.AssertStatusEquals(t, response.Code, http.StatusOK)
 		tests.AssertContentTypeHeaderEquals(t, response, jsonMediaType)
 	})

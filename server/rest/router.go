@@ -68,27 +68,3 @@ func (s *songHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 	writer.WriteHeader(http.StatusOK)
 	return nil
 }
-
-// Folder represents a music folder. It can be any folder in the filesystem hierarchy
-// such as an album, an artist folder containing many albums, a genre folder containing
-// many artists, etc. It is output by the REST API.
-type Folder struct {
-	Name  string `json:"name"`
-	Items []Song `json:"items"`
-}
-
-type folderHandler struct {
-}
-
-func (f *folderHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) error {
-	songs := []Song{{Title: "Hello World"}}
-	response := &Folder{Name: "Music", Items: songs}
-	err := json.NewEncoder(writer).Encode(response)
-	if err != nil {
-		return fmt.Errorf("could not encode the folder %v to JSON: %w", response, err)
-	}
-
-	writer.Header().Set("Content-Type", jsonMediaType)
-	writer.WriteHeader(http.StatusOK)
-	return nil
-}
