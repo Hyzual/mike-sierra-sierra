@@ -14,6 +14,8 @@ github.com/hyzual/sessionup-sqlitestore v1.0.1 h1:KiLWeFN++eHnYffpzI9tmYNSJ+fmku
 github.com/hyzual/sessionup-sqlitestore v1.0.1/go.mod h1:Fa8cdoaZC1g2bG8HQfD3DlhhZdP3GS1v4tSqs69e9y0=
 github.com/mattn/go-sqlite3 v1.14.4 h1:4rQjbDxdu9fSgI/r3KN72G3c2goxknAqHHgPWWs8UlI=
 github.com/mattn/go-sqlite3 v1.14.4/go.mod h1:WVKg1VTActs4Qso6iwGbiFih2UIHo0ENGwNd0Lj+XmI=
+github.com/mattn/go-sqlite3 v1.14.5 h1:1IdxlwTNazvbKJQSxoJ5/9ECbEeaTTyeU7sEAZ5KKTQ=
+github.com/mattn/go-sqlite3 v1.14.5/go.mod h1:WVKg1VTActs4Qso6iwGbiFih2UIHo0ENGwNd0Lj+XmI=
 github.com/swithek/sessionup v1.3.1 h1:FWDErKx4JsbG+7Z9NiUhKJfeiaArUpA6hrGe39LgIyE=
 github.com/swithek/sessionup v1.3.1/go.mod h1:2Hw9qm+mH/p/6dEwqYeQl9pee8rqjrYDTJ2XhET9Oyg=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
