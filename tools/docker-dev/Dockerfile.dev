@@ -1,4 +1,4 @@
-FROM golang:1.15.5-alpine3.12
+FROM golang:1.15.6-alpine3.12
 # git is needed for go get. gcc and musl-dev are needed for go-sqlite3 (cgo)
 RUN apk --no-cache add git gcc musl-dev \
   && go get github.com/cespare/reflex
