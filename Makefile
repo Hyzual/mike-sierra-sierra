@@ -5,11 +5,11 @@ PKG_LIST := $(shell go list ${PKG}/... | grep -v /vendor/)
 
 get_ip_addr = `docker inspect -f '{{.NetworkSettings.Networks.tuleap_default.IPAddress}}' mike-dev`
 
-.PHONY: all dep clean coverage start watch race
+.PHONY: all help dep clean coverage start watch race
 
 .SILENT: clean-dev-container
 
-all: start
+all: help
 
 lint-go: ## Lint the files
 	@golangci-lint run
