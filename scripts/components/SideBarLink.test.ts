@@ -18,6 +18,10 @@
 import { SideBarLink } from "./SideBarLink";
 import { router } from "../router";
 
+const noop = (): void => {
+    //Do nothing
+};
+
 describe(`SideBarLink`, () => {
     let link: SideBarLink;
 
@@ -25,6 +29,7 @@ describe(`SideBarLink`, () => {
         link = new SideBarLink();
         link.setAttribute("uri", "/folders");
         link.setAttribute("label", "Browse by Folder");
+        router.on("/folders", noop);
 
         document.body.append(link);
         await link.updateComplete;
