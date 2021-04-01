@@ -20,7 +20,7 @@ RUN go build -o . ./cmd/webserver ./cmd/cli \
 
 # -----
 # Builder image for frontend assets
-FROM alpine:3.13.2 as front-builder
+FROM alpine:3.13.4 as front-builder
 
 # Install nodejs and npm
 RUN apk --no-cache add npm
@@ -37,7 +37,7 @@ RUN npm install --no-audit && npm run build \
 
 # -----
 # Runtime image
-FROM alpine:3.13.2
+FROM alpine:3.13.4
 
 # Install runtime dependencies
 RUN apk --no-cache add ca-certificates
