@@ -4,10 +4,19 @@ More soon!
 
 ### Contributing
 
+#### Install Nix
+
+Only two dev tools are required: `git` to clone the sources from GitHub and `nix`. Please see the appropriate installation instructions from <https://nixos.org/download.html#nix-quick-install>.
+
+Then, run the following command that will download all dev tools (the first time) and open a shell with all dev tools installed:
+
+```sh
+$ nix-shell
+```
+
 #### Enable HTTPS support
 
-Download and install [mkcert](https://github.com/FiloSottile/mkcert#installation)
-Then, run the following commands:
+Run the following commands:
 
 ```sh
 $ mkcert -install
@@ -16,11 +25,12 @@ $ mv localhost+1.pem ./secrets/cert.pem
 $ mv localhost+1-key.pem ./secrets/key.pem
 ```
 
-> Warning: the rootCA-key.pem file that mkcert automatically generates gives complete power to intercept secure requests from your machine. Do not share it.
+> Warning: `~/.local/share/mkcert/rootCA-key.pem` file that mkcert automatically generates gives complete power to intercept secure requests from your machine. Do not share it.
 
 #### Start the dev Docker container
 
 ```sh
+# build and watch the Go sources
 $ make start
 # Build and watch the CSS and Javascript
 $ make watch
@@ -30,8 +40,8 @@ $ make watch
 #### Database
 
 Mike-sierra-sierra uses [SQLite](https://www.sqlite.org) to persist data.
-The database file is located at ./database/file/mike.db
-You must create the database file yourself and run the database/schema/install.sql script on it in order to create the DB tables.
+The database file is located at `./database/file/mike.db`
+You must create the database file yourself and run the [`./database/schema/install.sql`](file://./database/schema/install.sql) script on it in order to create the DB tables.
 
 #### First-time registration
 

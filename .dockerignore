@@ -2,6 +2,7 @@
 .git/
 # Ignore dotfiles
 .editorconfig
+.envrc
 .eslintrc.js
 .gitignore
 .prettierrc

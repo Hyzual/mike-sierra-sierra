@@ -5,19 +5,19 @@ jobs:
     name: Test Go server
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Go 1.x
-        uses: actions/setup-go@v2
-        with:
-          go-version: ^1.16
-        id: go
-
       - name: Check out the code
         uses: actions/checkout@v2.3.4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v13
+
+      - name: Set up Nix shell
+        run: nix-shell --pure
 
       # Install dependencies
 
       - name: Go dependencies
-        run: make dep
+        run: go mod download
 
       # Build and test Go code
 
@@ -49,10 +49,16 @@ jobs:
       - name: Check out the code
         uses: actions/checkout@v2.3.4
 
+      - name: Install Nix
+        uses: cachix/install-nix-action@v13
+
+      - name: Set up Nix shell
+        run: nix-shell --pure
+
       # Install dependencies
 
       - name: NPM dependencies
-        run: make npm-dep
+        run: npm install --no-audit
 
       # Run Jest tests
 
