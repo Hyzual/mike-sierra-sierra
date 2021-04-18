@@ -12,3 +12,5 @@ secrets/*
 !secrets/.gitkeep
 # Ignore built assets files
 /assets/
+# Ignore direnv cache for nix-shell
+.direnv/
