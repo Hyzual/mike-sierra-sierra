@@ -58,8 +58,7 @@ type Song struct {
 
 const jsonMediaType = "application/json; charset=utf-8"
 
-type songHandler struct {
-}
+type songHandler struct{}
 
 func (s *songHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) error {
 	response := &Song{Title: "Hello World"}

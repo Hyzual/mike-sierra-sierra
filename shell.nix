@@ -7,6 +7,7 @@ pkgs.mkShell {
         pkgs.nodejs-slim-14_x
         pkgs.nodePackages.npm
         pkgs.go
+        pkgs.golangci-lint
         pkgs.mkcert
     ];
 

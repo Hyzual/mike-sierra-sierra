@@ -3,3 +3,5 @@ linters:
     - bugs
     - unused
     - format
+  disable:
+    - scopelint

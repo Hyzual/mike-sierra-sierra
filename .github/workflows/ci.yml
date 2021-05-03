@@ -44,10 +44,17 @@ jobs:
       - name: Check out the code
         uses: actions/checkout@v2.3.4
 
+      - name: Install Nix
+        uses: cachix/install-nix-action@v13
+
+      - name: Set up Nix shell
+        run: nix-shell --pure
+
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2.5.2
         with:
-          version: v1.32
+          version: v1.39.0
+          skip-go-installation: true
 
   frontend_tests:
     name: Test Front-end

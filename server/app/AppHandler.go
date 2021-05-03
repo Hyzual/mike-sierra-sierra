@@ -18,11 +18,12 @@
 package app
 
 import (
-	"crypto/md5" //nolint gosec //md5 is required for Gravatar and is not used for sensitive crypto here
 	"encoding/hex"
 	"fmt"
 	"net/http"
 	"strings"
+
+	"crypto/md5" //nolint gosec //md5 is required for Gravatar and is not used for sensitive crypto here
 
 	"github.com/hyzual/mike-sierra-sierra/server"
 	"github.com/hyzual/mike-sierra-sierra/server/user"
