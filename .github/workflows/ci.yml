@@ -1,5 +1,12 @@
 name: CI pipeline
-on: [push, pull_request]
+on:
+  push:
+    branches-ignore:
+     - 'dependabot/**'
+  pull_request_target:
+
+permissions: read-all
+
 jobs:
   backend_tests:
     name: Test Go server
