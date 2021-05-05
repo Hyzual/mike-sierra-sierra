@@ -9,5 +9,5 @@ require (
 	github.com/hyzual/sessionup-sqlitestore v1.1.0
 	github.com/mattn/go-sqlite3 v1.14.7
 	github.com/swithek/sessionup v1.4.0
-	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37
+	golang.org/x/crypto v0.0.0-20210503195802-e9a32991a82e
 )
