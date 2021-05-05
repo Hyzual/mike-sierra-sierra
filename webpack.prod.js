@@ -16,22 +16,21 @@
  */
 
 const { merge } = require("webpack-merge");
-const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const { ESBuildMinifyPlugin } = require("esbuild-loader");
 
 const common_configurations = require("./webpack.common.js");
-
-const css_minimizer_plugin = new CssMinimizerPlugin({
-    minimizerOptions: {
-        preset: ["default", { discardComments: { removeAll: true } }],
-    },
-});
 
 const prod_configurations = common_configurations.map((config) =>
     merge(config, {
         mode: "production",
         optimization: {
             minimize: true,
-            minimizer: ["...", css_minimizer_plugin],
+            minimizer: [
+                new ESBuildMinifyPlugin({
+                    target: "es2020",
+                    css: true,
+                }),
+            ],
         },
         stats: {
             all: false,

@@ -18,7 +18,7 @@
 const path = require("path");
 const WebpackAssetsManifest = require("webpack-assets-manifest");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-const FixStyleOnlyEntriesPlugin = require("webpack-fix-style-only-entries");
+const RemoveEmptyScriptsPlugin = require("webpack-remove-empty-scripts");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 
@@ -33,11 +33,6 @@ const css_extract_plugin = new MiniCssExtractPlugin({
     filename: "[name]-[chunkhash].css",
 });
 
-const css_style_only_plugin = new FixStyleOnlyEntriesPlugin({
-    extensions: ["css"],
-    silent: true,
-});
-
 const clean_plugin = new CleanWebpackPlugin({
     cleanAfterEveryBuildPatterns: ["!css-assets/", "!css-assets/**"],
 });
@@ -49,15 +44,15 @@ const manifest_plugin = new WebpackAssetsManifest({
 
 const typescript_type_check_plugin = new ForkTsCheckerWebpackPlugin();
 
+const remove_empty_style_js_file_plugin = new RemoveEmptyScriptsPlugin();
+
 const typescript_rule = {
-    test: /\.ts(x?)$/,
-    exclude: /node_modules/,
-    use: [
-        {
-            loader: "ts-loader",
-            options: { transpileOnly: true },
-        },
-    ],
+    test: /\.ts$/,
+    loader: "esbuild-loader",
+    options: {
+        loader: "ts",
+        target: "es2020",
+    },
 };
 
 const css_rule = {
@@ -92,8 +87,8 @@ const configuration = {
         clean_plugin,
         manifest_plugin,
         typescript_type_check_plugin,
-        css_style_only_plugin,
         css_extract_plugin,
+        remove_empty_style_js_file_plugin,
     ],
     resolve: {
         extensions: [".ts", ".js"],
