@@ -1,6 +1,6 @@
 module github.com/hyzual/mike-sierra-sierra
 
-go 1.14
+go 1.16
 
 require (
 	github.com/blang/vfs v1.0.0
