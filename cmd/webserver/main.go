@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2020  Joris MASSON
+ *   Copyright (C) 2020-2021  Joris MASSON
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,6 @@ import (
 	"path"
 	"time"
 
-	"github.com/blang/vfs"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/schema"
 	"github.com/hyzual/mike-sierra-sierra"
@@ -60,7 +59,7 @@ func main() {
 	templatesPath := path.Join(cwd, "templates")
 	templateExecutor := server.NewTemplateExecutor(templatesPath)
 	musicLoader := server.NewBasePathJoiner(musicPath)
-	assetsResolver := server.NewAssetsResolver(vfs.OS(), assetsPath, "/assets")
+	assetsResolver := server.NewAssetsResolver(os.DirFS(assetsPath), "/assets")
 
 	sessionStore, err := sqlitestore.New(db, "sessions", time.Minute*30)
 	if err != nil {

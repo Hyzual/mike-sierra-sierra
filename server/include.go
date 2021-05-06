@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2020  Joris MASSON
+ *   Copyright (C) 2020-2021  Joris MASSON
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published by
@@ -22,11 +22,9 @@ import (
 	"fmt"
 	"html/template"
 	"io"
-	"os"
+	"io/fs"
 	"path"
 	"path/filepath"
-
-	"github.com/blang/vfs"
 )
 
 // PathJoiner joins the given relative path to its base path
@@ -102,25 +100,24 @@ type AssetsResolver interface {
 
 // baseAssetsResoler inmplements AssetsResolver
 type baseAssetsResolver struct {
-	fs             vfs.Filesystem
-	assetsBasePath string
-	assetsBaseURI  string
+	fs            fs.FS
+	assetsBaseURI string
 }
 
 // NewAssetsResolver creates a new AssetsResolver
-func NewAssetsResolver(fs vfs.Filesystem, assetsBasePath, assetsBaseURI string) AssetsResolver {
-	return &baseAssetsResolver{fs, assetsBasePath, assetsBaseURI}
+func NewAssetsResolver(fs fs.FS, assetsBaseURI string) AssetsResolver {
+	return &baseAssetsResolver{fs, assetsBaseURI}
 }
 
 // GetAssetURI returns the asset's URI from its baseName.
-// It reads the "manifest.json" file found at assetsBasePath and searches for baseName.
+// It reads the "manifest.json" file found at the root of baseAssetsResolver's fs and searches for baseName.
 // It then joins the corresponding "hashed file name" (read from the manifest.json file)
 // to its assetsBaseURI and returns the joined URI.
 func (b *baseAssetsResolver) GetAssetURI(baseName string) (string, error) {
-	manifestPath := path.Join(b.assetsBasePath, "./manifest.json")
-	manifestFile, err := b.fs.OpenFile(manifestPath, os.O_RDONLY, 0)
+	const manifestPath string = "manifest.json"
+	manifestFile, err := b.fs.Open(manifestPath)
 	if err != nil {
-		return "", fmt.Errorf("Could not read the manifest.json file in this folder: %s. Did you run 'npm run build' ?: %w", b.assetsBasePath, err)
+		return "", fmt.Errorf("Could not read the manifest.json file: %w", err)
 	}
 	defer manifestFile.Close()
 

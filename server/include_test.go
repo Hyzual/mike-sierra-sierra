@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2020  Joris MASSON
+ *   Copyright (C) 2020-2021  Joris MASSON
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published by
@@ -18,13 +18,13 @@
 package server_test
 
 import (
+	"bytes"
 	"encoding/json"
 	"os"
 	"strings"
 	"testing"
+	"testing/fstest"
 
-	"github.com/blang/vfs"
-	"github.com/blang/vfs/memfs"
 	"github.com/hyzual/mike-sierra-sierra/server"
 	"github.com/hyzual/mike-sierra-sierra/tests"
 )
@@ -123,55 +123,39 @@ func TestAssetsResolver(t *testing.T) {
 func newResolverWithNoManifest(t *testing.T) server.AssetsResolver {
 	t.Helper()
 
-	testFS := memfs.Create()
-	err := vfs.MkdirAll(testFS, "/app/assets", 0o755)
-	if err != nil {
-		t.Fatal("could not create the /app/assets folders")
+	testFS := fstest.MapFS{
+		"not-manifest.json": {Data: []byte{}},
 	}
 	// No manifest.json file
 
-	return server.NewAssetsResolver(testFS, "/app/assets", "/assets")
-}
-
-func buildManifestFile(t *testing.T) (vfs.Filesystem, vfs.File, func()) {
-	t.Helper()
-
-	testFS := memfs.Create()
-	err := vfs.MkdirAll(testFS, "/app/assets", 0o755)
-	if err != nil {
-		t.Fatal("could not create the /app/assets folders")
-	}
-	manifest, err := testFS.OpenFile("/app/assets/manifest.json", os.O_CREATE|os.O_RDWR, 0o755)
-	if err != nil {
-		t.Fatalf("Could not setup test manifest file, '%v'", err)
-	}
-
-	return testFS, manifest, func() {
-		manifest.Close()
-	}
+	return server.NewAssetsResolver(testFS, "/assets")
 }
 
 func newResolverWithBadlyEncodedManifest(t *testing.T) server.AssetsResolver {
 	t.Helper()
 
-	testFS, _, closeManifestFile := buildManifestFile(t)
-	defer closeManifestFile()
+	testFS := fstest.MapFS{
+		"manifest.json": {Data: []byte{}},
+	}
 	// manifest is empty and does not contain JSON
 
-	return server.NewAssetsResolver(testFS, "/app/assets", "/assets")
+	return server.NewAssetsResolver(testFS, "/assets")
 }
 
 func newResolverWithValidManifest(t *testing.T) server.AssetsResolver {
-	testFS, manifest, closeManifestFile := buildManifestFile(t)
-	defer closeManifestFile()
+	manifestBuffer := new(bytes.Buffer)
 	manifestContent := make(map[string]string)
 	manifestContent["style.css"] = "style.chunkhash.css"
 	manifestContent["subdirectory/file.js"] = "subdirectory/file.chunkhash.js"
-	err := json.NewEncoder(manifest).Encode(manifestContent)
+	err := json.NewEncoder(manifestBuffer).Encode(manifestContent)
 	if err != nil {
 		t.Fatalf("Could not setup test manifest file, '%v'", err)
 	}
-	return server.NewAssetsResolver(testFS, "/app/assets", "/assets")
+
+	testFS := fstest.MapFS{
+		"manifest.json": {Data: manifestBuffer.Bytes()},
+	}
+	return server.NewAssetsResolver(testFS, "/assets")
 }
 
 func assertPathEquals(t *testing.T, got, want string) {
