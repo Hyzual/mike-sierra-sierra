@@ -1,15 +1,11 @@
-{ pkgs ? import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/4cb48cc25622334f17ec6b9bf56e83de0d521fb7.tar.gz") {} }:
+{ pkgs ? import (./tools/nix/pinned-nixpkgs.nix) {} }:
 
 pkgs.mkShell {
-    buildInputs = [
-        pkgs.gnumake
-        pkgs.gitMinimal
-        pkgs.nodejs-slim-14_x
-        pkgs.nodePackages.npm
-        pkgs.go
-        pkgs.golangci-lint
-        pkgs.mkcert
-    ];
+    buildInputs =
+        (import ./tools/nix/general-build-tools.nix { inherit pkgs; }) ++
+        (import ./tools/nix/go.nix { inherit pkgs; }) ++
+        (import ./tools/nix/npm.nix { inherit pkgs; }) ++
+        (import ./tools/nix/dev-tools.nix { inherit pkgs; });
 
     # Use the SSH client provided by the system (FHS only) to avoid issues with Fedora default settings
     GIT_SSH = if pkgs.lib.pathExists "/usr/bin/ssh" then "/usr/bin/ssh" else "ssh";

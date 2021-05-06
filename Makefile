@@ -32,27 +32,6 @@ build-ci: ## Check that the Go code can be compiled
 dep: ## Get the Go dependencies
 	go mod download
 
-npm-dep: ## Get the NPM dependencies
-	npm install
-
-build-assets: ## Build the frontend assets for production
-	npm run build
-
-coverage-jest: ## Run Jest unit tests with coverage
-	npm run test --silent -- --coverage
-
-test-jest: ## Run Jest unit tests
-	npm run test --silent
-
-eslint-ci: ## Checks TypeScript and Javascript files for errors and formatting
-	npm run eslint --silent -- .
-
-stylelint-ci: ## Checks CSS for errors and formatting
-	npm run stylelint --silent -- ./styles
-
-prettier-ci: ## Checks whether HTML templates and JS configurations are well-formatted
-	npm run prettier --silent -- --list-different ./templates .eslintrc.js .stylelintrc.js
-
 build-docker-image: ## Builds the production Docker image
 	docker build . --file Dockerfile --tag hyzual/mike-sierra-sierra:latest
 

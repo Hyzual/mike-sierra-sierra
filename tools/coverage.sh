@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Code coverage generation
 # From https://gitlab.com/pantomath-io/demo-tools/-/blob/master/tools/coverage.sh

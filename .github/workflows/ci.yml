@@ -10,7 +10,8 @@ permissions: read-all
 jobs:
   backend_tests:
     name: Test Go server
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
+
     steps:
       - name: Check out the code
         uses: actions/checkout@v2.3.4
@@ -18,8 +19,8 @@ jobs:
       - name: Install Nix
         uses: cachix/install-nix-action@v13
 
-      - name: Set up Nix shell
-        run: nix-shell --pure
+      - name: Install go from Nix
+        run: nix-env --file tools/nix/go-build-tools.nix --install
 
       # Install dependencies
 
@@ -39,26 +40,20 @@ jobs:
 
   backend_lint:
     name: Lint Go server
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Check out the code
         uses: actions/checkout@v2.3.4
-
-      - name: Install Nix
-        uses: cachix/install-nix-action@v13
-
-      - name: Set up Nix shell
-        run: nix-shell --pure
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2.5.2
         with:
           version: v1.39.0
-          skip-go-installation: true
 
   frontend_tests:
     name: Test Front-end
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
+
     steps:
       - name: Check out the code
         uses: actions/checkout@v2.3.4
@@ -66,8 +61,8 @@ jobs:
       - name: Install Nix
         uses: cachix/install-nix-action@v13
 
-      - name: Set up Nix shell
-        run: nix-shell --pure
+      - name: Install npm from Nix
+        run: nix-env --file tools/nix/npm-build-tools.nix --install
 
       # Install dependencies
 
@@ -77,22 +72,22 @@ jobs:
       # Run Jest tests
 
       - name: Jest test coverage
-        run: make coverage-jest
+        run: npm run test --silent -- --coverage
 
       # Static analysis and conformity to coding style
 
       - name: eslint
-        run: make eslint-ci
+        run: npm run eslint --silent -- .
 
       - name: Stylelint
-        run: make stylelint-ci
+        run: npm run stylelint --silent -- ./styles
 
       - name: Prettier for HTML and Javascript config
-        run: make prettier-ci
+        run: npm run prettier --silent -- --list-different ./templates .eslintrc.js .stylelintrc.js
 
   docker_image:
     name: Test Docker image
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Install goss and dgoss
         uses: e1himself/goss-installation-action@v1.0.3
@@ -116,7 +111,7 @@ jobs:
 
   publish_image:
     name: Publish to Docker Hub
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     # Publish docker image if all tests succeed and push is on master branch
     needs: ['backend_tests', 'backend_lint', 'frontend_tests', 'docker_image']
     if: ${{ github.ref == 'refs/heads/master' && github.event_name == 'push' }}
