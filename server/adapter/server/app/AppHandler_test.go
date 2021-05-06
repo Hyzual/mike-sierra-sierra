@@ -25,8 +25,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/hyzual/mike-sierra-sierra/server"
-	"github.com/hyzual/mike-sierra-sierra/server/user"
+	"github.com/hyzual/mike-sierra-sierra/server/adapter"
+	"github.com/hyzual/mike-sierra-sierra/server/adapter/server/user"
 	"github.com/hyzual/mike-sierra-sierra/tests"
 )
 
@@ -83,11 +83,11 @@ func TestGetApp(t *testing.T) {
 	})
 }
 
-func newTemplateExecutorWithInvalidTemplate() server.TemplateExecutor {
+func newTemplateExecutorWithInvalidTemplate() adapter.TemplateExecutor {
 	return &stubTemplateExecutor{true}
 }
 
-func newTemplateExecutorWithValidTemplate() server.TemplateExecutor {
+func newTemplateExecutorWithValidTemplate() adapter.TemplateExecutor {
 	return &stubTemplateExecutor{false}
 }
 
@@ -102,11 +102,11 @@ func (s *stubTemplateExecutor) Load(_ io.Writer, data interface{}, templatePaths
 	return nil
 }
 
-func newValidAssetsResolver() server.AssetsResolver {
+func newValidAssetsResolver() adapter.AssetsResolver {
 	return &stubAssetsResolver{filename: "asset"}
 }
 
-func newInvalidAssetsResolver() server.AssetsResolver {
+func newInvalidAssetsResolver() adapter.AssetsResolver {
 	return &stubAssetsResolver{true, ""}
 }
 

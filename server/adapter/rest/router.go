@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2020  Joris MASSON
+ *   Copyright (C) 2020-2021  Joris MASSON
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published by
@@ -26,34 +26,21 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/hyzual/mike-sierra-sierra/server"
+	"github.com/hyzual/mike-sierra-sierra/server/adapter/server"
+	"github.com/hyzual/mike-sierra-sierra/server/domain/music"
 	"github.com/swithek/sessionup"
 )
 
 // Register registers a gorilla/mux Subrouter for the REST API on the given router
-func Register(router *mux.Router, sessionManager *sessionup.Manager) {
+func Register(router *mux.Router, sessionManager *sessionup.Manager, explorer music.MusicLibraryExplorer) {
 	songHandler := &songHandler{}
-	folderHandler := &folderHandler{}
-	topFolderHandler := &topFolderHandler{}
+	folderHandler := &folderHandler{explorer}
 
 	apiRouter := router.PathPrefix("/api/").Subrouter()
 	// All requests to the REST API must be authenticated
 	apiRouter.Use(sessionManager.Auth)
 	apiRouter.Handle("/songs/{songId}", server.WrapErrors(songHandler))
-	apiRouter.Handle("/folders", server.WrapErrors(topFolderHandler))
-	apiRouter.Handle("/folders/{folderId}", server.WrapErrors(folderHandler))
-}
-
-// Song represents a music file. It is distinguished by media type (audio/mp3, audio/flac, etc.)
-// Most of its fields mirror tags such as ID3 tags for MP3. It is output by the REST API.
-type Song struct {
-	Title       string `json:"title"`       // Title is the song's title. E.g. "Know Your Enemy"
-	TrackNumber uint   `json:"trackNumber"` // TrackNumber is the track number of the song. E.g. "3"
-	DiskNumber  uint   `json:"diskNumber"`  // DiskNumber is the disk number of the song. E.g. "1"
-	Artist      string `json:"artist"`      // Artist is the name of the main artist. E.g. "Yoko Kanno"
-	Duration    uint   `json:"duration"`    // Duration is the duration of the song in seconds. E.g. "165"
-	URI         string `json:"uri"`         // URI to access this song on this server. E.g. "/music/Yoko%20Kanno/1-03%20-Know%20Your%20Enemy.flac"
-	Type        string `json:"type"`        // MIME type of the song E.g. "audio/flac"
+	apiRouter.Handle("/folders/{path:.*}", server.WrapErrors(folderHandler))
 }
 
 const jsonMediaType = "application/json; charset=utf-8"

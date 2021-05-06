@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2020-2021  Joris MASSON
+ *   Copyright (C) 2021  Joris MASSON
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published by
@@ -15,16 +15,30 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export interface Song {
-    title: string;
+package adapter
+
+import (
+	"io/fs"
+	"os"
+
+	"github.com/hyzual/mike-sierra-sierra/server/domain/music"
+)
+
+// NewOSFileSystem creates a new OSFileSystem
+func NewOSFileSystem(dirFS fs.FS, pathJoiner PathJoiner) music.MusicLibraryFileSystem {
+	return &baseOSFileSystem{dirFS, pathJoiner}
 }
 
-export interface SubFolder {
-    uri: string;
-    name: string;
+type baseOSFileSystem struct {
+	dirFS      fs.FS
+	pathJoiner PathJoiner
 }
 
-export interface Folder {
-    folders: SubFolder[];
-    songs: Song[];
+func (b *baseOSFileSystem) Open(name string) (fs.File, error) {
+	return b.dirFS.Open(name)
+}
+
+func (b *baseOSFileSystem) ReadDir(name string) ([]fs.DirEntry, error) {
+	path := b.pathJoiner.Join(name)
+	return os.ReadDir(path)
 }

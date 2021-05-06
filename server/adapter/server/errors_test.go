@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2020  Joris MASSON
+ *   Copyright (C) 2020-2021  Joris MASSON
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published by
@@ -15,7 +15,7 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package server
+package server_test
 
 import (
 	"errors"
@@ -23,6 +23,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/hyzual/mike-sierra-sierra/server/adapter/server"
 	"github.com/hyzual/mike-sierra-sierra/tests"
 )
 
@@ -30,7 +31,7 @@ func TestWrapErrors(t *testing.T) {
 	request := httptest.NewRequest(http.MethodGet, "/endpoint", nil)
 
 	t.Run("when the wrapped handler returns nil, it does nothing", func(t *testing.T) {
-		handler := WrapErrors(&stubErroringHandler{nil})
+		handler := server.WrapErrors(&stubErroringHandler{nil})
 		response := httptest.NewRecorder()
 
 		handler.ServeHTTP(response, request)
@@ -40,8 +41,8 @@ func TestWrapErrors(t *testing.T) {
 
 	t.Run(`when the wrapped handler returns an HTTP Error,
 		it will respond with the error's message and code`, func(t *testing.T) {
-		err := NewBadRequestError(errors.New("Bad format"), "Bad format received in /endpoint")
-		handler := WrapErrors(&stubErroringHandler{err})
+		err := server.NewBadRequestError(errors.New("Bad format"), "Bad format received in /endpoint")
+		handler := server.WrapErrors(&stubErroringHandler{err})
 		response := httptest.NewRecorder()
 
 		handler.ServeHTTP(response, request)
@@ -52,7 +53,7 @@ func TestWrapErrors(t *testing.T) {
 	t.Run(`when the wrapped handler returns a non-HTTP error,
 		it will respond with a 500 Internal Server Error`, func(t *testing.T) {
 		err := errors.New("Could not connect to database")
-		handler := WrapErrors(&stubErroringHandler{err})
+		handler := server.WrapErrors(&stubErroringHandler{err})
 		response := httptest.NewRecorder()
 
 		handler.ServeHTTP(response, request)

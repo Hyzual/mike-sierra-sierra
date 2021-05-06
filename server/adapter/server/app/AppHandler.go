@@ -25,13 +25,13 @@ import (
 
 	"crypto/md5" //nolint gosec //md5 is required for Gravatar and is not used for sensitive crypto here
 
-	"github.com/hyzual/mike-sierra-sierra/server"
-	"github.com/hyzual/mike-sierra-sierra/server/user"
+	"github.com/hyzual/mike-sierra-sierra/server/adapter"
+	"github.com/hyzual/mike-sierra-sierra/server/adapter/server/user"
 )
 
 type appHandler struct {
-	templateExecutor server.TemplateExecutor
-	assetsResolver   server.AssetsResolver
+	templateExecutor adapter.TemplateExecutor
+	assetsResolver   adapter.AssetsResolver
 	userStore        user.Store
 }
 

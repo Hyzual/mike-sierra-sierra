@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2020  Joris MASSON
+ *   Copyright (C) 2020-2021  Joris MASSON
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published by
@@ -18,15 +18,17 @@
 import { LitElement, html, TemplateResult } from "lit-element";
 import { router } from "../router";
 import "./SideBarLink";
-import "./TopLevelFolders";
+import "./FolderDetails";
 import "./FoldersList";
 import "./FolderCover";
 
-const DEFAULT_PAGE = "default";
-const FOLDERS_PAGE = "folders";
+type Page = "default" | "folders";
+const DEFAULT_PAGE: Page = "default";
+const FOLDERS_PAGE: Page = "folders";
 
 class AppRoot extends LitElement {
-    private current_page = DEFAULT_PAGE;
+    private current_page: Page = DEFAULT_PAGE;
+    private current_folder_path = "";
 
     constructor() {
         super();
@@ -38,6 +40,14 @@ class AppRoot extends LitElement {
             })
             .on("/folders", () => {
                 this.current_page = FOLDERS_PAGE;
+                this.current_folder_path = "";
+                this.requestUpdate();
+            })
+            .on("/folders/:path", (match) => {
+                this.current_page = FOLDERS_PAGE;
+                if (match && match.data) {
+                    this.current_folder_path = match.data.path;
+                }
                 this.requestUpdate();
             })
             .resolve();
@@ -46,7 +56,9 @@ class AppRoot extends LitElement {
     render(): TemplateResult {
         switch (this.current_page) {
             case FOLDERS_PAGE:
-                return html`<mss-top-level-folders></mss-top-level-folders> `;
+                return html`<mss-folder-details
+                    .folder_path=${this.current_folder_path}
+                ></mss-folder-details> `;
             case DEFAULT_PAGE:
             default:
                 return html`Home`;

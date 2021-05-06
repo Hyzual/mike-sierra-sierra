@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/hyzual/mike-sierra-sierra/server"
+	"github.com/hyzual/mike-sierra-sierra/server/adapter/server"
 	"github.com/swithek/sessionup"
 )
 

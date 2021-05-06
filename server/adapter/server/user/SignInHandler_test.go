@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2020  Joris MASSON
+ *   Copyright (C) 2020-2021  Joris MASSON
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ import (
 	"testing"
 
 	"github.com/gorilla/schema"
-	"github.com/hyzual/mike-sierra-sierra/server"
+	"github.com/hyzual/mike-sierra-sierra/server/adapter"
 	"github.com/hyzual/mike-sierra-sierra/tests"
 	"github.com/swithek/sessionup"
 )
@@ -199,11 +199,11 @@ func (s *stubDAOForSignIn) GetUserMatchingSession(_ context.Context) (*Current, 
 	return nil, errors.New("This method should not have been called in tests")
 }
 
-func newTemplateExecutorWithInvalidTemplate() server.TemplateExecutor {
+func newTemplateExecutorWithInvalidTemplate() adapter.TemplateExecutor {
 	return &stubTemplateExecutor{true}
 }
 
-func newTemplateExecutorWithValidTemplate() server.TemplateExecutor {
+func newTemplateExecutorWithValidTemplate() adapter.TemplateExecutor {
 	return &stubTemplateExecutor{false}
 }
 

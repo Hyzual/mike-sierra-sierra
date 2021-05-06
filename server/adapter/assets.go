@@ -15,79 +15,14 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package server
+package adapter
 
 import (
 	"encoding/json"
 	"fmt"
-	"html/template"
-	"io"
 	"io/fs"
 	"path"
-	"path/filepath"
 )
-
-// PathJoiner joins the given relative path to its base path
-type PathJoiner interface {
-	Join(relativePath string) string
-}
-
-// NewBasePathJoiner creates a new PathJoiner
-func NewBasePathJoiner(basePath string) PathJoiner {
-	return &basePathJoiner{basePath}
-}
-
-// basePathJoiner implements PathJoiner. It is given a base path and will
-// Join all relative paths to it.
-type basePathJoiner struct {
-	basePath string // absolute path
-}
-
-// Join joins the given relative path to the basePath
-func (b *basePathJoiner) Join(relativePath string) string {
-	dir := path.Dir(relativePath)
-	if dir == ".." {
-		return b.basePath
-	}
-	return path.Join(b.basePath, relativePath)
-}
-
-// TemplateExecutor resolves the given relative template paths from the templates/ folder,
-// parses the templates from the resolved files and executes them on the given writer.
-// It returns an error if a template can't be found or if the execution fails.
-type TemplateExecutor interface {
-	Load(writer io.Writer, data interface{}, templatePaths ...string) error
-}
-
-// templateBaseExecutor implements TemplateExecutor for production code
-type templateBaseExecutor struct {
-	basePath string // absolute path to the /templates directory
-}
-
-// NewTemplateExecutor creates a new TemplateExecutor
-func NewTemplateExecutor(basePath string) TemplateExecutor {
-	return &templateBaseExecutor{basePath}
-}
-
-// Load resolves the given relative template paths from the templates/ folder,
-// parses the templates from the resolved files and executes them on the given writer.
-// It returns an error if a template can't be found or if the execution fails.
-func (t *templateBaseExecutor) Load(writer io.Writer, data interface{}, templatePaths ...string) error {
-	var cleanedPaths []string
-	for _, templatePath := range templatePaths {
-		cleanedPaths = append(cleanedPaths, path.Join(t.basePath, filepath.Clean(templatePath)))
-	}
-
-	tmpl, err := template.ParseFiles(cleanedPaths...)
-	if err != nil {
-		return fmt.Errorf("could not load the templates %v: %w", templatePaths, err)
-	}
-	err = tmpl.Execute(writer, data)
-	if err != nil {
-		return fmt.Errorf("could not execute the templates %v: %w", templatePaths, err)
-	}
-	return nil
-}
 
 // AssetsResolver reads the manifest.json file in the /assets directory
 // It is used by templates to resolve asset URIs with chunkhashes in their names.

@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2020  Joris MASSON
+ *   Copyright (C) 2020-2021  Joris MASSON
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published by
@@ -30,18 +30,11 @@ import (
 func TestRouter(t *testing.T) {
 	router := mux.NewRouter()
 	sessionManager := tests.NewValidSessionManager(t)
-	Register(router, sessionManager)
+	explorer := newValidLibraryExplorer(t)
+	Register(router, sessionManager, explorer)
 
-	t.Run("/api/folders is handled", func(t *testing.T) {
-		request := tests.NewAuthenticatedGetRequest(t, "/api/folders")
-		response := httptest.NewRecorder()
-		router.ServeHTTP(response, request)
-
-		tests.AssertStatusEquals(t, response.Code, http.StatusOK)
-	})
-
-	t.Run("/api/folders/1 is handled by FolderHandler", func(t *testing.T) {
-		request := tests.NewAuthenticatedGetRequest(t, "/api/folders/1")
+	t.Run("/api/folders/path is handled by FolderHandler", func(t *testing.T) {
+		request := tests.NewAuthenticatedGetRequest(t, "/api/folders/path")
 		response := httptest.NewRecorder()
 		router.ServeHTTP(response, request)
 

@@ -15,68 +15,17 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package server_test
+package adapter_test
 
 import (
 	"bytes"
 	"encoding/json"
-	"os"
-	"strings"
 	"testing"
 	"testing/fstest"
 
-	"github.com/hyzual/mike-sierra-sierra/server"
+	"github.com/hyzual/mike-sierra-sierra/server/adapter"
 	"github.com/hyzual/mike-sierra-sierra/tests"
 )
-
-func TestBasePathJoiner(t *testing.T) {
-	basePath := "/path/to/app/assets"
-	joiner := server.NewBasePathJoiner(basePath)
-
-	t.Run("it joins relative paths to baseDir to form absolute paths", func(t *testing.T) {
-		assertPathEquals(t, joiner.Join("./style.css"), "/path/to/app/assets/style.css")
-	})
-
-	t.Run("it joins nested paths to baseDir", func(t *testing.T) {
-		assertPathEquals(t, joiner.Join("./sub/dir/style.css"), "/path/to/app/assets/sub/dir/style.css")
-	})
-
-	t.Run("it does not allow ascending up its base path", func(t *testing.T) {
-		assertPathEquals(t, joiner.Join("../style.css"), "/path/to/app/assets")
-	})
-
-	t.Run("it does not allow ascending with a subdir before dot dot", func(t *testing.T) {
-		assertPathEquals(t, joiner.Join("./sub/dir/../../../style.css"), "/path/to/app/assets")
-	})
-}
-
-func TestTemplateExecutor(t *testing.T) {
-	basePath, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("Could not get the current working directory, '%v'", err)
-	}
-	loader := server.NewTemplateExecutor(basePath)
-
-	t.Run(`it parses the template file relative to its base path
-		and executes it with the given data`, func(t *testing.T) {
-		writer := &strings.Builder{}
-		err := loader.Load(writer, nil, "../templates/sign-in.html")
-		tests.AssertNoError(t, err)
-	})
-
-	t.Run(`it parses multiple template files relative to its base path
-		and executes them with the given data`, func(t *testing.T) {
-		writer := &strings.Builder{}
-		err := loader.Load(writer, nil, "../templates/app.html", "../templates/sidebar.html")
-		tests.AssertNoError(t, err)
-	})
-
-	t.Run("when it cannot load a template, it returns an error", func(t *testing.T) {
-		writer := &strings.Builder{}
-		err := loader.Load(writer, nil, "./unknown-template.html")
-		tests.AssertError(t, err)
-	})
-}
 
 func TestAssetsResolver(t *testing.T) {
 	t.Run("when there is no manifest.json file in the assets directory, it will return an error", func(t *testing.T) {
@@ -120,18 +69,18 @@ func TestAssetsResolver(t *testing.T) {
 	})
 }
 
-func newResolverWithNoManifest(t *testing.T) server.AssetsResolver {
+func newResolverWithNoManifest(t *testing.T) adapter.AssetsResolver {
 	t.Helper()
 
 	testFS := fstest.MapFS{
-		"not-manifest.json": {Data: []byte{}},
+		"not-manifest.json": {},
 	}
 	// No manifest.json file
 
-	return server.NewAssetsResolver(testFS, "/assets")
+	return adapter.NewAssetsResolver(testFS, "/assets")
 }
 
-func newResolverWithBadlyEncodedManifest(t *testing.T) server.AssetsResolver {
+func newResolverWithBadlyEncodedManifest(t *testing.T) adapter.AssetsResolver {
 	t.Helper()
 
 	testFS := fstest.MapFS{
@@ -139,10 +88,10 @@ func newResolverWithBadlyEncodedManifest(t *testing.T) server.AssetsResolver {
 	}
 	// manifest is empty and does not contain JSON
 
-	return server.NewAssetsResolver(testFS, "/assets")
+	return adapter.NewAssetsResolver(testFS, "/assets")
 }
 
-func newResolverWithValidManifest(t *testing.T) server.AssetsResolver {
+func newResolverWithValidManifest(t *testing.T) adapter.AssetsResolver {
 	manifestBuffer := new(bytes.Buffer)
 	manifestContent := make(map[string]string)
 	manifestContent["style.css"] = "style.chunkhash.css"
@@ -155,14 +104,7 @@ func newResolverWithValidManifest(t *testing.T) server.AssetsResolver {
 	testFS := fstest.MapFS{
 		"manifest.json": {Data: manifestBuffer.Bytes()},
 	}
-	return server.NewAssetsResolver(testFS, "/assets")
-}
-
-func assertPathEquals(t *testing.T, got, want string) {
-	t.Helper()
-	if got != want {
-		t.Errorf("joined path %s does not equal %s", got, want)
-	}
+	return adapter.NewAssetsResolver(testFS, "/assets")
 }
 
 func assertHashedNameEquals(t *testing.T, got, want string) {

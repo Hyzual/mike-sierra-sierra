@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2020  Joris MASSON
+ *   Copyright (C) 2020-2021  Joris MASSON
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published by
@@ -26,15 +26,15 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/schema"
-	"github.com/hyzual/mike-sierra-sierra/server"
+	"github.com/hyzual/mike-sierra-sierra/server/adapter"
 	"github.com/swithek/sessionup"
 )
 
 // Register registers the routes on the given gorilla/mux router.
 func Register(
 	router *mux.Router,
-	templateExecutor server.TemplateExecutor,
-	assetsResolver server.AssetsResolver,
+	templateExecutor adapter.TemplateExecutor,
+	assetsResolver adapter.AssetsResolver,
 	userStore Store,
 	sessionManager *sessionup.Manager,
 	decoder *schema.Decoder,

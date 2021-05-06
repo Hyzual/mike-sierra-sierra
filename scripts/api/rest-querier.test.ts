@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2020  Joris MASSON
+ *   Copyright (C) 2020-2021  Joris MASSON
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published by
@@ -15,9 +15,8 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ResultAsync } from "neverthrow";
-import { getFolder, getTopFolders } from "./rest-querier";
-import { Folder, TopLevelFolders } from "scripts/types";
+import { getFolder } from "./rest-querier";
+import { Folder } from "scripts/types";
 
 describe(`rest-querier`, () => {
     let globalFetch: jest.SpyInstance;
@@ -41,99 +40,66 @@ describe(`rest-querier`, () => {
         );
     }
 
-    it.each([
-        [
-            "getFolder()",
-            "Could not GET /api/folders/1",
-            (): ResultAsync<unknown, Error> => getFolder(1),
-        ],
-        [
-            "getTopFolders()",
-            "Could not GET /api/folders",
-            (): ResultAsync<unknown, Error> => getTopFolders(),
-        ],
-    ])(
-        `when there is a network error, %s will return an error`,
-        async (
-            _test_name: string,
-            expected_error_message: string,
-            functionUnderTest
-        ) => {
-            globalFetch.mockImplementation(() =>
-                Promise.resolve({
-                    ok: false,
-                    statusText: "Not found",
-                })
-            );
+    it(`when there is a network error, getFolder() will return an error`, async () => {
+        globalFetch.mockImplementation(() =>
+            Promise.resolve({
+                ok: false,
+                statusText: "Not found",
+            })
+        );
 
-            const result = await functionUnderTest();
-            if (!result.isErr()) {
-                throw new Error("Expected an error but did not get one");
-            }
-            expect(result.error.message).toMatch(expected_error_message);
+        const result = await getFolder("path");
+        if (!result.isErr()) {
+            throw new Error("Expected an error but did not get one");
         }
-    );
+        expect(result.error.message).toMatch("Could not GET /api/folders/path");
+    });
 
-    it.each([
-        [
-            "getFolder()",
-            "Could not decode JSON into Folder",
-            (): ResultAsync<unknown, Error> => getFolder(1),
-        ],
-        [
-            "getTopFolders",
-            "Could not decode JSON into top-level folders",
-            (): ResultAsync<unknown, Error> => getTopFolders(),
-        ],
-    ])(
-        `when the JSON response cannot be decoded, %s will return an error`,
-        async (
-            _test_name: string,
-            expected_error_message: string,
-            functionUnderTest
-        ) => {
-            globalFetch.mockImplementation(() =>
-                Promise.resolve({
-                    ok: true,
-                    json: () => Promise.reject(new Error("Error in JSON")),
-                })
-            );
+    it(`when the JSON response cannot be decoded, getFolder() will return an error`, async () => {
+        globalFetch.mockImplementation(() =>
+            Promise.resolve({
+                ok: true,
+                json: () => Promise.reject(new Error("Error in JSON")),
+            })
+        );
 
-            const result = await functionUnderTest();
-            if (!result.isErr()) {
-                throw new Error("Expected an error but did not get one");
-            }
-            expect(result.error.message).toMatch(expected_error_message);
+        const result = await getFolder("path");
+        if (!result.isErr()) {
+            throw new Error("Expected an error but did not get one");
         }
-    );
+        expect(result.error.message).toMatch(
+            "Could not decode JSON into Folder"
+        );
+    });
 
-    it(`getFolder() will return a Folder`, async () => {
+    it(`getFolder("path") will return a Folder`, async () => {
         const expected_folder: Folder = {
-            name: "Edith Chapman",
-            items: [],
+            folders: [],
+            songs: [],
         };
         mockFetchSuccess(expected_folder);
 
-        const result = await getFolder(0);
+        const result = await getFolder("path");
         if (!result.isOk()) {
             throw new Error("Did not expect an error but got one");
         }
         expect(result.value).toEqual(expected_folder);
     });
 
-    it(`getTopFolders() will return the top-level Folders`, async () => {
-        const expected_top_level_folders: TopLevelFolders = {
+    it(`getFolder("") will return the top-level (root) music Folder`, async () => {
+        const expected_folder: Folder = {
             folders: [
-                { id: 1, name: "pharos" },
-                { id: 2, name: "elution" },
+                { name: "pharos", uri: "pharos" },
+                { name: "elution", uri: "elution" },
             ],
+            songs: [{ title: "shall" }, { title: "asleep" }],
         };
-        mockFetchSuccess(expected_top_level_folders);
+        mockFetchSuccess(expected_folder);
 
-        const result = await getTopFolders();
+        const result = await getFolder("");
         if (!result.isOk()) {
             throw new Error("Did not expect an error but got one");
         }
-        expect(result.value).toEqual(expected_top_level_folders);
+        expect(result.value).toEqual(expected_folder);
     });
 });

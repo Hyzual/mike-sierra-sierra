@@ -28,19 +28,18 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/schema"
 	"github.com/hyzual/mike-sierra-sierra"
-	"github.com/hyzual/mike-sierra-sierra/server"
-	"github.com/hyzual/mike-sierra-sierra/server/app"
-	"github.com/hyzual/mike-sierra-sierra/server/rest"
-	"github.com/hyzual/mike-sierra-sierra/server/user"
+	"github.com/hyzual/mike-sierra-sierra/server/adapter"
+	"github.com/hyzual/mike-sierra-sierra/server/adapter/rest"
+	"github.com/hyzual/mike-sierra-sierra/server/adapter/server"
+	"github.com/hyzual/mike-sierra-sierra/server/adapter/server/app"
+	"github.com/hyzual/mike-sierra-sierra/server/adapter/server/user"
+	"github.com/hyzual/mike-sierra-sierra/server/domain/music"
 	sqlitestore "github.com/hyzual/sessionup-sqlitestore"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/swithek/sessionup"
 )
 
-const (
-	disableHTTPSEnv = "MIKE_DISABLE_HTTPS"
-	musicPath       = "/music" // It is a volume in the Docker image
-)
+const disableHTTPSEnv = "MIKE_DISABLE_HTTPS"
 
 func main() {
 	cwd, err := mike.Cwd()
@@ -55,11 +54,11 @@ func main() {
 
 	userStore := user.NewDAO(db)
 	assetsPath := path.Join(cwd, "assets")
-	assetsLoader := server.NewBasePathJoiner(cwd)
+	assetsLoader := adapter.NewBasePathJoiner(cwd)
 	templatesPath := path.Join(cwd, "templates")
-	templateExecutor := server.NewTemplateExecutor(templatesPath)
-	musicLoader := server.NewBasePathJoiner(musicPath)
-	assetsResolver := server.NewAssetsResolver(os.DirFS(assetsPath), "/assets")
+	templateExecutor := adapter.NewTemplateExecutor(templatesPath)
+	musicLoader := adapter.NewBasePathJoiner(music.MusicPath)
+	assetsResolver := adapter.NewAssetsResolver(os.DirFS(assetsPath), "/assets")
 
 	sessionStore, err := sqlitestore.New(db, "sessions", time.Minute*30)
 	if err != nil {
@@ -80,8 +79,10 @@ func main() {
 		sessionManager,
 		decoder,
 	)
-	// The REST API Subrouter registers itself
-	rest.Register(router, sessionManager)
+	musicDirFS := os.DirFS(music.MusicPath)
+	musicLibraryFileSystem := adapter.NewOSFileSystem(musicDirFS, musicLoader)
+	explorer := music.NewMusicLibraryExplorer(musicLibraryFileSystem)
+	rest.Register(router, sessionManager, explorer)
 	app.Register(
 		router,
 		templateExecutor,

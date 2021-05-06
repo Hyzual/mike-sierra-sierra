@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2020  Joris MASSON
+ *   Copyright (C) 2020-2021  Joris MASSON
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published by
@@ -45,8 +45,8 @@ class FoldersList extends LitElement {
         return html`${this.folders.map(
             (folder: SubFolder) =>
                 html`<folder-cover
-                    folder_id="${folder.id}"
                     folder_title="${folder.name}"
+                    folder_uri="${folder.uri}"
                 ></folder-cover>`
         )}`;
     }

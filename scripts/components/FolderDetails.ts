@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2020  Joris MASSON
+ *   Copyright (C) 2020-2021  Joris MASSON
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published by
@@ -15,14 +15,18 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { css, html, LitElement, TemplateResult } from "lit-element";
+import {
+    css,
+    html,
+    LitElement,
+    PropertyDeclarations,
+    TemplateResult,
+} from "lit-element";
 import { until } from "lit-html/directives/until";
 import { NetworkError } from "../api/NetworkError";
-import { getTopFolders } from "../api/rest-querier";
+import { getFolder } from "../api/rest-querier";
 
-const TopLevelLoadingErrorState = (
-    error: Error | NetworkError
-): TemplateResult => {
+const renderErrorState = (error: Error | NetworkError): TemplateResult => {
     const error_template =
         error instanceof NetworkError
             ? html`<p class="error">
@@ -33,15 +37,21 @@ const TopLevelLoadingErrorState = (
     return html`<div class="error-container">${error_template}</div>`;
 };
 
-const renderTopLevelFolders = async (): Promise<TemplateResult> => {
-    const result = await getTopFolders();
+const renderFolder = async (folder_path: string): Promise<TemplateResult> => {
+    const result = await getFolder(folder_path);
     if (result.isErr()) {
-        return TopLevelLoadingErrorState(result.error);
+        return renderErrorState(result.error);
     }
     return html`<folders-list .folders=${result.value.folders}></folders-list>`;
 };
 
-class TopLevelFoldersElement extends LitElement {
+export class FolderDetails extends LitElement {
+    folder_path = "";
+
+    static get properties(): PropertyDeclarations {
+        return { folder_path: { type: Object } };
+    }
+
     static readonly styles = css`
         .error-container {
             display: grid;
@@ -57,10 +67,10 @@ class TopLevelFoldersElement extends LitElement {
 
     render(): TemplateResult {
         return html`${until(
-            renderTopLevelFolders(),
+            renderFolder(this.folder_path),
             html`<span>Loading ...</span>`
         )}`;
     }
 }
 
-customElements.define("mss-top-level-folders", TopLevelFoldersElement);
+customElements.define("mss-folder-details", FolderDetails);

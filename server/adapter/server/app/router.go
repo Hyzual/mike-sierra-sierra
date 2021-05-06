@@ -23,16 +23,17 @@ package app
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/hyzual/mike-sierra-sierra/server"
-	"github.com/hyzual/mike-sierra-sierra/server/user"
+	"github.com/hyzual/mike-sierra-sierra/server/adapter"
+	"github.com/hyzual/mike-sierra-sierra/server/adapter/server"
+	"github.com/hyzual/mike-sierra-sierra/server/adapter/server/user"
 	"github.com/swithek/sessionup"
 )
 
 // Register registers the routes on the given gorilla/mux router.
 func Register(
 	router *mux.Router,
-	templateExecutor server.TemplateExecutor,
-	assetsResolver server.AssetsResolver,
+	templateExecutor adapter.TemplateExecutor,
+	assetsResolver adapter.AssetsResolver,
 	userStore user.Store,
 	sessionManager *sessionup.Manager,
 ) {

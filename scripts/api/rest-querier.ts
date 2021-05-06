@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2020  Joris MASSON
+ *   Copyright (C) 2020-2021  Joris MASSON
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published by
@@ -17,34 +17,27 @@
 
 import { ono } from "@jsdevtools/ono";
 import { ok, err, ResultAsync } from "neverthrow";
-import { Folder, TopLevelFolders } from "../types";
+import { Folder } from "../types";
 import { NetworkError } from "./NetworkError";
 
 const wrapError = (e: unknown): Error =>
     e instanceof Error ? e : ono("Unknown error");
 
-export const getTopFolders = (): ResultAsync<
-    TopLevelFolders,
-    Error | NetworkError
-> =>
-    getAPI("/api/folders").andThen((response) =>
-        ResultAsync.fromPromise(response.json(), wrapError).mapErr((error) =>
-            ono(error, "Could not decode JSON into top-level folders")
-        )
-    );
-
 export const getFolder = (
-    folder_id: number
-): ResultAsync<Folder, Error | NetworkError> =>
-    getAPI(`/api/folders/${folder_id}`).andThen((response) =>
+    uri: string
+): ResultAsync<Folder, Error | NetworkError> => {
+    return getAPI(
+        `/api/folders/${encodeURIComponent(uri)}`
+    ).andThen((response) =>
         ResultAsync.fromPromise(response.json(), wrapError).mapErr((error) =>
             ono(error, "Could not decode JSON into Folder")
         )
     );
+};
 
 function getAPI(uri: string): ResultAsync<Response, Error | NetworkError> {
     return ResultAsync.fromPromise(
-        fetch(encodeURI(uri), { method: "GET" }),
+        fetch(uri, { method: "GET" }),
         wrapError
     ).andThen((response) => {
         if (!response.ok) {

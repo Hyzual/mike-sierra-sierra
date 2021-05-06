@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2020  Joris MASSON
+ *   Copyright (C) 2020-2021  Joris MASSON
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published by
@@ -26,6 +26,7 @@ import (
 	"path"
 
 	"github.com/gorilla/mux"
+	"github.com/hyzual/mike-sierra-sierra/server/adapter"
 )
 
 // MusicServer serves HTTP requests.
@@ -37,8 +38,8 @@ type MusicServer struct {
 // New creates a new MusicServer
 func New(
 	router *mux.Router,
-	assetsLoader PathJoiner,
-	musicLoader PathJoiner,
+	assetsLoader adapter.PathJoiner,
+	musicLoader adapter.PathJoiner,
 ) *MusicServer {
 	s := new(MusicServer)
 
@@ -58,7 +59,7 @@ func (s *MusicServer) rootHandler(writer http.ResponseWriter, request *http.Requ
 }
 
 type assetsHandler struct {
-	assetsLoader PathJoiner
+	assetsLoader adapter.PathJoiner
 }
 
 func (a *assetsHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
@@ -72,7 +73,7 @@ func (a *assetsHandler) ServeHTTP(writer http.ResponseWriter, request *http.Requ
 }
 
 type musicHandler struct {
-	pathJoiner PathJoiner
+	pathJoiner adapter.PathJoiner
 }
 
 func (m *musicHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {

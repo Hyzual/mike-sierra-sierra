@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2020  Joris MASSON
+ *   Copyright (C) 2020-2021  Joris MASSON
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published by
@@ -22,18 +22,19 @@ import {
     TemplateResult,
     PropertyDeclarations,
 } from "lit-element";
+import { router } from "../router";
 
 // By importing the SVG image like this, webpack can hash its filename and put
 // it in the assets folder.
 import svg from "../../images/assets/no-cover.svg";
 
 class FolderCover extends LitElement {
-    private folder_id!: number;
-    private folder_title!: string;
+    folder_uri!: string;
+    folder_title!: string;
 
     static get properties(): PropertyDeclarations {
         return {
-            folder_id: { type: Number },
+            folder_uri: { type: String },
             folder_title: { type: String },
         };
     }
@@ -64,10 +65,12 @@ class FolderCover extends LitElement {
     `;
 
     render(): TemplateResult {
-        const folder_uri = `/app/folders/${encodeURIComponent(this.folder_id)}`;
-
+        const folder_uri = `/app/folders/${encodeURIComponent(
+            this.folder_uri
+        )}`;
         return html` <a
             href="${folder_uri}"
+            @click="${this.navigate}"
             class="folder-link"
             title="Browse folder"
         >
@@ -76,6 +79,11 @@ class FolderCover extends LitElement {
                 <span>${this.folder_title}</span>
             </div>
         </a>`;
+    }
+
+    private navigate(event: Event): void {
+        event.preventDefault();
+        router.navigate(`/folders/${encodeURIComponent(this.folder_uri)}`);
     }
 }
 

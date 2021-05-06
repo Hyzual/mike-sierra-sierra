@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2020  Joris MASSON
+ *   Copyright (C) 2020-2021  Joris MASSON
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published by
@@ -24,15 +24,16 @@ import (
 	"strconv"
 
 	"github.com/gorilla/schema"
-	"github.com/hyzual/mike-sierra-sierra/server"
+	"github.com/hyzual/mike-sierra-sierra/server/adapter"
+	"github.com/hyzual/mike-sierra-sierra/server/adapter/server"
 	"github.com/swithek/sessionup"
 	"golang.org/x/crypto/bcrypt"
 )
 
 // NewSignInGetHandler creates a new handler for GET /sign-in
 func NewSignInGetHandler(
-	te server.TemplateExecutor,
-	ar server.AssetsResolver,
+	te adapter.TemplateExecutor,
+	ar adapter.AssetsResolver,
 ) http.Handler {
 	return server.WrapErrors(
 		&getSignInHandler{te, ar},
@@ -40,8 +41,8 @@ func NewSignInGetHandler(
 }
 
 type getSignInHandler struct {
-	templateExecutor server.TemplateExecutor
-	assetsResolver   server.AssetsResolver
+	templateExecutor adapter.TemplateExecutor
+	assetsResolver   adapter.AssetsResolver
 }
 
 func (h *getSignInHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) error {

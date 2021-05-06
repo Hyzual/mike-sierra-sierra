@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2020  Joris MASSON
+ *   Copyright (C) 2020-2021  Joris MASSON
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published by
@@ -22,7 +22,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/schema"
-	"github.com/hyzual/mike-sierra-sierra/server"
+	"github.com/hyzual/mike-sierra-sierra/server/adapter"
+	"github.com/hyzual/mike-sierra-sierra/server/adapter/server"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -36,8 +37,8 @@ const (
 
 // NewFirstTimeRegistrationGetHandler creates a new handler for GET /first-time-registration
 func NewFirstTimeRegistrationGetHandler(
-	te server.TemplateExecutor,
-	ar server.AssetsResolver,
+	te adapter.TemplateExecutor,
+	ar adapter.AssetsResolver,
 ) http.Handler {
 	return server.WrapErrors(
 		&getFirstTimeRegistrationHandler{te, ar},
@@ -45,8 +46,8 @@ func NewFirstTimeRegistrationGetHandler(
 }
 
 type getFirstTimeRegistrationHandler struct {
-	templateExecutor server.TemplateExecutor
-	assetsResolver   server.AssetsResolver
+	templateExecutor adapter.TemplateExecutor
+	assetsResolver   adapter.AssetsResolver
 }
 
 func (h *getFirstTimeRegistrationHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) error {
