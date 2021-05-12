@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2020  Joris MASSON
+ *   Copyright (C) 2020-2021  Joris MASSON
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published by
@@ -31,7 +31,7 @@ div {
   --lighter-color: #{$lighter-color};
 }
 */
-body {
+:root {
     --light-shades-color: #e5dada;
     --darker-light-shades-color: #dacbcb;
     --lighter-light-shades-color: #f0e9e9;
@@ -48,7 +48,9 @@ body {
     --darker-dark-shades-color: #020101;
     --lighter-dark-shades-color: #201515;
     --error-color: #d31818;
+}
 
+body {
     margin: 0;
     color: var(--light-shades-color);
     font-family: Arial, Helvetica, sans-serif;
