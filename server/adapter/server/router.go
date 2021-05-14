@@ -36,12 +36,12 @@ func Register(
 	assetsLoader adapter.PathJoiner,
 	musicLoader adapter.PathJoiner,
 ) {
-	musicHandler := &musicHandler{musicLoader}
+	musicHandler := sessionManager.Auth(http.StripPrefix("/music/", &musicHandler{musicLoader}))
 	assetsHandler := &assetsHandler{assetsLoader}
 
 	router.HandleFunc("/", rootHandler)
 	router.PathPrefix("/assets/").Handler(assetsHandler)
-	router.PathPrefix("/music/").Handler(http.StripPrefix("/music/", musicHandler))
+	router.PathPrefix("/music/").Handler(musicHandler)
 }
 
 func rootHandler(writer http.ResponseWriter, request *http.Request) {
