@@ -16,8 +16,7 @@
  */
 
 /*
-Package server implements the music server.
-It handles all HTTP routing, serves HTML pages, REST routes and media files.
+Package server implements the music server. It serves HTML pages and media files.
 */
 package server
 
@@ -27,34 +26,25 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/hyzual/mike-sierra-sierra/server/adapter"
+	"github.com/swithek/sessionup"
 )
 
-// MusicServer serves HTTP requests.
-// It serves the HTML pages, the REST routes and the media files as well.
-type MusicServer struct {
-	http.Handler
-}
-
-// New creates a new MusicServer
-func New(
+// Register registers routes for the assets and music routes on the given gorilla/mux router.
+func Register(
 	router *mux.Router,
+	sessionManager *sessionup.Manager,
 	assetsLoader adapter.PathJoiner,
 	musicLoader adapter.PathJoiner,
-) *MusicServer {
-	s := new(MusicServer)
-
+) {
 	musicHandler := &musicHandler{musicLoader}
 	assetsHandler := &assetsHandler{assetsLoader}
 
-	router.HandleFunc("/", s.rootHandler)
+	router.HandleFunc("/", rootHandler)
 	router.PathPrefix("/assets/").Handler(assetsHandler)
 	router.PathPrefix("/music/").Handler(http.StripPrefix("/music/", musicHandler))
-
-	s.Handler = router
-	return s
 }
 
-func (s *MusicServer) rootHandler(writer http.ResponseWriter, request *http.Request) {
+func rootHandler(writer http.ResponseWriter, request *http.Request) {
 	http.Redirect(writer, request, "/app", http.StatusFound)
 }
 

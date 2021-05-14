@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2020  Joris MASSON
+ *   Copyright (C) 2020-2021  Joris MASSON
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published by
@@ -19,7 +19,6 @@ package server
 
 import (
 	"errors"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -29,24 +28,25 @@ import (
 	"github.com/hyzual/mike-sierra-sierra/tests"
 )
 
-func TestUnkwnownRoute(t *testing.T) {
-	musicServer := newMusicServer()
+func TestRouter(t *testing.T) {
+	router := mux.NewRouter()
+	sessionManager := tests.NewValidSessionManager(t)
+	assetsLoader := &stubPathJoiner{filename: ""}
+	musicLoader := &stubPathJoiner{filename: ""}
+	Register(router, sessionManager, assetsLoader, musicLoader)
+
 	t.Run("/unknown returns 404", func(t *testing.T) {
 		request := tests.NewGetRequest(t, "/unknown")
 		response := httptest.NewRecorder()
-		musicServer.ServeHTTP(response, request)
+		router.ServeHTTP(response, request)
 
 		tests.AssertStatusEquals(t, response.Code, http.StatusNotFound)
 	})
-}
-
-func TestGetRoot(t *testing.T) {
-	musicServer := newMusicServer()
 
 	t.Run("/ redirects to /app", func(t *testing.T) {
 		request := tests.NewGetRequest(t, "/")
 		response := httptest.NewRecorder()
-		musicServer.ServeHTTP(response, request)
+		router.ServeHTTP(response, request)
 
 		tests.AssertStatusEquals(t, response.Code, http.StatusFound)
 		tests.AssertLocationHeaderEquals(t, response, "/app")
@@ -56,13 +56,14 @@ func TestGetRoot(t *testing.T) {
 func TestGetAssets(t *testing.T) {
 	tempFile, removeTempFile := createTempFile(t)
 	defer removeTempFile()
-	musicServer := newMusicServerWithAsset(tempFile.Name())
+	assetsLoader := &stubPathJoiner{tempFile.Name()}
+	handler := &assetsHandler{assetsLoader}
 
 	t.Run("returns OK for a path leading to a file", func(t *testing.T) {
 		request := tests.NewGetRequest(t, "/assets/style.css")
 		response := httptest.NewRecorder()
 
-		musicServer.ServeHTTP(response, request)
+		handler.ServeHTTP(response, request)
 
 		tests.AssertStatusEquals(t, response.Code, http.StatusOK)
 	})
@@ -71,7 +72,7 @@ func TestGetAssets(t *testing.T) {
 		request := tests.NewGetRequest(t, "/assets/")
 		response := httptest.NewRecorder()
 
-		musicServer.ServeHTTP(response, request)
+		handler.ServeHTTP(response, request)
 
 		tests.AssertStatusEquals(t, response.Code, http.StatusNotFound)
 	})
@@ -80,13 +81,14 @@ func TestGetAssets(t *testing.T) {
 func TestGetMusic(t *testing.T) {
 	tempFile, removeTempFile := createTempFile(t)
 	defer removeTempFile()
-	musicServer := newMusicServerWithMusic(tempFile.Name())
+	musicLoader := &stubPathJoiner{tempFile.Name()}
+	handler := &musicHandler{musicLoader}
 
 	t.Run("returns OK for a path leading to a music file", func(t *testing.T) {
 		request := tests.NewGetRequest(t, "/music/album/amazing-song.mp3")
 		response := httptest.NewRecorder()
 
-		musicServer.ServeHTTP(response, request)
+		handler.ServeHTTP(response, request)
 
 		tests.AssertStatusEquals(t, response.Code, http.StatusOK)
 	})
@@ -103,24 +105,6 @@ func TestUnauthorized(t *testing.T) {
 	tests.AssertLocationHeaderEquals(t, response, "/sign-in")
 }
 
-func newMusicServer() *MusicServer {
-	router := mux.NewRouter()
-	assetsLoader := &stubPathJoiner{filename: ""}
-	return New(router, assetsLoader, nil)
-}
-
-func newMusicServerWithAsset(filename string) *MusicServer {
-	router := mux.NewRouter()
-	assetsLoader := &stubPathJoiner{filename}
-	return New(router, assetsLoader, nil)
-}
-
-func newMusicServerWithMusic(filename string) *MusicServer {
-	router := mux.NewRouter()
-	musicLoader := &stubPathJoiner{filename}
-	return New(router, nil, musicLoader)
-}
-
 type stubPathJoiner struct {
 	filename string
 }
@@ -132,7 +116,7 @@ func (s *stubPathJoiner) Join(relativePath string) string {
 func createTempFile(t *testing.T) (*os.File, func()) {
 	t.Helper()
 
-	tempFile, err := ioutil.TempFile("", "db")
+	tempFile, err := os.CreateTemp("", "db")
 	if err != nil {
 		t.Fatalf("could not create temp file %v", err)
 	}

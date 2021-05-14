@@ -90,8 +90,9 @@ func main() {
 		userStore,
 		sessionManager,
 	)
-	server := server.New(
+	server.Register(
 		router,
+		sessionManager,
 		assetsLoader,
 		musicLoader,
 	)
@@ -104,7 +105,7 @@ func main() {
 		port = "8443"
 	}
 	srv := &http.Server{
-		Handler:      server,
+		Handler:      router,
 		Addr:         ":" + port,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
