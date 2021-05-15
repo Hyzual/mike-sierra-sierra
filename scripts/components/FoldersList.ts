@@ -15,14 +15,9 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {
-    LitElement,
-    css,
-    html,
-    PropertyDeclarations,
-    TemplateResult,
-} from "lit-element";
-import { SubFolder } from "../types";
+import type { PropertyDeclarations, TemplateResult } from "lit-element";
+import { LitElement, css, html } from "lit-element";
+import type { SubFolder } from "../types";
 
 class FoldersList extends LitElement {
     folders: SubFolder[] = [];
@@ -44,12 +39,12 @@ class FoldersList extends LitElement {
     render(): TemplateResult {
         return html`${this.folders.map(
             (folder: SubFolder) =>
-                html`<folder-cover
+                html`<mss-folder-cover
                     folder_title="${folder.name}"
                     folder_uri="${folder.uri}"
-                ></folder-cover>`
+                ></mss-folder-cover>`
         )}`;
     }
 }
 
-customElements.define("folders-list", FoldersList);
+customElements.define("mss-folders-list", FoldersList);

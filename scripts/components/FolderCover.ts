@@ -15,13 +15,8 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {
-    LitElement,
-    css,
-    html,
-    TemplateResult,
-    PropertyDeclarations,
-} from "lit-element";
+import type { TemplateResult, PropertyDeclarations } from "lit-element";
+import { LitElement, css, html } from "lit-element";
 import { router } from "../router";
 
 // By importing the SVG image like this, webpack can hash its filename and put
@@ -87,4 +82,4 @@ class FolderCover extends LitElement {
     }
 }
 
-customElements.define("folder-cover", FolderCover);
+customElements.define("mss-folder-cover", FolderCover);

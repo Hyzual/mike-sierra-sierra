@@ -17,9 +17,9 @@
 
 import { errAsync, okAsync } from "neverthrow";
 import * as rest_querier from "../api/rest-querier";
-import { Folder } from "../types";
+import type { Folder } from "../types";
 import "./FolderDetails";
-import type { FolderDetails } from "./FolderDetails";
+import { FolderDetails } from "./FolderDetails";
 
 describe("FolderDetails", () => {
     const tag_name = "mss-folder-details";
@@ -32,7 +32,7 @@ describe("FolderDetails", () => {
         jest.spyOn(rest_querier, "getFolder").mockReturnValue(
             okAsync({ folders: [], songs: [] })
         );
-        const element = document.createElement(tag_name) as FolderDetails;
+        const element = new FolderDetails();
         document.body.append(element);
 
         await element.updateComplete;
@@ -48,7 +48,7 @@ describe("FolderDetails", () => {
             songs: [],
         });
         jest.spyOn(rest_querier, "getFolder").mockReturnValue(async_result);
-        const element = document.createElement(tag_name) as FolderDetails;
+        const element = new FolderDetails();
         document.body.append(element);
 
         await element.updateComplete;
@@ -66,7 +66,7 @@ describe("FolderDetails", () => {
             songs: [],
         });
         jest.spyOn(rest_querier, "getFolder").mockReturnValue(async_result);
-        const element = document.createElement(tag_name) as FolderDetails;
+        const element = new FolderDetails();
         element.folder_path = "live";
         document.body.append(element);
 
@@ -80,7 +80,7 @@ describe("FolderDetails", () => {
             new Error("Could not decode JSON")
         );
         jest.spyOn(rest_querier, "getFolder").mockReturnValue(async_result);
-        const element = document.createElement(tag_name) as FolderDetails;
+        const element = new FolderDetails();
         document.body.append(element);
 
         await element.updateComplete;

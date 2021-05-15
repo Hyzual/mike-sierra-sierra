@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2020  Joris MASSON
+ *   Copyright (C) 2020-2021  Joris MASSON
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published by
@@ -15,13 +15,8 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {
-    html,
-    LitElement,
-    PropertyDeclarations,
-    TemplateResult,
-    css,
-} from "lit-element";
+import type { PropertyDeclarations, TemplateResult } from "lit-element";
+import { html, LitElement, css } from "lit-element";
 import { router } from "../router";
 
 export class SideBarLink extends LitElement {
@@ -62,4 +57,4 @@ export class SideBarLink extends LitElement {
     }
 }
 
-customElements.define("side-bar-link", SideBarLink);
+customElements.define("mss-side-bar-link", SideBarLink);

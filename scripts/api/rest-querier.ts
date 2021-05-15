@@ -17,7 +17,7 @@
 
 import { ono } from "@jsdevtools/ono";
 import { ok, err, ResultAsync } from "neverthrow";
-import { Folder } from "../types";
+import type { Folder } from "../types";
 import { NetworkError } from "./NetworkError";
 
 const wrapError = (e: unknown): Error =>

@@ -73,6 +73,7 @@ module.exports = {
         "require-await": "error",
         // Typescript
         "@typescript-eslint/camelcase": "off",
+        "@typescript-eslint/consistent-type-imports": "error",
         "@typescript-eslint/class-literal-property-style": "error",
         "@typescript-eslint/consistent-type-assertions": [
             "error",

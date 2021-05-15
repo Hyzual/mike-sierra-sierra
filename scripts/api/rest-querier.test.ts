@@ -16,7 +16,7 @@
  */
 
 import { getFolder } from "./rest-querier";
-import { Folder } from "scripts/types";
+import type { Folder } from "scripts/types";
 
 describe(`rest-querier`, () => {
     let globalFetch: jest.SpyInstance;

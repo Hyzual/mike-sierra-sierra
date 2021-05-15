@@ -15,13 +15,8 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {
-    css,
-    html,
-    LitElement,
-    PropertyDeclarations,
-    TemplateResult,
-} from "lit-element";
+import type { PropertyDeclarations, TemplateResult } from "lit-element";
+import { css, html, LitElement } from "lit-element";
 import { until } from "lit-html/directives/until";
 import { NetworkError } from "../api/NetworkError";
 import { getFolder } from "../api/rest-querier";
@@ -42,7 +37,9 @@ const renderFolder = async (folder_path: string): Promise<TemplateResult> => {
     if (result.isErr()) {
         return renderErrorState(result.error);
     }
-    return html`<folders-list .folders=${result.value.folders}></folders-list>`;
+    return html`<mss-folders-list
+        .folders=${result.value.folders}
+    ></mss-folders-list>`;
 };
 
 export class FolderDetails extends LitElement {

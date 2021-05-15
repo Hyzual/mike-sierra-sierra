@@ -15,7 +15,8 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { LitElement, html, TemplateResult } from "lit-element";
+import type { TemplateResult } from "lit-element";
+import { LitElement, html } from "lit-element";
 import { router } from "../router";
 import "./SideBarLink";
 import "./FolderDetails";
@@ -66,4 +67,4 @@ class AppRoot extends LitElement {
     }
 }
 
-customElements.define("app-root", AppRoot);
+customElements.define("mss-app-root", AppRoot);
