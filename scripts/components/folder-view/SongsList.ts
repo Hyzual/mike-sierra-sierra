@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2020-2021  Joris MASSON
+ *   Copyright (C) 2021  Joris MASSON
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published by
@@ -16,35 +16,34 @@
  */
 
 import type { PropertyDeclarations, TemplateResult } from "lit-element";
-import { LitElement, css, html } from "lit-element";
-import type { SubFolder } from "../types";
+import { LitElement, html, css } from "lit-element";
+import type { Song } from "../../types";
+import type { PlayQueueState } from "../music/PlayQueueState";
 
-class FoldersList extends LitElement {
-    folders: SubFolder[] = [];
+class SongsList extends LitElement {
+    songs: Song[] = [];
+    play_queue!: PlayQueueState;
 
     static get properties(): PropertyDeclarations {
-        return { folders: { type: Array } };
+        return { songs: { type: Array } };
     }
 
     static readonly styles = css`
         :host {
-            display: grid;
-            gap: 8px 8px;
-            grid-auto-flow: row;
-            grid-template-columns: repeat(auto-fit, 256px);
-            grid-template-rows: max-content;
+            display: flex;
+            flex-direction: column;
         }
     `;
 
     render(): TemplateResult {
-        return html`${this.folders.map(
-            (folder: SubFolder) =>
-                html`<mss-folder-cover
-                    folder_title="${folder.name}"
-                    folder_path="${folder.path}"
-                ></mss-folder-cover>`
+        return html`${this.songs.map(
+            (song: Song) =>
+                html`<mss-song-line
+                    .song=${song}
+                    .play_queue=${this.play_queue}
+                ></mss-song-line>`
         )}`;
     }
 }
 
-customElements.define("mss-folders-list", FoldersList);
+customElements.define("mss-songs-list", SongsList);

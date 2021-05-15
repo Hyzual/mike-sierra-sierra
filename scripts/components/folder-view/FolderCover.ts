@@ -17,11 +17,11 @@
 
 import type { TemplateResult, PropertyDeclarations } from "lit-element";
 import { LitElement, css, html } from "lit-element";
-import { router } from "../router";
+import { router } from "../../router";
 
 // By importing the SVG image like this, webpack can hash its filename and put
 // it in the assets folder.
-import svg from "../../images/assets/no-cover.svg";
+import svg from "../../../images/assets/no-cover.svg";
 
 const getFolderUri = (path: string): string =>
     `/folders/${encodeURIComponent(path)}`;

@@ -18,8 +18,9 @@
 import type { PropertyDeclarations, TemplateResult } from "lit-element";
 import { css, html, LitElement } from "lit-element";
 import { until } from "lit-html/directives/until";
-import { NetworkError } from "../api/NetworkError";
-import { getFolder } from "../api/rest-querier";
+import { NetworkError } from "../../api/NetworkError";
+import { getFolder } from "../../api/rest-querier";
+import type { PlayQueueState } from "../music/PlayQueueState";
 
 const renderErrorState = (error: Error | NetworkError): TemplateResult => {
     const error_template =
@@ -32,7 +33,10 @@ const renderErrorState = (error: Error | NetworkError): TemplateResult => {
     return html`<div class="error-container">${error_template}</div>`;
 };
 
-const renderFolder = async (folder_path: string): Promise<TemplateResult> => {
+const renderFolder = async (
+    play_queue: PlayQueueState,
+    folder_path: string
+): Promise<TemplateResult> => {
     const result = await getFolder(folder_path);
     if (result.isErr()) {
         return renderErrorState(result.error);
@@ -40,14 +44,18 @@ const renderFolder = async (folder_path: string): Promise<TemplateResult> => {
     return html`<mss-folders-list
             .folders=${result.value.folders}
         ></mss-folders-list>
-        <mss-songs-list .songs=${result.value.songs}></mss-songs-list>`;
+        <mss-songs-list
+            .songs=${result.value.songs}
+            .play_queue=${play_queue}
+        ></mss-songs-list>`;
 };
 
 export class FolderDetails extends LitElement {
     folder_path = "";
+    play_queue!: PlayQueueState;
 
     static get properties(): PropertyDeclarations {
-        return { folder_path: { type: Object } };
+        return { folder_path: { type: String } };
     }
 
     static readonly styles = css`
@@ -65,7 +73,7 @@ export class FolderDetails extends LitElement {
 
     render(): TemplateResult {
         return html`${until(
-            renderFolder(this.folder_path),
+            renderFolder(this.play_queue, this.folder_path),
             html`<span>Loading ...</span>`
         )}`;
     }

@@ -19,6 +19,8 @@ import type { PropertyDeclarations, TemplateResult } from "lit-element";
 import { html, LitElement, css } from "lit-element";
 import { router } from "../router";
 
+const getFullURI = (uri: string): string => router.link(uri);
+
 export class SideBarLink extends LitElement {
     private uri!: string;
     private label!: string;
@@ -46,7 +48,9 @@ export class SideBarLink extends LitElement {
     `;
 
     render(): TemplateResult {
-        return html`<a href="${this.uri}" @click="${this.navigate}" class="link"
+        return html`<a href="${getFullURI(this.uri)}" @click="${
+            this.navigate
+        }" class="link"
             ><slot name="icon"></slot></i>${this.label}</a
         >`;
     }

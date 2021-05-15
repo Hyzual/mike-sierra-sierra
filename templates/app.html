@@ -9,42 +9,32 @@
             href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌋</text></svg>"
         />
     </head>
-    <body class="mss-grid-body">
-        {{with .HeaderPresenter}}
-        <header class="mss-app-header">
-            <div class="mss-app-header-app-name">Mike-Sierra-Sierra</div>
-            <div class="mss-app-header-spacer"></div>
-            <div class="mss-app-header-current-user">
-                <img
-                    src="https://www.gravatar.com/avatar/{{.GravatarHash}}?s=32"
-                    alt="Gravatar profile picture"
-                    class="mss-app-header-current-user-avatar"
-                /><span>{{.Username}}</span>
-            </div>
-            <div class="mss-app-header-sign-out">
-                <form action="/sign-out" method="POST">
-                    <button
-                        class="mss-button-secondary mss-app-header-sign-out-button"
-                        type="submit"
-                    >
-                        Sign out
-                    </button>
-                </form>
-            </div>
-        </header>
-        {{end}} {{template "sidebar.html" .}}
-        <nav class="mss-app-breadcrumbs">Breadcrumbs</nav>
-        <main class="mss-app-main">
-            <mss-app-root></mss-app-root>
-        </main>
-        <footer class="mss-app-footer">
-            <audio controls class="mss-app-player">
-                <source
-                    src="/music/12- Glenn Stafford - Zerg Two.flac"
-                    type="audio/flac"
-                />
-            </audio>
-        </footer>
+    <body>
+        <mss-app-root>
+            {{with .HeaderPresenter}}
+            <header class="mss-app-header" slot="header">
+                <div class="mss-app-header-app-name">Mike-Sierra-Sierra</div>
+                <div class="mss-app-header-spacer"></div>
+                <div class="mss-app-header-current-user">
+                    <img
+                        src="https://www.gravatar.com/avatar/{{.GravatarHash}}?s=32"
+                        alt="Gravatar profile picture"
+                        class="mss-app-header-current-user-avatar"
+                    /><span>{{.Username}}</span>
+                </div>
+                <div class="mss-app-header-sign-out">
+                    <form action="/sign-out" method="POST">
+                        <button
+                            class="mss-button-secondary mss-app-header-sign-out-button"
+                            type="submit"
+                        >
+                            Sign out
+                        </button>
+                    </form>
+                </div>
+            </header>
+            {{end}} {{template "sidebar.html" .}}
+        </mss-app-root>
         <noscript>Mike-Sierra-Sierra needs JavaScript to function.</noscript>
         <script src="{{ .AppURI }}" type="module"></script>
     </body>

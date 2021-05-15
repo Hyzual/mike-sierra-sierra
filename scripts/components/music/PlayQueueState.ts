@@ -15,31 +15,29 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { PropertyDeclarations, TemplateResult } from "lit-element";
-import { LitElement, html, css } from "lit-element";
+import type { Song } from "../../types";
+import { NullSong } from "../../types";
 
-export class SongLine extends LitElement {
-    private song_title!: string;
-    private song_uri!: string;
+type CurrentSongChangedCallback = (new_song: Song) => void;
 
-    static get properties(): PropertyDeclarations {
-        return {
-            song_title: { type: String },
-            song_uri: { type: String },
-        };
+const noopSongChangedCallback = (): void => {
+    //Do nothing
+};
+
+export class PlayQueueState {
+    private callback: CurrentSongChangedCallback = noopSongChangedCallback;
+    #currentSong: Song = NullSong;
+
+    get currentSong(): Song {
+        return this.#currentSong;
     }
 
-    static readonly styles = css`
-        :host {
-            display: flex;
-            flex: 1;
-        }
-    `;
+    set currentSong(new_song: Song) {
+        this.callback(new_song);
+        this.#currentSong = new_song;
+    }
 
-    render(): TemplateResult {
-        return html`<span>${this.song_title}</span>
-            <a href="${this.song_uri}">Play</a>`;
+    setCallback(callback: CurrentSongChangedCallback): void {
+        this.callback = callback;
     }
 }
-
-customElements.define("mss-song-line", SongLine);

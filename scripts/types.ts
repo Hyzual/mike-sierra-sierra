@@ -16,16 +16,21 @@
  */
 
 export interface Song {
-    title: string;
-    uri: string;
+    readonly title: string;
+    readonly uri: string;
 }
 
+export const NullSong: Song = {
+    title: "",
+    uri: "",
+};
+
 export interface SubFolder {
-    path: string;
-    name: string;
+    readonly path: string;
+    readonly name: string;
 }
 
 export interface Folder {
-    folders: SubFolder[];
-    songs: Song[];
+    readonly folders: SubFolder[];
+    readonly songs: Song[];
 }

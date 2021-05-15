@@ -16,32 +16,41 @@
  */
 
 import type { PropertyDeclarations, TemplateResult } from "lit-element";
-import { LitElement, html, css } from "lit-element";
-import type { Song } from "../types";
+import { css, html, LitElement } from "lit-element";
+import type { PlayQueueState } from "./PlayQueueState";
 
-class SongsList extends LitElement {
-    songs: Song[] = [];
+export class MusicPlayer extends LitElement {
+    readonly play_queue!: PlayQueueState;
 
     static get properties(): PropertyDeclarations {
-        return { songs: { type: Array } };
+        return { play_queue: { type: Object } };
+    }
+
+    firstUpdated(): void {
+        this.play_queue.setCallback(this.onCurrentSongChange.bind(this));
     }
 
     static readonly styles = css`
         :host {
             display: flex;
-            flex-direction: column;
+        }
+
+        .player {
+            flex: 1;
         }
     `;
 
     render(): TemplateResult {
-        return html`${this.songs.map(
-            (song: Song) =>
-                html`<mss-song-line
-                    song_title="${song.title}"
-                    song_uri="${song.uri}"
-                ></mss-song-line>`
-        )}`;
+        return html`<audio
+            controls
+            class="player"
+            src="${this.play_queue.currentSong.uri}"
+        ></audio>`;
+    }
+
+    private onCurrentSongChange(): void {
+        this.requestUpdate();
     }
 }
 
-customElements.define("mss-songs-list", SongsList);
+customElements.define("mss-music-player", MusicPlayer);

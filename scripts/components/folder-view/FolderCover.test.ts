@@ -15,10 +15,10 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { router } from "../router";
+import { router } from "../../router";
 import { FolderCover } from "./FolderCover";
 
-jest.mock("../../images/assets/no-cover.svg", () => {
+jest.mock("../../../images/assets/no-cover.svg", () => {
     return "<svg></svg>";
 });
 

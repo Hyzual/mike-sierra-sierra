@@ -16,14 +16,16 @@
  */
 
 import type { TemplateResult } from "lit-element";
-import { LitElement, html } from "lit-element";
+import { LitElement, html, css } from "lit-element";
 import { router } from "../router";
 import "./SideBarLink";
-import "./FolderDetails";
-import "./FoldersList";
-import "./FolderCover";
-import "./SongsList";
-import "./SongLine";
+import "./folder-view/FolderDetails";
+import "./folder-view/FoldersList";
+import "./folder-view/FolderCover";
+import "./folder-view/SongsList";
+import "./folder-view/SongLine";
+import "./music/MusicPlayer";
+import { PlayQueueState } from "./music/PlayQueueState";
 
 type Page = "default" | "folders";
 const DEFAULT_PAGE: Page = "default";
@@ -32,9 +34,11 @@ const FOLDERS_PAGE: Page = "folders";
 class AppRoot extends LitElement {
     private current_page: Page = DEFAULT_PAGE;
     private current_folder_path = "";
+    private play_queue: PlayQueueState;
 
     constructor() {
         super();
+        this.play_queue = new PlayQueueState();
 
         router
             .on(() => {
@@ -56,11 +60,52 @@ class AppRoot extends LitElement {
             .resolve();
     }
 
+    static readonly styles = css`
+        :host {
+            display: grid;
+            grid-template-areas:
+                "navbar navbar"
+                "sidebar breadcrumbs"
+                "sidebar main"
+                "footer footer";
+            grid-template-columns: minmax(300px, auto) 1fr;
+            grid-template-rows: 40px 40px 1fr 40px;
+            height: 100vh;
+        }
+
+        .main {
+            grid-area: main;
+            background: var(--dark-shades-color);
+        }
+
+        .breadcrumbs {
+            grid-area: breadcrumbs;
+            background: var(--darker-dark-shades-color);
+        }
+
+        .footer {
+            grid-area: footer;
+            background: var(--darker-dark-shades-color);
+        }
+    `;
+
     render(): TemplateResult {
+        return html`<slot name="header"></slot>
+            <nav class="breadcrumbs">Breadcrumbs</nav>
+            <slot name="sidebar"></slot>
+            <main class="main">${this.renderMainElement()}</main>
+            <mss-music-player
+                class="footer"
+                .play_queue=${this.play_queue}
+            ></mss-music-player>`;
+    }
+
+    private renderMainElement(): TemplateResult {
         switch (this.current_page) {
             case FOLDERS_PAGE:
                 return html`<mss-folder-details
                     .folder_path=${this.current_folder_path}
+                    .play_queue=${this.play_queue}
                 ></mss-folder-details> `;
             case DEFAULT_PAGE:
             default:

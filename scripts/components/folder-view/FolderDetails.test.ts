@@ -16,8 +16,8 @@
  */
 
 import { errAsync, okAsync } from "neverthrow";
-import * as rest_querier from "../api/rest-querier";
-import type { Folder } from "../types";
+import * as rest_querier from "../../api/rest-querier";
+import type { Folder } from "../../types";
 import "./FolderDetails";
 import { FolderDetails } from "./FolderDetails";
 

@@ -43,7 +43,7 @@ describe(`SideBarLink`, () => {
         expect(
             link.shadowRoot?.querySelector("a")?.outerHTML
         ).toMatchInlineSnapshot(
-            `"<a class=\\"link\\" href=\\"/folders\\"><slot name=\\"icon\\"></slot>Browse by Folder<!----></a>"`
+            `"<a class=\\"link\\" href=\\"/app/folders\\"><slot name=\\"icon\\"></slot>Browse by Folder<!----></a>"`
         );
     });
 
