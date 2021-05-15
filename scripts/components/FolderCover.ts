@@ -23,7 +23,7 @@ import { router } from "../router";
 // it in the assets folder.
 import svg from "../../images/assets/no-cover.svg";
 
-class FolderCover extends LitElement {
+export class FolderCover extends LitElement {
     folder_uri!: string;
     folder_title!: string;
 
