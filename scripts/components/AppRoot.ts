@@ -22,6 +22,8 @@ import "./SideBarLink";
 import "./FolderDetails";
 import "./FoldersList";
 import "./FolderCover";
+import "./SongsList";
+import "./SongLine";
 
 type Page = "default" | "folders";
 const DEFAULT_PAGE: Page = "default";

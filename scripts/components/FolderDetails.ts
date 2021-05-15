@@ -38,8 +38,9 @@ const renderFolder = async (folder_path: string): Promise<TemplateResult> => {
         return renderErrorState(result.error);
     }
     return html`<mss-folders-list
-        .folders=${result.value.folders}
-    ></mss-folders-list>`;
+            .folders=${result.value.folders}
+        ></mss-folders-list>
+        <mss-songs-list .songs=${result.value.songs}></mss-songs-list>`;
 };
 
 export class FolderDetails extends LitElement {

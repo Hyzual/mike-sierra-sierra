@@ -36,13 +36,13 @@ type FolderContents struct {
 // yet, another HTTP request is needed to expose them.
 type SubFolder struct {
 	Name string `json:"name"` // Basename of the folder
-	URI  string `json:"uri"`  // URI to query the contents of this folder on the server. For example "/music/Yoko%20Kanno/
+	Path string `json:"path"` // Path from the root music folder. For example "Yoko%20Kanno"
 }
 
 func fromSubFolder(source music.SubFolder) SubFolder {
 	return SubFolder{
 		Name: source.Name,
-		URI:  source.Path,
+		Path: source.Path,
 	}
 }
 
@@ -61,7 +61,7 @@ type Song struct {
 func fromSong(source music.Song) Song {
 	return Song{
 		Title: source.Title,
-		URI:   source.Path,
+		URI:   source.URI,
 	}
 }
 

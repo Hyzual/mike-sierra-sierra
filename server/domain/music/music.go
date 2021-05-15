@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io/fs"
 	"path"
+	"strings"
 )
 
 const MusicPath = "/music" // It is a volume in the Docker image
@@ -36,7 +37,7 @@ type SubFolder struct {
 // Most of its fields mirror tags such as ID3 tags for MP3.
 type Song struct {
 	Title string // Title of the song
-	Path  string // Absolute path to the song's file. For example "/music/Symphonic Metal/Nightwish/Dark Passion Play/7 Days to the Wolves.ogg"
+	URI   string // URI to play the song. For example "/music/Symphonic Metal/Nightwish/Dark Passion Play/7 Days to the Wolves.ogg"
 }
 
 // MusicLibraryExplorer allows to explore the contents of the music library folders. It needs a MusicLibraryFileSystem.
@@ -70,11 +71,23 @@ func (b *baseMusicLibraryExplorer) ListContents(folderPath string) ([]SubFolder,
 		filePath := path.Join(folderPath, entry.Name())
 		if entry.IsDir() {
 			subFolders = append(subFolders, SubFolder{Name: entry.Name(), Path: filePath})
-		} else {
-			songs = append(songs, Song{Title: entry.Name(), Path: filePath})
+		} else if isFileASong(entry) {
+			songURI := path.Join(MusicPath, filePath)
+			songs = append(songs, Song{Title: entry.Name(), URI: songURI})
 		}
 	}
 	return subFolders, songs, nil
+}
+
+var supportedExtensions = [3]string{".mp3", ".flac", ".ogg"}
+
+func isFileASong(entry fs.DirEntry) bool {
+	for _, extension := range supportedExtensions {
+		if strings.HasSuffix(entry.Name(), extension) {
+			return true
+		}
+	}
+	return false
 }
 
 // NewMusicLibraryExplorer creates a new MusicLibraryExplorer

@@ -17,10 +17,11 @@
 
 export interface Song {
     title: string;
+    uri: string;
 }
 
 export interface SubFolder {
-    uri: string;
+    path: string;
     name: string;
 }
 

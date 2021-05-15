@@ -48,8 +48,8 @@ func TestBaseMusicLibraryExplorer(t *testing.T) {
 		assertSubFoldersContain(t, folders, music.SubFolder{Name: "against", Path: "Sub Folder/against"})
 		assertSubFoldersContain(t, folders, music.SubFolder{Name: "increase", Path: "Sub Folder/increase"})
 
-		assertSongsContain(t, songs, music.Song{Title: "summer.mp3", Path: "Sub Folder/summer.mp3"})
-		assertSongsContain(t, songs, music.Song{Title: "porch.ogg", Path: "Sub Folder/porch.ogg"})
+		assertSongsContain(t, songs, music.Song{Title: "summer.mp3", URI: "/music/Sub Folder/summer.mp3"})
+		assertSongsContain(t, songs, music.Song{Title: "porch.ogg", URI: "/music/Sub Folder/porch.ogg"})
 	})
 
 	t.Run(`given "." as a path, it sorts the contents of the root music library folder
@@ -67,8 +67,8 @@ func TestBaseMusicLibraryExplorer(t *testing.T) {
 		assertSubFoldersContain(t, folders, music.SubFolder{Name: "ability", Path: "ability"})
 		assertSubFoldersContain(t, folders, music.SubFolder{Name: "usual", Path: "usual"})
 
-		assertSongsContain(t, songs, music.Song{Title: "food shot.mp3", Path: "food shot.mp3"})
-		assertSongsContain(t, songs, music.Song{Title: "sit.flac", Path: "sit.flac"})
+		assertSongsContain(t, songs, music.Song{Title: "food shot.mp3", URI: "/music/food shot.mp3"})
+		assertSongsContain(t, songs, music.Song{Title: "sit.flac", URI: "/music/sit.flac"})
 	})
 }
 
@@ -115,7 +115,7 @@ func assertSongEquals(t *testing.T, got music.Song, want music.Song) {
 	if got.Title != want.Title {
 		t.Errorf("song title %s does not equal %s", got.Title, want.Title)
 	}
-	if got.Path != want.Path {
-		t.Errorf("song path %s does not equal %s", got.Path, want.Path)
+	if got.URI != want.URI {
+		t.Errorf("song URI %s does not equal %s", got.URI, want.URI)
 	}
 }

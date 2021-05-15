@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2020-2021  Joris MASSON
+ *   Copyright (C) 2021  Joris MASSON
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published by
@@ -16,35 +16,30 @@
  */
 
 import type { PropertyDeclarations, TemplateResult } from "lit-element";
-import { LitElement, css, html } from "lit-element";
-import type { SubFolder } from "../types";
+import { LitElement, html, css } from "lit-element";
 
-class FoldersList extends LitElement {
-    folders: SubFolder[] = [];
+export class SongLine extends LitElement {
+    private song_title!: string;
+    private song_uri!: string;
 
     static get properties(): PropertyDeclarations {
-        return { folders: { type: Array } };
+        return {
+            song_title: { type: String },
+            song_uri: { type: String },
+        };
     }
 
     static readonly styles = css`
         :host {
-            display: grid;
-            gap: 8px 8px;
-            grid-auto-flow: row;
-            grid-template-columns: repeat(auto-fit, 256px);
-            grid-template-rows: max-content;
+            display: flex;
+            flex: 1;
         }
     `;
 
     render(): TemplateResult {
-        return html`${this.folders.map(
-            (folder: SubFolder) =>
-                html`<mss-folder-cover
-                    folder_title="${folder.name}"
-                    folder_path="${folder.path}"
-                ></mss-folder-cover>`
-        )}`;
+        return html`<span>${this.song_title}</span>
+            <a href="${this.song_uri}">Play</a>`;
     }
 }
 
-customElements.define("mss-folders-list", FoldersList);
+customElements.define("mss-song-line", SongLine);

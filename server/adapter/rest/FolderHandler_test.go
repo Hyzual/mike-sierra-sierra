@@ -140,8 +140,8 @@ func (e *libraryExplorerStub) ListContents(pathName string) ([]music.SubFolder, 
 		{Name: "indicate", Path: "Sub Folder/indicate"},
 	}
 	songs := []music.Song{
-		{Title: "Medicine Worry", Path: "Sub Folder/Medicine Worry.mp3"},
-		{Title: "He Wall", Path: "Sub Folder/He Wall.ogg"},
+		{Title: "Medicine Worry", URI: "/music/Sub Folder/Medicine Worry.mp3"},
+		{Title: "He Wall", URI: "/music/Sub Folder/He Wall.ogg"},
 	}
 	return folders, songs, nil
 }

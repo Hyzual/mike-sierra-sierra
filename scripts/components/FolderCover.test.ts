@@ -31,7 +31,7 @@ describe(`FolderCover`, () => {
 
     beforeEach(async () => {
         element = new FolderCover();
-        element.setAttribute("folder_uri", "manufacturing/gently");
+        element.setAttribute("folder_path", "manufacturing/gently");
         element.setAttribute("folder_title", "Gently");
         router.on("/folders/:path", noop);
 

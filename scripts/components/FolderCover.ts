@@ -23,13 +23,16 @@ import { router } from "../router";
 // it in the assets folder.
 import svg from "../../images/assets/no-cover.svg";
 
+const getFolderUri = (path: string): string =>
+    `/folders/${encodeURIComponent(path)}`;
+
 export class FolderCover extends LitElement {
-    folder_uri!: string;
+    folder_path!: string;
     folder_title!: string;
 
     static get properties(): PropertyDeclarations {
         return {
-            folder_uri: { type: String },
+            folder_path: { type: String },
             folder_title: { type: String },
         };
     }
@@ -60,9 +63,7 @@ export class FolderCover extends LitElement {
     `;
 
     render(): TemplateResult {
-        const folder_uri = `/app/folders/${encodeURIComponent(
-            this.folder_uri
-        )}`;
+        const folder_uri = router.link(getFolderUri(this.folder_path));
         return html` <a
             href="${folder_uri}"
             @click="${this.navigate}"
@@ -78,7 +79,7 @@ export class FolderCover extends LitElement {
 
     private navigate(event: Event): void {
         event.preventDefault();
-        router.navigate(`/folders/${encodeURIComponent(this.folder_uri)}`);
+        router.navigate(getFolderUri(this.folder_path));
     }
 }
 

@@ -22,8 +22,6 @@ import "./FolderDetails";
 import { FolderDetails } from "./FolderDetails";
 
 describe("FolderDetails", () => {
-    const tag_name = "mss-folder-details";
-
     afterEach(() => {
         document.body.innerHTML = "";
     });
@@ -42,8 +40,8 @@ describe("FolderDetails", () => {
     it(`renders a list of folders once the root folder is loaded`, async () => {
         const async_result = okAsync<Folder, Error>({
             folders: [
-                { name: "last", uri: "last" },
-                { name: "direction", uri: "direction" },
+                { name: "last", path: "last" },
+                { name: "direction", path: "direction" },
             ],
             songs: [],
         });
@@ -60,8 +58,8 @@ describe("FolderDetails", () => {
         and renders a list of folders`, async () => {
         const async_result = okAsync<Folder, Error>({
             folders: [
-                { name: "liquid", uri: "live/liquid" },
-                { name: "wooden", uri: "live/wooden" },
+                { name: "liquid", path: "live/liquid" },
+                { name: "wooden", path: "live/wooden" },
             ],
             songs: [],
         });

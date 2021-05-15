@@ -89,10 +89,13 @@ describe(`rest-querier`, () => {
     it(`getFolder("") will return the top-level (root) music Folder`, async () => {
         const expected_folder: Folder = {
             folders: [
-                { name: "pharos", uri: "pharos" },
-                { name: "elution", uri: "elution" },
+                { name: "pharos", path: "pharos" },
+                { name: "elution", path: "elution" },
             ],
-            songs: [{ title: "shall" }, { title: "asleep" }],
+            songs: [
+                { title: "shall", uri: "/music/shall.mp3" },
+                { title: "asleep", uri: "/music/asleep.mp3" },
+            ],
         };
         mockFetchSuccess(expected_folder);
 
