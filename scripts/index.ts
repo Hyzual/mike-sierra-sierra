@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2020  Joris MASSON
+ *   Copyright (C) 2020-2021  Joris MASSON
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published by
@@ -15,9 +15,4 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { init as initFontAwesome } from "./fontawesome";
 import "./components/AppRoot";
-
-document.addEventListener("DOMContentLoaded", () => {
-    initFontAwesome();
-});

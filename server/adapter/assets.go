@@ -64,7 +64,7 @@ func (b *baseAssetsResolver) GetAssetURI(baseName string) (string, error) {
 
 	hashedFileName, ok := manifestContents[baseName]
 	if !ok {
-		return "", fmt.Errorf("Could not find %s in the manifest.json file: %w", baseName, err)
+		return "", fmt.Errorf("Could not find %s in the manifest.json file", baseName)
 	}
 	joinedURI := path.Join(b.assetsBaseURI, hashedFileName)
 

@@ -61,7 +61,7 @@ const css_rule = {
 };
 
 const css_assets_rule = {
-    test: /\.svg$/,
+    test: /\.(ttf|eot|svg|woff|woff2)$/,
     use: [
         {
             loader: "file-loader",

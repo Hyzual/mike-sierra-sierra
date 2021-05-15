@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2020  Joris MASSON
+ *   Copyright (C) 2020-2021  Joris MASSON
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published by
@@ -15,6 +15,7 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+@import "../node_modules/fork-awesome/css/fork-awesome.min.css";
 @import "./common.css";
 @import "./sign-in-register.css";
 @import "./app.css";
