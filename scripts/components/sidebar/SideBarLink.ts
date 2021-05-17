@@ -17,7 +17,7 @@
 
 import type { PropertyDeclarations, TemplateResult } from "lit";
 import { html, LitElement, css } from "lit";
-import { router } from "../router";
+import { router } from "../../router";
 
 const getFullURI = (uri: string): string => router.link(uri);
 

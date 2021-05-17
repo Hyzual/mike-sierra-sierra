@@ -15,10 +15,11 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { TemplateResult } from "lit";
+import type { PropertyDeclarations, TemplateResult } from "lit";
 import { LitElement, html, css } from "lit";
 import { router } from "../router";
-import "./SideBarLink";
+import "./sidebar/SidebarMenu";
+import "./sidebar/SideBarLink";
 import "./folder-view/FolderDetails";
 import "./folder-view/FoldersList";
 import "./folder-view/FolderCover";
@@ -27,9 +28,10 @@ import "./folder-view/SongLine";
 import "./music/MusicPlayer";
 import { PlayQueueState } from "./music/PlayQueueState";
 
-type Page = "default" | "folders";
+type Page = "default" | "folders" | "play_queue";
 const DEFAULT_PAGE: Page = "default";
 const FOLDERS_PAGE: Page = "folders";
+const PLAY_QUEUE_PAGE: Page = "play_queue";
 
 class AppRoot extends LitElement {
     private current_page: Page = DEFAULT_PAGE;
@@ -43,21 +45,28 @@ class AppRoot extends LitElement {
         router
             .on(() => {
                 this.current_page = DEFAULT_PAGE;
-                this.requestUpdate();
+            })
+            .on("/play-queue", () => {
+                this.current_page = PLAY_QUEUE_PAGE;
             })
             .on("/folders", () => {
                 this.current_page = FOLDERS_PAGE;
                 this.current_folder_path = "";
-                this.requestUpdate();
             })
             .on("/folders/:path", (match) => {
                 this.current_page = FOLDERS_PAGE;
                 if (match && match.data) {
                     this.current_folder_path = match.data.path;
                 }
-                this.requestUpdate();
             })
             .resolve();
+    }
+
+    static get properties(): PropertyDeclarations {
+        return {
+            current_page: { state: true },
+            current_folder_path: { state: true },
+        };
     }
 
     static readonly styles = css`
@@ -83,6 +92,11 @@ class AppRoot extends LitElement {
             background: var(--darker-dark-shades-color);
         }
 
+        .sidebar {
+            grid-area: sidebar;
+            background: var(--darker-dark-shades-color);
+        }
+
         .footer {
             grid-area: footer;
             background: var(--darker-dark-shades-color);
@@ -92,7 +106,7 @@ class AppRoot extends LitElement {
     render(): TemplateResult {
         return html`<slot name="header"></slot>
             <nav class="breadcrumbs">Breadcrumbs</nav>
-            <slot name="sidebar"></slot>
+            <mss-sidebar-menu class="sidebar"></mss-sidebar-menu>
             <main class="main">${this.renderMainElement()}</main>
             <mss-music-player
                 class="footer"

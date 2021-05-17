@@ -16,7 +16,7 @@
  */
 
 import { SideBarLink } from "./SideBarLink";
-import { router } from "../router";
+import { router } from "../../router";
 
 const noop = (): void => {
     //Do nothing

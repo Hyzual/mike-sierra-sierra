@@ -54,9 +54,9 @@ func (h *appHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request
 		AppURI:          scriptURI,
 		HeaderPresenter: headerPresenter,
 	}
-	err = h.templateExecutor.Load(writer, presenter, "app.html", "sidebar.html")
+	err = h.templateExecutor.Load(writer, presenter, "app.html")
 	if err != nil {
-		return fmt.Errorf("could not load templates %s and %s", "app.html", "sidebar.html")
+		return fmt.Errorf("could not load template %s", "app.html")
 	}
 	return nil
 }
