@@ -61,12 +61,14 @@ $ make coverage-go-html
 #### NPM commands
 
 ```sh
+# Install npm dependencies
+$ npm install 
 # Build and minify the CSS and Javascript (for production)
-$ make build-assets
+$ npm run build
 # Run unit tests
-$ make test-jest
+$ npm test
 # Display text test coverage
-$ make coverage-jest
+$ npm test -- --coverage
 # Build and watch (for development)
 $ make watch
 ```
@@ -74,7 +76,7 @@ s
 #### Add music files to the dev Docker image
 
 ```sh
-# Run an alpine container with bind-mount to a folder where you have music (on your host)
+# Run an alpine container with bind-mount to a folder where you have music (on your host). Replace <my-user> in the command
 $ docker run -it --rm -v /home/<my-user>/Music:/source -v mike_music:/dest alpine ash
 [container]$ cp /source/*.mp3 dest
 ```
