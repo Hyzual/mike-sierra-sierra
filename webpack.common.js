@@ -60,16 +60,18 @@ const css_rule = {
     use: [MiniCssExtractPlugin.loader, "css-loader"],
 };
 
-const css_assets_rule = {
-    test: /\.(ttf|eot|svg|woff|woff2)$/,
-    use: [
-        {
-            loader: "file-loader",
-            options: {
-                name: "css-assets/[name]-[sha256:hash:hex:16].[ext]",
-            },
-        },
-    ],
+const svg_separate_file_rule = {
+    test: /\.svg$/,
+    type: "asset/resource",
+    generator: {
+        filename: "css-assets/[name]-[hash][ext][query]",
+    },
+};
+
+const svg_inline_rule = {
+    test: /\.svg$/,
+    resourceQuery: /raw/,
+    type: "asset/source",
 };
 
 const configuration = {
@@ -81,7 +83,12 @@ const configuration = {
     target: ["web"],
     output,
     module: {
-        rules: [typescript_rule, css_rule, css_assets_rule],
+        rules: [
+            typescript_rule,
+            css_rule,
+            svg_separate_file_rule,
+            svg_inline_rule,
+        ],
     },
     plugins: [
         clean_plugin,

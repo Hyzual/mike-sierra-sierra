@@ -15,7 +15,6 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-@import "../node_modules/fork-awesome/css/fork-awesome.min.css";
 @import "./common.css";
 @import "./sign-in-register.css";
 @import "./app.css";
