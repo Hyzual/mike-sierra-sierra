@@ -15,8 +15,8 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { PropertyDeclarations, TemplateResult } from "lit-element";
-import { LitElement, css, html } from "lit-element";
+import type { PropertyDeclarations, TemplateResult } from "lit";
+import { LitElement, css, html } from "lit";
 import type { SubFolder } from "../../types";
 
 class FoldersList extends LitElement {

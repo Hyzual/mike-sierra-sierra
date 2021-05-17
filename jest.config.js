@@ -49,9 +49,9 @@ module.exports = {
     // The test environment that will be used for testing
     testEnvironment: "jest-environment-jsdom",
 
-    // Transpile lit-html for tests because it uses ES modules
+    // Transpile lit for tests because it uses ES modules
     transformIgnorePatterns: [
-        "/node_modules/(?!(lit-html|lit-element)).+\\.js",
+        "/node_modules/(?!(lit|@lit/reactive-element)).+\\.js",
     ],
 
     moduleNameMapper: {

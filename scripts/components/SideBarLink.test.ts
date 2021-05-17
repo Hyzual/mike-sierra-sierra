@@ -40,10 +40,16 @@ describe(`SideBarLink`, () => {
     });
 
     it(`Given a uri and a label, it will render a sidebar link`, () => {
+        const removeLitPlaceholders = (
+            html: string | undefined
+        ): string | undefined => html?.replace(/\?lit\$[0-9]+\$/, "");
+
         expect(
-            link.shadowRoot?.querySelector("a")?.outerHTML
+            removeLitPlaceholders(
+                link.shadowRoot?.querySelector("a")?.outerHTML
+            )
         ).toMatchInlineSnapshot(
-            `"<a class=\\"link\\" href=\\"/app/folders\\"><slot name=\\"icon\\"></slot>Browse by Folder<!----></a>"`
+            `"<a class=\\"link\\" href=\\"/app/folders\\"><slot name=\\"icon\\"></slot><!---->Browse by Folder</a>"`
         );
     });
 

@@ -15,8 +15,8 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { PropertyDeclarations, TemplateResult } from "lit-element";
-import { LitElement, html, css } from "lit-element";
+import type { PropertyDeclarations, TemplateResult } from "lit";
+import { LitElement, html, css } from "lit";
 import type { Song } from "../../types";
 import type { PlayQueueState } from "../music/PlayQueueState";
 

@@ -15,8 +15,8 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { TemplateResult, PropertyDeclarations } from "lit-element";
-import { LitElement, css, html } from "lit-element";
+import type { TemplateResult, PropertyDeclarations } from "lit";
+import { LitElement, css, html } from "lit";
 import { router } from "../../router";
 
 // By importing the SVG image like this, webpack can hash its filename and put

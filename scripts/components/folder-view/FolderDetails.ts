@@ -15,8 +15,8 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { PropertyDeclarations, TemplateResult } from "lit-element";
-import { css, html, LitElement } from "lit-element";
+import type { PropertyDeclarations, TemplateResult } from "lit";
+import { css, html, LitElement } from "lit";
 import { until } from "lit-html/directives/until";
 import { NetworkError } from "../../api/NetworkError";
 import { getFolder } from "../../api/rest-querier";

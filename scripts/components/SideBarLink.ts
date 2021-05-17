@@ -15,8 +15,8 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { PropertyDeclarations, TemplateResult } from "lit-element";
-import { html, LitElement, css } from "lit-element";
+import type { PropertyDeclarations, TemplateResult } from "lit";
+import { html, LitElement, css } from "lit";
 import { router } from "../router";
 
 const getFullURI = (uri: string): string => router.link(uri);

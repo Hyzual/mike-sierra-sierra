@@ -15,8 +15,8 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { TemplateResult } from "lit-element";
-import { LitElement, html, css } from "lit-element";
+import type { TemplateResult } from "lit";
+import { LitElement, html, css } from "lit";
 import { router } from "../router";
 import "./SideBarLink";
 import "./folder-view/FolderDetails";
