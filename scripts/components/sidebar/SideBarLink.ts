@@ -48,10 +48,11 @@ export class SideBarLink extends LitElement {
     `;
 
     render(): TemplateResult {
-        return html`<a href="${getFullURI(this.uri)}" @click="${
-            this.navigate
-        }" class="link"
-            ><slot></slot></i>${this.label}</a
+        return html`<a
+            href="${getFullURI(this.uri)}"
+            @click="${this.navigate}"
+            class="link"
+            ><slot></slot>${this.label}</a
         >`;
     }
 

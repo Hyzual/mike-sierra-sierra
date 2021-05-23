@@ -20,6 +20,7 @@ import { LitElement, html, css } from "lit";
 import { router } from "../router";
 import "./sidebar/SidebarMenu";
 import "./sidebar/SideBarLink";
+import "./sidebar/FolderIcon";
 import "./folder-view/FolderDetails";
 import "./folder-view/FoldersList";
 import "./folder-view/FolderCover";

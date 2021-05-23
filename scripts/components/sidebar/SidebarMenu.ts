@@ -20,6 +20,7 @@ import { css, html, LitElement, svg } from "lit";
 import { unsafeSVG } from "lit/directives/unsafe-svg";
 import home_icon from "@glyphs/core/duo/house.svg";
 import music_note_icon from "@glyphs/core/duo/music-note.svg?raw";
+import folder_open_icon from "@glyphs/core/duo/folder-open.svg";
 
 const scaleIcon = (icon_svg: string): string =>
     icon_svg
@@ -70,11 +71,9 @@ class SidebarMenu extends LitElement {
                 </li>
                 <li>
                     <mss-side-bar-link uri="folders" label="Browse by Folder">
-                        <i
-                            class="fa fa-fw fa-folder mss-button-icon"
-                            aria-hidden="true"
-                            slot="icon"
-                        ></i>
+                        <mss-folder-icon
+                            .src=${folder_open_icon}
+                        ></mss-folder-icon>
                     </mss-side-bar-link>
                 </li>
                 <li>
