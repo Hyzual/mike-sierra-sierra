@@ -13,11 +13,11 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-      - name: Check out the code
-        uses: actions/checkout@v2.3.4
-
       - name: Install Nix
         uses: cachix/install-nix-action@v13
+
+      - name: Check out the code
+        uses: actions/checkout@v2.3.4
 
       - name: Install go from Nix
         run: nix-env --file tools/nix/go-build-tools.nix --install
@@ -55,11 +55,11 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-      - name: Check out the code
-        uses: actions/checkout@v2.3.4
-
       - name: Install Nix
         uses: cachix/install-nix-action@v13
+
+      - name: Check out the code
+        uses: actions/checkout@v2.3.4
 
       - name: Install npm from Nix
         run: nix-env --file tools/nix/npm-build-tools.nix --install
@@ -89,14 +89,14 @@ jobs:
     name: Test Docker image
     runs-on: ubuntu-20.04
     steps:
-      - name: Install goss and dgoss
-        uses: e1himself/goss-installation-action@v1.0.3
-        with:
-          # Goss release version to install
-          version: 'v0.3.16'
+      - name: Install Nix
+        uses: cachix/install-nix-action@v13
 
       - name: Check out the code
         uses: actions/checkout@v2.3.4
+
+      - name: Install goss and dgoss from Nix
+        run: nix-env --file tools/nix/docker-build-tools.nix --install
 
       - name: Build the Docker image
         uses: docker/build-push-action@v2.5.0

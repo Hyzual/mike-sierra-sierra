@@ -5,6 +5,7 @@ pkgs.mkShell {
         (import ./tools/nix/general-build-tools.nix { inherit pkgs; }) ++
         (import ./tools/nix/go.nix { inherit pkgs; }) ++
         (import ./tools/nix/npm.nix { inherit pkgs; }) ++
+        (import ./tools/nix/goss.nix { inherit pkgs; }) ++
         (import ./tools/nix/dev-tools.nix { inherit pkgs; });
 
     # Use the SSH client provided by the system (FHS only) to avoid issues with Fedora default settings
