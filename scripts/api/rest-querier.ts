@@ -26,12 +26,11 @@ const wrapError = (e: unknown): Error =>
 export const getFolder = (
     uri: string
 ): ResultAsync<Folder, Error | NetworkError> => {
-    return getAPI(
-        `/api/folders/${encodeURIComponent(uri)}`
-    ).andThen((response) =>
-        ResultAsync.fromPromise(response.json(), wrapError).mapErr((error) =>
-            ono(error, "Could not decode JSON into Folder")
-        )
+    return getAPI(`/api/folders/${encodeURIComponent(uri)}`).andThen(
+        (response) =>
+            ResultAsync.fromPromise(response.json(), wrapError).mapErr(
+                (error) => ono(error, "Could not decode JSON into Folder")
+            )
     );
 };
 
