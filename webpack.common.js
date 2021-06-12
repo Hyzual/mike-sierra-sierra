@@ -60,16 +60,24 @@ const css_rule = {
     use: [MiniCssExtractPlugin.loader, "css-loader"],
 };
 
+const svg_regexp = /\.svg$/;
+
 const svg_separate_file_rule = {
-    test: /\.svg$/,
+    test: svg_regexp,
     type: "asset/resource",
     generator: {
         filename: "css-assets/[name]-[hash][ext][query]",
     },
 };
 
-const svg_inline_rule = {
-    test: /\.svg$/,
+const svg_data_uri_rule = {
+    test: svg_regexp,
+    resourceQuery: /data/,
+    type: "asset/inline",
+};
+
+const svg_raw_rule = {
+    test: svg_regexp,
     resourceQuery: /raw/,
     type: "asset/source",
 };
@@ -87,7 +95,8 @@ const configuration = {
             typescript_rule,
             css_rule,
             svg_separate_file_rule,
-            svg_inline_rule,
+            svg_data_uri_rule,
+            svg_raw_rule,
         ],
     },
     plugins: [

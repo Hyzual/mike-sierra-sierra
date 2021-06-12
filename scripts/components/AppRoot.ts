@@ -20,7 +20,7 @@ import { LitElement, html, css } from "lit";
 import { router } from "../router";
 import "./sidebar/SidebarMenu";
 import "./sidebar/SideBarLink";
-import "./sidebar/FolderIcon";
+import "./sidebar/Icon";
 import "./folder-view/FolderDetails";
 import "./folder-view/FoldersList";
 import "./folder-view/FolderCover";
@@ -44,7 +44,7 @@ class AppRoot extends LitElement {
         this.play_queue = new PlayQueueState();
 
         router
-            .on(() => {
+            .on("/", () => {
                 this.current_page = DEFAULT_PAGE;
             })
             .on("/play-queue", () => {

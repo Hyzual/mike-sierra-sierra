@@ -49,7 +49,7 @@ describe(`SideBarLink`, () => {
                 link.shadowRoot?.querySelector("a")?.outerHTML
             )
         ).toMatchInlineSnapshot(
-            `"<a class=\\"link\\" href=\\"/app/folders\\"><slot name=\\"icon\\"></slot><!---->Browse by Folder</a>"`
+            `"<a href=\\"/app/folders\\"><slot></slot><!---->Browse by Folder</a>"`
         );
     });
 

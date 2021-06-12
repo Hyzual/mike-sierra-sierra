@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2020  Joris MASSON
+ *   Copyright (C) 2020-2021  Joris MASSON
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU Affero General Public License as published by
@@ -16,6 +16,11 @@
  */
 
 declare module "*.svg" {
+    const content: string;
+    export default content;
+}
+
+declare module "*.svg?data" {
     const content: string;
     export default content;
 }

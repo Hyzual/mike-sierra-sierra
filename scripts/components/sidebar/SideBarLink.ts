@@ -33,25 +33,23 @@ export class SideBarLink extends LitElement {
     }
 
     static readonly styles = css`
-        .link {
+        a {
             display: block;
             padding: 4px 8px;
             border-left: 4px solid transparent;
             color: var(--dark-accent-color);
         }
 
-        .link:active,
-        .link:hover {
+        a:focus,
+        a:active,
+        a:hover {
             border-left-color: var(--light-accent-color);
             color: var(--lighter-dark-accent-color);
         }
     `;
 
     render(): TemplateResult {
-        return html`<a
-            href="${getFullURI(this.uri)}"
-            @click="${this.navigate}"
-            class="link"
+        return html`<a href="${getFullURI(this.uri)}" @click="${this.navigate}"
             ><slot></slot>${this.label}</a
         >`;
     }

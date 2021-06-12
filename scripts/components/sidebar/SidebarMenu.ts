@@ -15,97 +15,92 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { TemplateResult } from "lit";
-import { css, html, LitElement, svg } from "lit";
-import { unsafeSVG } from "lit/directives/unsafe-svg";
-import home_icon from "@glyphs/core/duo/house.svg";
-import music_note_icon from "@glyphs/core/duo/music-note.svg?raw";
-import folder_open_icon from "@glyphs/core/duo/folder-open.svg";
+import type { Hybrids } from "hybrids";
+import { define, html } from "hybrids";
+import home_icon from "@glyphs/core/path/house.svg?raw";
+import music_note_icon from "@glyphs/core/path/music-note.svg?raw";
+import folder_open_icon from "@glyphs/core/path/folder-open.svg?raw";
+import image_one_icon from "@glyphs/core/path/image-1.svg?raw";
+import user_circle_icon from "@glyphs/core/path/user-circle.svg?raw";
+import tags_icon from "@glyphs/core/path/tags.svg?raw";
 
-const scaleIcon = (icon_svg: string): string =>
-    icon_svg
-        .replace(/width="80"/, 'width="24"')
-        .replace(/height="80"/, 'height="24"');
+type SidebarMenu = Record<never, string>;
 
-class SidebarMenu extends LitElement {
-    static readonly styles = css`
-        .title {
-            margin: 8px 0 0 12px;
-            font-size: 20px;
-        }
-
-        .menu {
-            margin: 8px 0 0;
-            padding: 0;
-            list-style: none;
-        }
-
-        .icon {
-            position: relative;
-            top: 6px;
-            width: 24px;
-            margin: 0 4px 0 0;
-        }
-    `;
-
-    render(): TemplateResult {
-        // const home_icon_svg = svg`${unsafeSVG(home_icon)}`;
-        const music_note_svg = svg`${unsafeSVG(scaleIcon(music_note_icon))}`;
-
+const SidebarMenu: Hybrids<SidebarMenu> = {
+    render: () => {
         return html`<section>
-            <h3 class="title">Music</h3>
-            <ul class="menu">
-                <li>
-                    <mss-side-bar-link uri="/" label="Home">
-                        <img
-                            class="icon"
-                            src="${home_icon}"
-                            aria-hidden="true"
-                        />
-                    </mss-side-bar-link>
-                </li>
-                <li>
-                    <mss-side-bar-link uri="/" label="All Songs">
-                        ${music_note_svg}
-                    </mss-side-bar-link>
-                </li>
-                <li>
-                    <mss-side-bar-link uri="folders" label="Browse by Folder">
-                        <mss-folder-icon
-                            .src=${folder_open_icon}
-                        ></mss-folder-icon>
-                    </mss-side-bar-link>
-                </li>
-                <li>
-                    <mss-side-bar-link uri="/" label="Albums">
-                        <i
-                            class="fa fa-fw fa-picture-o mss-button-icon"
-                            aria-hidden="true"
-                            slot="icon"
-                        ></i>
-                    </mss-side-bar-link>
-                </li>
-                <li>
-                    <mss-side-bar-link uri="/" label="Artists">
-                        <i
-                            class="fa fa-fw fa-user-circle mss-button-icon"
-                            aria-hidden="true"
-                            slot="icon"
-                        ></i>
-                    </mss-side-bar-link>
-                </li>
-                <li>
-                    <mss-side-bar-link uri="/" label="Genres">
-                        <i
-                            class="fa fa-fw fa-tags mss-button-icon"
-                            aria-hidden="true"
-                            slot="icon"
-                        ></i>
-                    </mss-side-bar-link>
-                </li>
-            </ul>
-        </section> `;
-    }
-}
+                <h3 class="title">Music</h3>
+                <ul class="menu">
+                    <li>
+                        <mss-side-bar-link uri="/" label="Home">
+                            <mss-icon
+                                class="icon"
+                                src="${home_icon}"
+                            ></mss-icon>
+                        </mss-side-bar-link>
+                    </li>
+                    <li>
+                        <mss-side-bar-link uri="/" label="All Songs">
+                            <mss-icon
+                                class="icon"
+                                src="${music_note_icon}"
+                            ></mss-icon>
+                        </mss-side-bar-link>
+                    </li>
+                    <li>
+                        <mss-side-bar-link
+                            uri="folders"
+                            label="Browse by Folder"
+                        >
+                            <mss-icon
+                                class="icon"
+                                src="${folder_open_icon}"
+                            ></mss-icon>
+                        </mss-side-bar-link>
+                    </li>
+                    <li>
+                        <mss-side-bar-link uri="/" label="Albums">
+                            <mss-icon
+                                class="icon"
+                                src="${image_one_icon}"
+                            ></mss-icon>
+                        </mss-side-bar-link>
+                    </li>
+                    <li>
+                        <mss-side-bar-link uri="/" label="Artists">
+                            <mss-icon
+                                class="icon"
+                                src="${user_circle_icon}"
+                            ></mss-icon>
+                        </mss-side-bar-link>
+                    </li>
+                    <li>
+                        <mss-side-bar-link uri="/" label="Genres">
+                            <mss-icon
+                                class="icon"
+                                src="${tags_icon}"
+                            ></mss-icon>
+                        </mss-side-bar-link>
+                    </li>
+                </ul>
+            </section>
+            <style>
+                .title {
+                    margin: 8px 0 0 12px;
+                    font-size: 20px;
+                }
 
-customElements.define("mss-sidebar-menu", SidebarMenu);
+                .menu {
+                    margin: 8px 0 0;
+                    padding: 0;
+                    list-style: none;
+                }
+
+                .icon {
+                    margin: 0 4px 0 0;
+                }
+            </style>`;
+    },
+};
+
+define("mss-sidebar-menu", SidebarMenu);

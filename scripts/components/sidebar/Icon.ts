@@ -18,22 +18,24 @@
 import type { Hybrids } from "hybrids";
 import { define, html } from "hybrids";
 
-interface FolderIcon {
+interface Icon {
     src: string;
 }
 
-export const FolderIcon: Hybrids<FolderIcon> = {
+const Icon: Hybrids<Icon> = {
     src: "",
     render: (host) => {
-        return html`<img src="${host.src}" /><style>
-                img {
-                    position: relative;
-                    top: 6px;
+        return html`<style>
+                svg {
                     width: 24px;
-                    margin: 0 4px 0 0;
+                    height: 24px;
                 }
-            </style>`;
+                path {
+                    stroke: var(--dark-accent-color);
+                    stroke-width: 3px;
+                }</style
+            ><i innerHTML="${host.src}"></i>`;
     },
 };
 
-define("mss-folder-icon", FolderIcon);
+define("mss-icon", Icon);
