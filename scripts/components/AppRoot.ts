@@ -19,7 +19,7 @@ import type { PropertyDeclarations, TemplateResult } from "lit";
 import { LitElement, html, css } from "lit";
 import { router } from "../router";
 import "./sidebar/SidebarMenu";
-import "./sidebar/SideBarLink";
+import "./sidebar/SidebarLink";
 import "./sidebar/Icon";
 import "./folder-view/FolderDetails";
 import "./folder-view/FoldersList";

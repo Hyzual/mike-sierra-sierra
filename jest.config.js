@@ -51,7 +51,7 @@ module.exports = {
 
     // Transpile lit for tests because it uses ES modules
     transformIgnorePatterns: [
-        "/node_modules/(?!(lit|@lit/reactive-element)).+\\.js",
+        "/node_modules/(?!(lit|@lit/reactive-element|hybrids)).+\\.js",
     ],
 
     moduleNameMapper: {

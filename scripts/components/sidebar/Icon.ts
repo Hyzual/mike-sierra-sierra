@@ -22,6 +22,8 @@ interface Icon {
     src: string;
 }
 
+//TODO: self-XSS because I can set the src property ?
+//TODO: should accept an icon name and translate to the correct SVG.
 const Icon: Hybrids<Icon> = {
     src: "",
     render: (host) => {

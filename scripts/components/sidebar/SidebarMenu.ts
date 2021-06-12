@@ -32,23 +32,23 @@ const SidebarMenu: Hybrids<SidebarMenu> = {
                 <h3 class="title">Music</h3>
                 <ul class="menu">
                     <li>
-                        <mss-side-bar-link uri="/" label="Home">
+                        <mss-sidebar-link uri="/" label="Home">
                             <mss-icon
                                 class="icon"
                                 src="${home_icon}"
                             ></mss-icon>
-                        </mss-side-bar-link>
+                        </mss-sidebar-link>
                     </li>
                     <li>
-                        <mss-side-bar-link uri="/" label="All Songs">
+                        <mss-sidebar-link uri="/" label="All Songs">
                             <mss-icon
                                 class="icon"
                                 src="${music_note_icon}"
                             ></mss-icon>
-                        </mss-side-bar-link>
+                        </mss-sidebar-link>
                     </li>
                     <li>
-                        <mss-side-bar-link
+                        <mss-sidebar-link
                             uri="folders"
                             label="Browse by Folder"
                         >
@@ -56,31 +56,31 @@ const SidebarMenu: Hybrids<SidebarMenu> = {
                                 class="icon"
                                 src="${folder_open_icon}"
                             ></mss-icon>
-                        </mss-side-bar-link>
+                        </mss-sidebar-link>
                     </li>
                     <li>
-                        <mss-side-bar-link uri="/" label="Albums">
+                        <mss-sidebar-link uri="/" label="Albums">
                             <mss-icon
                                 class="icon"
                                 src="${image_one_icon}"
                             ></mss-icon>
-                        </mss-side-bar-link>
+                        </mss-sidebar-link>
                     </li>
                     <li>
-                        <mss-side-bar-link uri="/" label="Artists">
+                        <mss-sidebar-link uri="/" label="Artists">
                             <mss-icon
                                 class="icon"
                                 src="${user_circle_icon}"
                             ></mss-icon>
-                        </mss-side-bar-link>
+                        </mss-sidebar-link>
                     </li>
                     <li>
-                        <mss-side-bar-link uri="/" label="Genres">
+                        <mss-sidebar-link uri="/" label="Genres">
                             <mss-icon
                                 class="icon"
                                 src="${tags_icon}"
                             ></mss-icon>
-                        </mss-side-bar-link>
+                        </mss-sidebar-link>
                     </li>
                 </ul>
             </section>
