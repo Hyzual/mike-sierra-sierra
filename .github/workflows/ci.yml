@@ -17,7 +17,7 @@ jobs:
         uses: cachix/install-nix-action@v13
 
       - name: Check out the code
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v2.4.0
 
       - name: Install go from Nix
         run: nix-env --file tools/nix/go-build-tools.nix --install
@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Check out the code
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v2.4.0
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2.5.2
@@ -59,7 +59,7 @@ jobs:
         uses: cachix/install-nix-action@v13
 
       - name: Check out the code
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v2.4.0
 
       - name: Install npm from Nix
         run: nix-env --file tools/nix/npm-build-tools.nix --install
@@ -93,7 +93,7 @@ jobs:
         uses: cachix/install-nix-action@v13
 
       - name: Check out the code
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v2.4.0
 
       - name: Install goss and dgoss from Nix
         run: nix-env --file tools/nix/docker-build-tools.nix --install
@@ -117,7 +117,7 @@ jobs:
     if: ${{ github.ref == 'refs/heads/master' && github.event_name == 'push' }}
     steps:
       - name: Check out the code
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v2.4.0
 
       - name: Login to DockerHub
         uses: docker/login-action@v1
