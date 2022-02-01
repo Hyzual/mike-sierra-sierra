@@ -99,7 +99,7 @@ jobs:
         run: nix-env --file tools/nix/docker-build-tools.nix --install
 
       - name: Build the Docker image
-        uses: docker/build-push-action@v2.5.0
+        uses: docker/build-push-action@v2.8.0
         with:
           context: .
           file: ./Dockerfile
@@ -129,7 +129,7 @@ jobs:
         uses: docker/setup-buildx-action@v1
 
       - name: Build and push the production image
-        uses: docker/build-push-action@v2.5.0
+        uses: docker/build-push-action@v2.8.0
         with:
           push: true
           tags: hyzual/mike-sierra-sierra:latest
